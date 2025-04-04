@@ -2,6 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { Link } from "react-router";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -30,6 +31,7 @@ function App() {
         </div>
         <p>{greetMsg}</p>
       </header>
+      <Link to="/test">To test!</Link>
     </div>
   );
 }
