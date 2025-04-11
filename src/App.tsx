@@ -1,51 +1,55 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import { Link } from "react-router";
+import File from "./components/functional/File";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-  const [projectNames, setProjectNames] = useState<string[]>([]);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  const createNewProject = (name: string) => {
+    //TODO: Implement create new Folder
+    //TODO: Check if name already exists
+    console.log("Create new project"+name);
+    readProjectFolder();
   }
 
   const readProjectFolder = async () => {
-    const projectPaths: string[] = await invoke("open_folder", {path: "./projects"}) || [];
+    const projectPaths: string[] = await invoke("open_folder", { path: "./projects" }) || [];
     const projectFileNames = projectPaths.map((path) => path.split("/").pop());
     //Remove undefined values
     const filteredProjectFileNames = projectFileNames.filter((name) => name !== undefined);
-    console.log("Project file names:", filteredProjectFileNames);
     setProjectNames(filteredProjectFileNames);
   }
 
+  const [projectNames, setProjectNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    readProjectFolder();
+
+  }, []);
+
+  console.log("names", projectNames)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={reactLogo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <div>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <button onClick={greet}>Greet</button>
-        </div>
-        <p>{greetMsg}</p>
-      </header>
-      <Link to="/test">To test!</Link>
-      <button onClick={readProjectFolder}>Open Folder</button>
-      <h1>Projects</h1>
-      {projectNames.map((projectName, index) => <Link to={`/projects/${projectName}`} ><div key={index}>{projectName}</div></Link>)}
-    </div>
+    <>
+      <h1 className="mb-12 text-center">Projects</h1>
+      <div className="App flex flex-wrap">
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+        <File name="New project" isFolder={true} />
+
+        {projectNames.map((projectName, index) => <Link to={`/projects/${projectName}`} ><File key={index} name={projectName} isFolder/></Link>)}
+      </div>
+    </>
   );
 }
 
