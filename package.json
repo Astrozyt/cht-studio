@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@bpmn-io/form-js-editor": "^1.15.1",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-menubar": "^1.1.7",

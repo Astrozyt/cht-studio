@@ -27,16 +27,16 @@ const File = ({ isFolder, name }: FileProps) => {
             <CardContent className="flex justify-around">{isFolder ? <Folder /> : <FileSpreadsheet />}</CardContent>
 
             <CardFooter className="text-center px-0">
-                <Button variant="ghost" className="w-1/3 border-t" onClick={()=>{navigate(`projects/${name}/emulate`)}}>
+                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${name}/emulate`) }}>
                     <Play />
                 </Button>
                 <Separator className="h-8" orientation="vertical" />
-                <Button variant="ghost" className="w-1/3 border-t" onClick={()=>{navigate(`projects/${name}/overview`)}}>
+                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${name}`) }}>
                     <Edit />
                 </Button>
                 <Separator className="h-8" orientation="vertical" />
-                <Button variant="ghost" onClick={()=>setIsOpen(true)}className="w-1/3 border-t">
-                   <Trash />
+                <Button variant="ghost" onClick={() => setIsOpen(true)} className="w-1/3 border-t">
+                    <Trash />
                 </Button>
 
                 <AlertDialog open={isOpen}>
@@ -49,7 +49,7 @@ const File = ({ isFolder, name }: FileProps) => {
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel onClick={()=>{setIsOpen(false)}}>Back</AlertDialogCancel>
+                            <AlertDialogCancel onClick={() => { setIsOpen(false) }}>Back</AlertDialogCancel>
                             <AlertDialogAction onClick={() => { handleDelete(name) }}>Delete</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
