@@ -3,17 +3,13 @@ import { invoke } from "@tauri-apps/api/core";
 
 import { Link } from "react-router";
 import File from "../../components/functional/File";
+import NewProjectDialog from "./components/NewProjectDialog";
+import { Button } from "@/components/ui/button";
+import { Menubar } from "@/components/ui/menubar";
 
-function Projects() {
+const Projects = () => {
 
-    const createNewProject = (name: string) => {
-        //TODO: Implement create new Folder
-        //TODO: Check if name already exists
-        console.log("Create new project" + name);
-        readProjectFolder();
-    }
-
-    const readProjectFolder = async () => {
+    const readProjectsFolder = async () => {
         const projectPaths: string[] = await invoke("open_folder", { path: "./projects" }) || [];
         const projectFileNames = projectPaths.map((path) => path.split("/").pop());
         //Remove undefined values
@@ -22,35 +18,25 @@ function Projects() {
     }
 
     const [projectNames, setProjectNames] = useState<string[]>([]);
-
+    const [refreshCount, setRefreshCount] = useState(0);
     useEffect(() => {
-        readProjectFolder();
+        readProjectsFolder();
 
     }, []);
 
-    console.log("names", projectNames)
     return (
         <>
-            <h1 className="mb-12 text-center">Projects</h1>
+            <Menubar>
+                <h1 className="text-center">Projects</h1>
+                <NewProjectDialog updateFolder={readProjectsFolder} />
+                <Button variant="outline" onClick={() => { readProjectsFolder() }} className="">Refresh</Button>
+            </Menubar>
             <div className="App flex flex-wrap">
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-                <File name="New project" isFolder={true} />
-
-                {projectNames.map((projectName, index) => <Link to={`/projects/${projectName}`} ><File key={index} name={projectName} isFolder /></Link>)}
-            </div>
+                {projectNames.map((projectName, index) => <File key={index} name={projectName} isFolder />)}
+            </div >
         </>
     );
 }
+
 
 export default Projects;

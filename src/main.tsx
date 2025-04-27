@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter, Route, Routes } from "react-router";
-import Project from "./components/projects";
+import Project from "./routes/Project";
 import AppLayout from "./components/AppLyout";
 import Emulator from "./components/projects/Emulator";
 import Projects from "./routes/Projects";

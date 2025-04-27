@@ -7,7 +7,7 @@ const AppLayout = () => {
     return (
         <>
             <header className="app-header grid bg-blue-100 grid-cols-12 grid-rows-3 h-12">
-                <h1 className="col-start-2 row-start-2">CHT Studio</h1>
+                <h1 className="col-start-2 col-end-4 row-start-2">CHT Studio</h1>
                 {breadCrumbs.length > 0 && <Breadcrumb className="row-start-2 col-start-5">
                     <BreadcrumbList className="flex-nowrap">
                         <BreadcrumbItem>
@@ -17,9 +17,9 @@ const AppLayout = () => {
                         {breadCrumbs.map((crumb, index) => {
                             const path = `/${breadCrumbs.slice(0, index + 1).join("/")}`;
                             return index + 1 === breadCrumbs.length ?
-                            <BreadcrumbItem key={path}>
-                                {crumb}
-                            </BreadcrumbItem> :
+                                <BreadcrumbItem key={path}>
+                                    {crumb}
+                                </BreadcrumbItem> :
                                 <>
                                     <BreadcrumbItem key={path}>
                                         <Link to={path}>{crumb}</Link>
