@@ -6,6 +6,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/c
 import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
 import { Menubar } from "@/components/ui/menubar";
 import File from "../../components/functional/File";
+import NewFormDialog from "./components/NewFormDialog";
+import FormCard from "./components/FormCard";
 
 enum fileTypes {
   xml = "xml",
@@ -20,25 +22,7 @@ enum fileTypes {
 const Project = () => {
 
   let { projectName } = useParams();
-  const [files, setFiles] = useState<string[]>([]);
   let navigate = useNavigate();
-
-  // const [fileNames, setFileNames] = useState<string[]>([]);
-
-  const readForms = async (path: string) => {
-    console.log("Filesread started!");
-    const files: string[] = await invoke(`list_xml_files`, { path });
-    console.log("Files: ", files);
-    const formFileNames = files.map((fileName) => fileName.split("/").pop());
-    //Remove undefined values
-    const filteredFormFileNames = formFileNames.filter((name) => name !== undefined);
-    setFiles(filteredFormFileNames);
-    return files;
-  }
-
-  useEffect(() => {
-    readForms(`./projects/${projectName}/forms`);
-  }, []);
 
   return (
     <>
@@ -51,31 +35,7 @@ const Project = () => {
           <Button className="w-fit">New Branch</Button>
         </Menubar>
 
-        <Card className="m-4">
-          <CardHeader>
-            <h1>Forms</h1>
-            <Button className="w-fit">New Form</Button>
-            <Button onClick={() => readForms(`./projects/${projectName}/forms`)} className="w-fit">Refresh</Button>
-
-          </CardHeader>
-          <CardContent>
-            <ul>
-              {/*TODO: Add state to these Links! */}
-              {/* <li>Form 1<Link to="forms/form1">Open this form</Link></li>
-              <li>Form 2<Link to="forms/form2">Open this form</Link></li> */}
-              <File name="Form 3" isFolder={false} />
-            </ul>
-            {files.map((form, index) => (
-              <div key={index}>
-
-                <p>{form}</p>
-              </div>
-            ))}
-          </CardContent>
-          <CardFooter>
-
-          </CardFooter>
-        </Card>
+        <FormCard updateView={() => { }} />
 
         <Card className="m-4">
           <Link to="tasks">
@@ -94,7 +54,7 @@ const Project = () => {
           <TabsContent value="connector"><XmlEmulator /></TabsContent>
 
         </Tabs> */}
-        {files.map((file, index) => <p key={index}>{file}</p>)}
+        {/* {files.map((file, index) => <p key={index}>{file}</p>)} */}
       </div >
     </>
   );

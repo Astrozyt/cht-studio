@@ -33,7 +33,11 @@ fn list_xml_files(path: &str) -> Vec<String> {
     if let Ok(entries) = std::fs::read_dir(path) {
         for entry in entries.flatten() {
             if let Ok(metadata) = entry.metadata() {
-                if metadata.is_file() && entry.path().extension().map_or(false, |ext| ext == "xml")
+                if metadata.is_file()
+                    && entry
+                        .path()
+                        .extension()
+                        .map_or(false, |ext| ext == "xml" || ext == "json")
                 {
                     if let Ok(file_path) = entry.path().into_os_string().into_string() {
                         xml_files.push(file_path);
@@ -55,6 +59,14 @@ fn create_folder(name: &str) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn create_json_file(path: &str, content: &str) -> Result<(), String> {
+    if let Err(e) = std::fs::write(path, content) {
+        return Err(format!("Failed to create file: {}", e));
+    }
+    Ok(())
+}
+
 //Function to save xml file
 // #[tauri::command]
 // fn save_xml_file(path: &str, content: &str) -> Result<(), String> {
@@ -72,7 +84,8 @@ pub fn run() {
             open_folder,
             create_folder,
             greet,
-            list_xml_files
+            list_xml_files,
+            create_json_file,
         ])
         // .invoke_handler(tauri::generate_handler![list_xml_files])
         .run(tauri::generate_context!())
