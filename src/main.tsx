@@ -6,7 +6,7 @@ import Project from "./routes/Project";
 import AppLayout from "./components/AppLyout";
 import Emulator from "./components/projects/Emulator";
 import Projects from "./routes/Projects";
-import { XmlConnector, XmlEditor, XmlOverview } from "./components/projects/xml";
+import { XmlConnector, XmlEditor, XmlOverview } from "./components/projects/Formbuilder/xmlSnippets";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

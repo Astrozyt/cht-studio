@@ -9,10 +9,10 @@ import { useNavigate } from "react-router";
 type FileProps = {
     name: string;
     isFolder: boolean;
-
+    isForm?: boolean;
 };
 
-const File = ({ isFolder, name }: FileProps) => {
+const File = ({ isFolder, name, isForm }: FileProps) => {
 
     const handleDelete = (fileName: string) => {
         alert("Deleted " + fileName);
@@ -27,11 +27,11 @@ const File = ({ isFolder, name }: FileProps) => {
             <CardContent className="flex justify-around">{isFolder ? <Folder /> : <FileSpreadsheet />}</CardContent>
 
             <CardFooter className="text-center px-0">
-                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${name}/emulate`) }}>
+                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/' : ''}${name}/emulate`) }}>
                     <Play />
                 </Button>
                 <Separator className="h-8" orientation="vertical" />
-                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${name}`) }}>
+                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/' : ''}${name}`) }}>
                     <Edit />
                 </Button>
                 <Separator className="h-8" orientation="vertical" />

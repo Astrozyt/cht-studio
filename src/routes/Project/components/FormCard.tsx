@@ -58,7 +58,7 @@ const FormCard = ({ updateView }: any) => {
         <CardContent>
             {forms.map((form, index) => (
                 <div key={index}>
-                    <File name={form} isFolder={false} />
+                    <File name={form} isFolder={false} isForm />
 
                 </div>
             ))}
@@ -69,7 +69,17 @@ const FormCard = ({ updateView }: any) => {
                 </ul>
             </div> */}
 
-            <Dropzone onDrop={(i) => { console.log("Worked!", i) }}>
+            <Dropzone onDrop={(i) => {
+                const reader = new FileReader;
+                reader.onload = (e) => {
+                    var contents = e.target?.result;
+                    //TODO: JSON.stringify
+                    console.log("Contents: ", contents);
+                    //TODO: Save via TAuri
+                };
+                //TODO: Validate XML
+
+            }}>
                 {({ getRootProps, getInputProps, isDragActive }) => (
                     <div {...getRootProps({ className: `dropzone w-xl h-20 ${isDragActive && 'bg-green-500' || 'bg-yellow-500'}` })}>
                         <input {...getInputProps()} />
