@@ -31,10 +31,11 @@ const AddQuestionDialog = ({ editQuestionFn, questionData, questionId }: { editQ
             trigger: null,
             choice_filter: null,
             parameters: null,
-            repeat_count: null,
+            repeat_count: undefined,
             image: null,
             audio: null,
-            video: null
+            video: null,
+            options_list: [],
         }
     })
 
@@ -221,9 +222,9 @@ const AddQuestionDialog = ({ editQuestionFn, questionData, questionId }: { editQ
                         <DialogClose asChild>
                             <Button type="button" variant="outline" onClick={() => { }}>Cancel</Button>
                         </DialogClose>
-                        {/* <DialogClose asChild> */}
-                        <Button type="submit" variant="default">Add</Button>
-                        {/* </DialogClose> */}
+                        <DialogClose asChild>
+                            <Button type="submit" variant="default">Add</Button>
+                        </DialogClose>
                     </DialogFooter>
                 </form>
             </Form>

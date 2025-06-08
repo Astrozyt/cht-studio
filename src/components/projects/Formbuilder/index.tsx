@@ -1,95 +1,92 @@
-//Question types according to https://docs.getodk.org/form-question-types/
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { BodyNode } from "@/routes/Project/components/FormCard/extractBody";
 
-import { useState } from "react";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../../ui/table";
-import { Button } from "../../ui/button";
-import { Card } from "../../ui/card";
-import { Question, QuestionTypes } from "./types";
-import { Form, useParams } from "react-router";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import AddQuestionDialog from "./components/AddQuestionDialog";
-
-
-const FormEditor = () => {
-    // const [elements, setElements] = useState([1, 2, 3]);
-
-
-    const [questions, setQuestions] = useState<Question[]>([]);
-
-    const MoveItem = (index: number, moveSize: number) => {
-        //Move element one position
-        const newQuestions = [...questions];
-        newQuestions[index] = questions[index + moveSize];
-        newQuestions[index + moveSize] = questions[index];
-        setQuestions(newQuestions);
-    }
-
-    const editQuestionFn = (question: Question, questionId?: number) => {
-        questionId ?
-            setQuestions(questions.map((q, index) => {
-                if (index === questionId) {
-                    return question;
-                }
-                return q;
-            })) :
-            setQuestions([...questions, question]);
-    }
-
-
-
+export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
     return (
-        <div className="grid grid-cols-[4fr_1fr] gap-1 mx-4">
-            <Card>
-                <Table>
-                    {/* <TableCaption>Edit form {formName} of project {projectName}</TableCaption> */}
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead></TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="w-[100px]">Name</TableHead>
-                            <TableHead>Label</TableHead>
-                            <TableHead>Calculation</TableHead>
-                            <TableHead className="text-right">Trigger</TableHead>
-                            <TableHead>Choice filter</TableHead>
-                            <TableHead>Parameters</TableHead>
-                            <TableHead>Repeat count</TableHead>
-                            <TableHead>Note</TableHead>
-                            <TableHead>Image</TableHead>
-                            <TableHead>Audio</TableHead>
-                            <TableHead>Video</TableHead>
-                            <TableHead></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {questions.map((question: Question, index) => (
-                            //TODO: Implement correctly
-                            <TableRow key={question.name}>
-                                <TableCell>
-                                    {index && <Button onClick={() => {
-                                        MoveItem(index, -1)
-                                    }}>{<ArrowUp />}</Button> || undefined}
-                                    {index + 1 < questions.length && <Button onClick={() => { MoveItem(index, 1) }}><ArrowDown /></Button>
-                                    }</TableCell>
-                                <TableCell className="font-medium">INV001</TableCell>
-                                <TableCell>{question.name}</TableCell>
-                                <TableCell>Credit Card</TableCell>
-                                <TableCell className="text-right">$250.00</TableCell>
-                            </TableRow>
-                        ))}
-                        <TableRow>
-                            <TableCell colSpan={12} className="text-right">
-                                <AddQuestionDialog editQuestionFn={editQuestionFn} questionData={undefined} questionId={undefined} />
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </Card>
-            <Card id="questionChoices">
-                Infos
-            </Card>
+        <div>
+            <h1>Form Editor</h1>
+            {/* Render form model details here */}
+            {/* {formModel ? (
+                <pre>{JSON.stringify(formModel, null, 2)}</pre>
+            ) : (
+                <p>No form model available</p>
+            )} */}
+            <Table>
+                <TableCaption>A list of your recent invoices.</TableCaption>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Tag</TableHead>
+                        <TableHead>Ref</TableHead>
+                        <TableHead>Appearance</TableHead>
+                        <TableHead>Labelref</TableHead>
+                        <TableHead>Items</TableHead>
+                        <TableHead>Children</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {formModel ? formModel.map((item, index) => (
+                        <FormNodeEditor key={index} node={item} level={0} />
+                    )) : (<p>No form model available</p>)}
+                    {/* //     <TableRow key={index}>
+                        //         <TableCell className="font-medium">{item.ref}</TableCell>
+                        //         <TableCell>{item.labels?.en || "Unknown"}</TableCell>
+                        //         <TableCell>{item.hints?.en || "N/A"}</TableCell>
+                        //         <TableCell className="text-right">{item.items ? item.items.map(i => i.value).join(", ") : "N/A"}</TableCell>
+                        //     </TableRow>
+                        // )) : (
+                        //     <TableRow>
+                        //         <TableCell colSpan={4} className="text-center">No form model available</TableCell>
+                        //     </TableRow>
+                        // )} */}
+
+                    {/* Example static row, can be removed */}
+                    {/* <TableRow>
+                        <TableCell className="font-medium">INV001</TableCell>
+                        <TableCell>Paid</TableCell>
+                        <TableCell>Credit Card</TableCell>
+                        <TableCell className="text-right">$250.00</TableCell>
+                    </TableRow> */}
+                </TableBody>
+            </Table>
         </div>
     );
 }
-export default FormEditor;
+
+//This was partially written by AI, but I had to fix it up a bit
+function FormNodeEditor({ node, level }: { node: BodyNode; level: number }) {
+    return (
+        <>
+            <TableRow className="m-1 p-1 border-solid border-black" style={{ marginLeft: `${level * 1}rem` }}>
+                <TableCell><strong>Tag:</strong> {node.tag}</TableCell>
+                <TableCell><strong>Ref:</strong> {node.ref}</TableCell>
+                <TableCell><strong>Appearance:</strong> {node.appearance}</TableCell>
+                <TableCell><strong>LabelRef:</strong> {node.labelRef ?? "(no labelRef)"}</TableCell>
+                <TableCell>
+                    <ul>
+                        {node.items && (
+
+
+                            node.items.map((item, i) => (
+                                <li key={i}>
+                                    Value: {item.value}, LabelRef: {item.labelRef}
+                                </li>
+                            ))
+
+                        )}
+                    </ul>
+                </TableCell>
+                <TableCell><strong>Children:</strong> {node.children && node.children.length > 0 ? node.children.length : "None"}</TableCell>
+
+
+            </TableRow>
+
+            {node.children && node.children.length > 0 && (
+                <>
+                    {node.children.map((child, i) => (
+                        <FormNodeEditor key={i} node={child} level={level + 1} />
+                    ))}
+                </>
+            )}
+        </>
+    );
+}

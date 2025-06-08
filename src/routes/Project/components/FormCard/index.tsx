@@ -1,13 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Menubar } from "@radix-ui/react-menubar";
-import NewFormDialog from "./NewFormDialog";
+import NewFormDialog from "../NewFormDialog";
 import { useCallback, useEffect, useState } from "react";
-import File from "../../../components/functional/File";
+import File from "../../../../components/functional/File";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { useParams } from "react-router";
 import Dropzone, { useDropzone } from 'react-dropzone';
 import { listen } from "@tauri-apps/api/event";
+import { Input } from "@/components/ui/input";
+import { extractITextTranslations } from "./extractTranslations";
+import { extractBinds } from "./extractBinds";
+import { extractInstanceTree } from "./extractInstance";
+import { BodyNode, extractBody } from "./extractBody";
+import { FormEditor } from "@/components/projects/Formbuilder";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -19,7 +25,34 @@ const FormCard = ({ updateView }: any) => {
         updateView();
     })
 
+    // const extractITextTranslations = (xmlString: string): { id: string; lang: string; value: string }[] => {
+    //     const parser = new DOMParser();
+    //     const xmlDoc = parser.parseFromString(xmlString, "text/xml");
 
+    //     const translations = xmlDoc.querySelectorAll("translation");
+
+    //     const result: { id: string; lang: string; value: string }[] = [];
+
+    //     translations.forEach((translation) => {
+    //         const lang = translation.getAttribute("lang") ?? "";
+
+    //         const texts = translation.querySelectorAll("text");
+
+    //         texts.forEach((textEl) => {
+    //             const id = textEl.getAttribute("id") ?? "";
+    //             const valueEl = textEl.querySelector("value");
+    //             const value = valueEl ? valueEl.textContent?.trim() ?? "" : "";
+
+    //             result.push({
+    //                 id,
+    //                 lang,
+    //                 value,
+    //             });
+    //         });
+    //     });
+
+    //     return result;
+    // }
 
     const readForms = async (path: string) => {
         console.log("Filesread started!");
@@ -38,15 +71,20 @@ const FormCard = ({ updateView }: any) => {
 
     const [forms, setForms] = useState<string[]>([]);
     const [waitingForImport, setWaitingForImport] = useState(false);
+    const [importedModel, setImportedModel] = useState<BodyNode[] | null>(null);
 
-    const onDrop = useCallback(acceptedFiles => {
-        console.log("Files dropped: ");
-        // Do something with the files
-        // TODO: Create JSON from XML
-        // TODO: Check if correct format
-        // TODO: Save to folder
-    }, [])
-    // const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("File changed", event);
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const xmlString = e.target?.result;
+                console.log("Contents: ", xmlString);
+
+            }
+        }
+    }
 
 
     return <Card className="m-4">
@@ -70,14 +108,30 @@ const FormCard = ({ updateView }: any) => {
             </div> */}
 
             <Dropzone onDrop={(i) => {
-                const reader = new FileReader;
+                console.log("Files dropped: ", i);
+                const reader = new FileReader();
+                reader.readAsText(i[0]);
+
                 reader.onload = (e) => {
                     var contents = e.target?.result;
-                    //TODO: JSON.stringify
-                    console.log("Contents: ", contents);
+                    if (!contents) {
+                        console.error("No contents found in file");
+                        return;
+                    }
+
+
+                    console.log("Contentsssss: ", contents);
+                    const translations = extractITextTranslations(contents as string);
+                    console.log("Translations: ", translations);
+                    const binds = extractBinds(contents as string);
+                    console.log("Binds: ", binds);
+                    const instance = extractInstanceTree(contents as string);
+                    console.log("Instance: ", instance);
+                    const body = extractBody(contents as string);
+                    console.log("Body: ", body);
                     //TODO: Save via TAuri
+                    setImportedModel(body);
                 };
-                //TODO: Validate XML
 
             }}>
                 {({ getRootProps, getInputProps, isDragActive }) => (
@@ -87,6 +141,10 @@ const FormCard = ({ updateView }: any) => {
                     </div>
                 )}
             </Dropzone>
+
+            {<FormEditor formModel={importedModel} />}
+
+            <Input type="file" accept=".xml" onChange={handleFileChange} className="mt-4 bg-blue-600" />
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
             <NewFormDialog updateFolder={readForms} />
