@@ -1,5 +1,3 @@
-import FormEditor from "@/components/projects/Formbuilder";
-// import FormBuilder from "../../FormBuilder";
 
 
 const XmlOverview = () => {
@@ -38,7 +36,7 @@ const XmlEditor = () => {
 
   return (
     <>
-      <FormEditor />
+      {/* <FormEditor /> */}
       <h1>XML Editor</h1>
     </>
   );
