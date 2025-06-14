@@ -143,26 +143,28 @@ const renderNode = (node: BodyNode, index: number, level: number): JSX.Element =
     // console.log("Rendering Node:", node, "Labels:", node.labels);
     console.log("Node Hints:", node.hints);
     return (
-        <li key={level + "_" + index} className={`border-2 p-2 m-2`} style={{ marginLeft: `${level * 1}rem` }}>
-            <div className="flex space-x-4">
-                <span className="font-bold flex-2">{node.tag}</span>
-                <span className="flex-3">{node.ref}</span>
-                <span className="flex-3">{node.appearance}</span>
+        <li key={level + "_" + index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
+            <div className="flex justify-end w-full space-x-4">
+                <span className="font-bold flex-1 border-r-1">{node.tag}</span>
+                <span className="w-48 overflow-hidden border-r-1 truncate">{node.ref}</span>
+                <span className="w-48 border-r-1">{node.appearance}</span>
 
-                <ul className="flex-2">{node.labels && node.labels.map((label, i) => { return <li key={i}>***{label.lang}: {label.value}</li>; }) || "No Labels"}</ul>
-                <ul className="flex-2">
+                <ul className="w-48 border-r-1">{node.labels && node.labels.map((label, i) => { return <li className="truncate whitespace-nowrap overflow-hidden" key={i}>{label.lang}: {label.value}</li>; }) || "No Labels"}</ul>
+                <ul className="w-48 border-r-1">
                     Items
                     {node.items ? node.items.map((item, i) => <li key={i}>Item: {item.labelRef}</li>) : null}
                 </ul>
-                <ul className="flex-2">
-                    Hints
-                    {node.hints ? node.hints.map((hint, i) => <li key={i}>{hint.lang}: {hint.value}</li>) : "No Hints"}
+                <ul className="w-48 border-r-1">
+                    {/* Hints */}
+                    {node.hints ? node.hints.map((hint, i) => <li className="truncate whitespace-nowrap overflow-hidden" key={i}>{hint.lang}: {hint.value}</li>) : "No Hints"}
                 </ul>
-                <Button className="bg-red-500"><TrashIcon /></Button>
+                <span className="w-20">
+                    <Button className="bg-red-500"><TrashIcon /></Button>
+                </span>
             </div>
 
             {node.children && node.children.length > 0 && (
-                <ul className="ml-4 border-l-2 border-gray-300 pl-2 mt-2 space-y-2">
+                <ul className="border-l-2 border-gray-300 pl-0 mt-2 space-y-2">
                     {node.children.map((child, i) => renderNode(child, i, level + 1))}
                 </ul>
             )}
