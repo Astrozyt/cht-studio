@@ -7,8 +7,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
     const [formData, setFormData] = useState<BodyNode[]>(formModel || []);
-    console.log("Form Model Loaded:", formModel);
-    console.log("Form Data Loaded:", formData);
+    // console.log("Form Model Loaded:", formModel);
+    // console.log("Form Data Loaded:", formData);
 
     useEffect(() => {
         if (formModel) {
@@ -20,10 +20,19 @@ export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
         <div>
             <ul className=" border-2 rounded p-2">
                 <h2>Form Editor (Formname)</h2>
+                <div id="form-editor-header" className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Tag</h3>
+                    <p className="text-sm text-gray-500">Ref</p>
+                    <p className="text-sm text-gray-500">Appearance</p>
+                    <p className="text-sm text-gray-500">Labels</p>
+                    <p className="text-sm text-gray-500">Items</p>
+                    <p className="text-sm text-gray-500">Hints</p>
+                    <p className="text-sm text-gray-500">Actions</p>
+                </div>
                 {formData.map((node, index) => renderNode(node, index, 0))}
 
             </ul>
-            <h1>Form Editor</h1>
+            {/* <h1>Form Editor</h1>
             <Table>
                 <TableCaption>A list of your recent invoices.</TableCaption>
                 <TableHeader>
@@ -41,70 +50,58 @@ export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
                         <FormNodeEditor key={index} node={item} level={0} updateFn={setFormData} prevTree={formData} />
                     )) : (<p>No form model available</p>)}
                 </TableBody>
-            </Table>
+            </Table> */}
         </div>
     );
 }
 
 //This was partially written by AI, but I had to fix it up a bit
-const FormNodeEditor = ({ node, level, updateFn, prevTree }: { node: BodyNode; level: number; updateFn: Dispatch<SetStateAction<BodyNode[]>>; prevTree: BodyNode[] }) => {
+// const FormNodeEditor = ({ node, level, updateFn, prevTree }: { node: BodyNode; level: number; updateFn: Dispatch<SetStateAction<BodyNode[]>>; prevTree: BodyNode[] }) => {
 
-    return (
-        <>
-            <TableRow className="m-1 p-1 border-solid border-black" style={{ marginLeft: `${level * 1}rem` }}>
-                <TableCell><strong>Tag:</strong> {node.tag}</TableCell>
-                <TableCell><strong>Ref:</strong> {node.ref}</TableCell>
-                <TableCell><strong>Appearance:</strong> {node.appearance}</TableCell>
-                <TableCell><strong>LabelRef:</strong> {node.labelRef ?? "(no labelRef)"}</TableCell>
-                <TableCell>
-                    <ul>
-                        {node.items && (
-
-
-                            node.items.map((item, i) => (
-                                <li key={i}>
-                                    Value: {item.value}, LabelRef: {item.labelRef}
-                                </li>
-                            ))
-
-                        )}
-                    </ul>
-                </TableCell>
-                <TableCell><strong>Children:</strong> {node.children && node.children.length > 0 ? node.children.length : "None"}</TableCell>
+//     return (
+//         <>
+//             <TableRow className="m-1 p-1 border-solid border-black" style={{ marginLeft: `${level * 1}rem` }}>
+//                 <TableCell><strong>Tag:</strong> {node.tag}</TableCell>
+//                 <TableCell><strong>Ref:</strong> {node.ref}</TableCell>
+//                 <TableCell><strong>Appearance:</strong> {node.appearance}</TableCell>
+//                 <TableCell><strong>LabelRef:</strong> {node.labelRef ?? "(no labelRef)"}</TableCell>
+//                 <TableCell>
+//                     <ul>
+//                         {node.items && (
 
 
-            </TableRow>
+//                             node.items.map((item, i) => (
+//                                 <li key={i}>
+//                                     Value: {item.itemLabels?.length ?? 0}, LabelRef: {item.labelRef}
+//                                 </li>
+//                             ))
 
-            {node.children && node.children.length > 0 && (
-                <>
-                    {node.children.map((child, i) => (
-                        <FormNodeEditor key={i} node={child} level={level + 1} updateFn={updateFn} prevTree={prevTree} />
-                    ))}
-                </>
-            )}
-            <Button onClick={() => {
-                // Add new node to the tree at the current node
-                const updatedTree = addNodeToTree(prevTree, node.ref || '', testNewNode);
-                console.log("Updated Tree:", updatedTree);
-
-                updateFn(updatedTree);
-            }}>Add New Node</Button>
-
-        </>
-    );
-}
+//                         )}
+//                     </ul>
+//                 </TableCell>
+//                 <TableCell><strong>Children:</strong> {node.children && node.children.length > 0 ? node.children.length : "None"}</TableCell>
 
 
+//             </TableRow>
 
+//             {node.children && node.children.length > 0 && (
+//                 <>
+//                     {node.children.map((child, i) => (
+//                         <FormNodeEditor key={i} node={child} level={level + 1} updateFn={updateFn} prevTree={prevTree} />
+//                     ))}
+//                 </>
+//             )}
+//             <Button onClick={() => {
+//                 // Add new node to the tree at the current node
+//                 const updatedTree = addNodeToTree(prevTree, node.ref || '', testNewNode);
+//                 // console.log("Updated Tree:", updatedTree);
 
-const testNewNode: BodyNode = {
-    tag: "input",
-    ref: "new-node-123",
-    appearance: "text",
-    labelRef: "label-new-node",
-    items: [],
-    children: [],
-};
+//                 updateFn(updatedTree);
+//             }}>Add New Node</Button>
+
+//         </>
+//     );
+// }
 
 
 const addNodeToTree = (
@@ -143,15 +140,23 @@ const addNodeToTree = (
 };
 
 const renderNode = (node: BodyNode, index: number, level: number): JSX.Element => {
+    // console.log("Rendering Node:", node, "Labels:", node.labels);
+    console.log("Node Hints:", node.hints);
     return (
         <li key={level + "_" + index} className={`border-2 p-2 m-2`} style={{ marginLeft: `${level * 1}rem` }}>
             <div className="flex space-x-4">
                 <span className="font-bold flex-2">{node.tag}</span>
                 <span className="flex-3">{node.ref}</span>
                 <span className="flex-3">{node.appearance}</span>
-                <ul className="flex-2">Listlabels</ul>
+
+                <ul className="flex-2">{node.labels && node.labels.map((label, i) => { return <li key={i}>***{label.lang}: {label.value}</li>; }) || "No Labels"}</ul>
                 <ul className="flex-2">
-                    {node.items ? node.items.map((item, i) => <li key={i}>Item: {item.value}</li>) : null}
+                    Items
+                    {node.items ? node.items.map((item, i) => <li key={i}>Item: {item.labelRef}</li>) : null}
+                </ul>
+                <ul className="flex-2">
+                    Hints
+                    {node.hints ? node.hints.map((hint, i) => <li key={i}>{hint.lang}: {hint.value}</li>) : "No Hints"}
                 </ul>
                 <Button className="bg-red-500"><TrashIcon /></Button>
             </div>

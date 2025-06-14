@@ -12,7 +12,7 @@ const NewFormDialog = ({ updateFolder }: any) => {
 
     const createNewForm = async () => {
         const result = await invoke("create_json_file", { path: `./projects/${projectName}/forms/${newFormName}.json`, content: JSON.stringify({}) });
-        console.log("Result", result);
+        // console.log("Result", result);
     }
 
     const [newFormName, setNewFormName] = useState("");

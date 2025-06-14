@@ -14,6 +14,7 @@ import { extractBinds } from "./extractBinds";
 import { extractInstanceTree } from "./extractInstance";
 import { BodyNode, extractBody } from "./extractBody";
 import { FormEditor } from "@/components/projects/Formbuilder";
+import { mergeExtractedData } from "./mergeExtractedData";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -21,43 +22,13 @@ const FormCard = ({ updateView }: any) => {
     let { projectName } = useParams();
 
     listen('tauri://file-drop', (event) => {
-        console.log("File imported", event);
         updateView();
     })
 
-    // const extractITextTranslations = (xmlString: string): { id: string; lang: string; value: string }[] => {
-    //     const parser = new DOMParser();
-    //     const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-
-    //     const translations = xmlDoc.querySelectorAll("translation");
-
-    //     const result: { id: string; lang: string; value: string }[] = [];
-
-    //     translations.forEach((translation) => {
-    //         const lang = translation.getAttribute("lang") ?? "";
-
-    //         const texts = translation.querySelectorAll("text");
-
-    //         texts.forEach((textEl) => {
-    //             const id = textEl.getAttribute("id") ?? "";
-    //             const valueEl = textEl.querySelector("value");
-    //             const value = valueEl ? valueEl.textContent?.trim() ?? "" : "";
-
-    //             result.push({
-    //                 id,
-    //                 lang,
-    //                 value,
-    //             });
-    //         });
-    //     });
-
-    //     return result;
-    // }
 
     const readForms = async (path: string) => {
-        console.log("Filesread started!");
         const files: string[] = await invoke(`list_xml_files`, { path });
-        console.log("Files: ", files);
+        // console.log("Files: ", files);
         const formFileNames = files.map((fileName) => fileName.split("/").pop());
         //Remove undefined values
         const filteredFormFileNames = formFileNames.filter((name) => name !== undefined);
@@ -80,7 +51,7 @@ const FormCard = ({ updateView }: any) => {
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const xmlString = e.target?.result;
-                console.log("Contents: ", xmlString);
+                // console.log("Contents: ", xmlString);
 
             }
         }
@@ -100,15 +71,9 @@ const FormCard = ({ updateView }: any) => {
 
                 </div>
             ))}
-            {/* <div {...getRootProps({ className: `dropzone w-xl h-20 ${isDragActive && 'bg-blue-500' || 'bg-red-500'}` })}>
-                <input {...getInputProps()} />
-                <ul>
-                    {acceptedFiles.map((file) => (<li key={file.path}>{file.path} - {file.size} bytes</li>))}
-                </ul>
-            </div> */}
 
             <Dropzone onDrop={(i) => {
-                console.log("Files dropped: ", i);
+                // console.log("Files dropped: ", i);
                 const reader = new FileReader();
                 reader.readAsText(i[0]);
 
@@ -130,7 +95,8 @@ const FormCard = ({ updateView }: any) => {
                     const body = extractBody(contents as string);
                     console.log("Body: ", body);
                     //TODO: Save via TAuri
-                    setImportedModel(body);
+                    const fullNode = mergeExtractedData(body, translations, [], instance);
+                    setImportedModel(fullNode);
                 };
 
             }}>
@@ -144,7 +110,7 @@ const FormCard = ({ updateView }: any) => {
 
             {<FormEditor formModel={importedModel} />}
 
-            <Input type="file" accept=".xml" onChange={handleFileChange} className="mt-4 bg-blue-600" />
+            {/* <Input type="file" accept=".xml" onChange={handleFileChange} className="mt-4 bg-blue-600" /> */}
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
             <NewFormDialog updateFolder={readForms} />
