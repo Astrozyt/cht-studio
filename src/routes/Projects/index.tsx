@@ -6,6 +6,8 @@ import File from "../../components/functional/File";
 import NewProjectDialog from "./components/NewProjectDialog";
 import { Button } from "@/components/ui/button";
 import { Menubar } from "@/components/ui/menubar";
+import { HelloFromFormbuilder } from '@ght/formbuilder';
+
 
 const Projects = () => {
 
@@ -34,6 +36,7 @@ const Projects = () => {
             <div className="App flex flex-wrap">
                 {projectNames.map((projectName, index) => <File key={index} name={projectName} isFolder />)}
             </div >
+            <HelloFromFormbuilder />
         </>
     );
 }
