@@ -1,14 +1,10 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BodyNode } from "@/routes/Project/components/FormCard/extractBody";
-import { Icon, TrashIcon } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { TrashIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
     const [formData, setFormData] = useState<BodyNode[]>(formModel || []);
-    // console.log("Form Model Loaded:", formModel);
-    // console.log("Form Data Loaded:", formData);
 
     useEffect(() => {
         if (formModel) {
@@ -32,76 +28,9 @@ export const FormEditor = ({ formModel }: { formModel: BodyNode[] | null }) => {
                 {formData.map((node, index) => renderNode(node, index, 0))}
 
             </ul>
-            {/* <h1>Form Editor</h1>
-            <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Tag</TableHead>
-                        <TableHead>Ref</TableHead>
-                        <TableHead>Appearance</TableHead>
-                        <TableHead>Labelref</TableHead>
-                        <TableHead>Items</TableHead>
-                        <TableHead>Children</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {formData ? formData.map((item, index) => (
-                        <FormNodeEditor key={index} node={item} level={0} updateFn={setFormData} prevTree={formData} />
-                    )) : (<p>No form model available</p>)}
-                </TableBody>
-            </Table> */}
         </div>
     );
 }
-
-//This was partially written by AI, but I had to fix it up a bit
-// const FormNodeEditor = ({ node, level, updateFn, prevTree }: { node: BodyNode; level: number; updateFn: Dispatch<SetStateAction<BodyNode[]>>; prevTree: BodyNode[] }) => {
-
-//     return (
-//         <>
-//             <TableRow className="m-1 p-1 border-solid border-black" style={{ marginLeft: `${level * 1}rem` }}>
-//                 <TableCell><strong>Tag:</strong> {node.tag}</TableCell>
-//                 <TableCell><strong>Ref:</strong> {node.ref}</TableCell>
-//                 <TableCell><strong>Appearance:</strong> {node.appearance}</TableCell>
-//                 <TableCell><strong>LabelRef:</strong> {node.labelRef ?? "(no labelRef)"}</TableCell>
-//                 <TableCell>
-//                     <ul>
-//                         {node.items && (
-
-
-//                             node.items.map((item, i) => (
-//                                 <li key={i}>
-//                                     Value: {item.itemLabels?.length ?? 0}, LabelRef: {item.labelRef}
-//                                 </li>
-//                             ))
-
-//                         )}
-//                     </ul>
-//                 </TableCell>
-//                 <TableCell><strong>Children:</strong> {node.children && node.children.length > 0 ? node.children.length : "None"}</TableCell>
-
-
-//             </TableRow>
-
-//             {node.children && node.children.length > 0 && (
-//                 <>
-//                     {node.children.map((child, i) => (
-//                         <FormNodeEditor key={i} node={child} level={level + 1} updateFn={updateFn} prevTree={prevTree} />
-//                     ))}
-//                 </>
-//             )}
-//             <Button onClick={() => {
-//                 // Add new node to the tree at the current node
-//                 const updatedTree = addNodeToTree(prevTree, node.ref || '', testNewNode);
-//                 // console.log("Updated Tree:", updatedTree);
-
-//                 updateFn(updatedTree);
-//             }}>Add New Node</Button>
-
-//         </>
-//     );
-// }
 
 
 const addNodeToTree = (
@@ -140,8 +69,7 @@ const addNodeToTree = (
 };
 
 const renderNode = (node: BodyNode, index: number, level: number): JSX.Element => {
-    // console.log("Rendering Node:", node, "Labels:", node.labels);
-    console.log("Node Hints:", node.hints);
+    // console.log("Rendering binds", node);
     return (
         <li key={level + "_" + index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
             <div className="flex justify-end w-full space-x-4">
@@ -158,6 +86,15 @@ const renderNode = (node: BodyNode, index: number, level: number): JSX.Element =
                     {/* Hints */}
                     {node.hints ? node.hints.map((hint, i) => <li className="truncate whitespace-nowrap overflow-hidden" key={i}>{hint.lang}: {hint.value}</li>) : "No Hints"}
                 </ul>
+                <span className="text-sm w-20 border-r-1">Req: {node.bind.required || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1 overflow-hidden truncate">Rel: {node.bind.relevant || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1">Typ: {node.bind.type || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1 overflow-hidden truncate">Cont: {node.bind.constraint || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1 overflow-hidden truncate">ConstM: {node.bind.constraintMsg || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1">ReadOnly: {node.bind.readonly || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1">Calc: {node.bind.calculate || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1">Preload: {node.bind.preload || "N/A"}</span>
+                <span className="text-sm w-20 border-r-1">PreloadParams: {node.bind.preloadParams || "N/A"}</span>
                 <span className="w-20">
                     <Button className="bg-red-500"><TrashIcon /></Button>
                 </span>

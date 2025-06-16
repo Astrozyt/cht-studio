@@ -95,7 +95,7 @@ const FormCard = ({ updateView }: any) => {
                     const body = extractBody(contents as string);
                     console.log("Body: ", body);
                     //TODO: Save via TAuri
-                    const fullNode = mergeExtractedData(body, translations, [], instance);
+                    const fullNode = mergeExtractedData(body, translations, binds, instance);
                     setImportedModel(fullNode);
                 };
 

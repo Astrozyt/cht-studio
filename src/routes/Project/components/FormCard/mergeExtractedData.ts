@@ -17,8 +17,23 @@ export const mergeExtractedData = (bodyTree: BodyNode[],
         // console.log("--->iTextMap", iTextMap, "Node labelRef", node.labelRef, "iTextKey", iTextKey);
         const labels = iTextMap.filter(item => item.id === iTextKey + ":label");
         const hints = node.hintRef ? iTextMap.filter(item => item.id === node.hintRef) : [];
-        console.log("Hints", node.hintRef, hints);
-
+        // console.log("Hints", node.hintRef, hints);
+        const bindsForNode = binds.find(bind => bind.nodeset === node.ref) || {
+            nodeset: node.ref || "",
+            type: undefined,
+            required: undefined,
+            relevant: undefined,
+            constraint: undefined,
+            constraintMsg: undefined,
+            readonly: undefined, // added readonly attribute
+            calculate: undefined, // added calculate attribute
+            preload: undefined, // added preload attribute
+            preloadParams: undefined // added preloadParams attribute
+        };
+        if (bindsForNode.calculate) {
+            console.log("Found calculate bind for node", node.ref, bindsForNode.calculate);
+        }
+        // console.log("Binds for node", node.ref, bindsForNode);
         const mergedNode: BodyNode = {
             ...node,
 
@@ -36,7 +51,7 @@ export const mergeExtractedData = (bodyTree: BodyNode[],
                 : undefined,
 
             // Merge bind
-            // bind: node.ref ? binds.find(b => b.ref === node.ref) ?? null : null,
+            bind: bindsForNode, // updated to null
 
             // Merge instance
             // instanceValue: node.ref ? instanceMap[node.ref] ?? null : null,
