@@ -12,13 +12,8 @@ export type Bind = {
     preloadParams?: string; // added preloadParams attribute
 };
 
-export const extractBinds = (xmlString: string): Bind[] => {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-
-    const binds = xmlDoc.querySelectorAll("bind");
-    const result: Bind[] = [];
-    binds.forEach((bind) => {
+export const extractBinds = (binds: Iterable<Element>): Bind[] => {
+    const result: Bind[] = Array.from(binds).map((bind) => {
         const nodeset = bind.getAttribute("nodeset") ?? "";
         const type = bind.getAttribute("type") ?? undefined;
         const required = bind.getAttribute("required") ?? undefined;
@@ -29,10 +24,8 @@ export const extractBinds = (xmlString: string): Bind[] => {
         const calculate = bind.getAttribute("calculate") ?? undefined; // added calculate attribute
         const preload = bind.getAttribute("jr:preload") ?? undefined; // added preload attribute
         const preloadParams = bind.getAttribute("jr:preloadParams") ?? undefined; // added preloadParams attribute
-        if (calculate) {
-            console.log("Found calculate bind for nodeset", nodeset, "with expression", calculate);
-        }
-        result.push({
+
+        return {
             nodeset,
             type,
             required,
@@ -43,7 +36,7 @@ export const extractBinds = (xmlString: string): Bind[] => {
             calculate, // added calculate attribute
             preload, // added preload attribute
             preloadParams // added preloadParams attribute
-        });
+        };
     });
     return result;
 

@@ -15,6 +15,7 @@ import { extractInstanceTree } from "./extractInstance";
 import { BodyNode, extractBody } from "./extractBody";
 import { FormEditor } from "@/components/projects/Formbuilder";
 import { mergeExtractedData } from "./mergeExtractedData";
+import { parseXFormDoc } from "@ght/xformparser";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -22,15 +23,14 @@ const FormCard = ({ updateView }: any) => {
     let { projectName } = useParams();
 
     listen('tauri://file-drop', (event) => {
+        console.log("Tauri: File dropped:", event.payload);
         updateView();
     })
 
 
     const readForms = async (path: string) => {
         const files: string[] = await invoke(`list_xml_files`, { path });
-        // console.log("Files: ", files);
         const formFileNames = files.map((fileName) => fileName.split("/").pop());
-        //Remove undefined values
         const filteredFormFileNames = formFileNames.filter((name) => name !== undefined);
         setForms(filteredFormFileNames);
         return files;
@@ -41,21 +41,8 @@ const FormCard = ({ updateView }: any) => {
     }, []);
 
     const [forms, setForms] = useState<string[]>([]);
-    const [waitingForImport, setWaitingForImport] = useState(false);
     const [importedModel, setImportedModel] = useState<BodyNode[] | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("File changed", event);
-        const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const xmlString = e.target?.result;
-                // console.log("Contents: ", xmlString);
-
-            }
-        }
-    }
 
 
     return <Card className="m-4">
@@ -73,7 +60,6 @@ const FormCard = ({ updateView }: any) => {
             ))}
 
             <Dropzone onDrop={(i) => {
-                // console.log("Files dropped: ", i);
                 const reader = new FileReader();
                 reader.readAsText(i[0]);
 
@@ -83,20 +69,9 @@ const FormCard = ({ updateView }: any) => {
                         console.error("No contents found in file");
                         return;
                     }
+                    const fullModel = parseXFormDoc([new DOMParser().parseFromString(contents as string, "text/xml")]);
+                    setImportedModel(fullModel);
 
-
-                    console.log("Contentsssss: ", contents);
-                    const translations = extractITextTranslations(contents as string);
-                    console.log("Translations: ", translations);
-                    const binds = extractBinds(contents as string);
-                    console.log("Binds: ", binds);
-                    const instance = extractInstanceTree(contents as string);
-                    console.log("Instance: ", instance);
-                    const body = extractBody(contents as string);
-                    console.log("Body: ", body);
-                    //TODO: Save via TAuri
-                    const fullNode = mergeExtractedData(body, translations, binds, instance);
-                    setImportedModel(fullNode);
                 };
 
             }}>
@@ -110,12 +85,10 @@ const FormCard = ({ updateView }: any) => {
 
             {<FormEditor formModel={importedModel} />}
 
-            {/* <Input type="file" accept=".xml" onChange={handleFileChange} className="mt-4 bg-blue-600" /> */}
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
             <NewFormDialog updateFolder={readForms} />
             <Button onClick={() => readForms(`./projects/${projectName}/forms`)} className="w-fit">Refresh</Button>
-            <Button onClick={() => { setWaitingForImport(true) }} className="w-fit">Import form</Button>
         </CardFooter>
     </Card>
 };

@@ -1,0 +1,57 @@
+[
+    {
+        "id": "/bp_confirm/age:hint",
+        "lang": "en",
+        "value": "hidden"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/1:label",
+        "lang": "en",
+        "value": "Yes"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/2:label",
+        "lang": "en",
+        "value": "Completely refuses it"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/99:label",
+        "lang": "en",
+        "value": "Considers it"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent:label",
+        "lang": "en",
+        "value": "Does the participant agree to have his/her blood pressure measured now?"
+    },
+    {
+        "id": "/bp_confirm/age:hint",
+        "lang": "se",
+        "value": "hidden"
+    },
+    {
+        "id": "/bp_confirm/age:label",
+        "lang": "se",
+        "value": "-"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/1:label",
+        "lang": "se",
+        "value": "-"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/2:label",
+        "lang": "se",
+        "value": "-"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent/99:label",
+        "lang": "se",
+        "value": "-"
+    },
+    {
+        "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent:label",
+        "lang": "se",
+        "value": "Vill deltagaren att blodtrycket mäts nu?"
+    }
+]
