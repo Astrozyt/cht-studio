@@ -1,21 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Menubar } from "@radix-ui/react-menubar";
-import NewFormDialog from "../NewFormDialog";
-import { useCallback, useEffect, useState } from "react";
-import File from "../../../../components/functional/File";
-import { invoke, isTauri } from "@tauri-apps/api/core";
-import { useParams } from "react-router";
-import Dropzone, { useDropzone } from 'react-dropzone';
-import { listen } from "@tauri-apps/api/event";
-import { Input } from "@/components/ui/input";
-import { extractITextTranslations } from "./extractTranslations";
-import { extractBinds } from "./extractBinds";
-import { extractInstanceTree } from "./extractInstance";
-import { BodyNode, extractBody } from "./extractBody";
 import { FormEditor } from "@/components/projects/Formbuilder";
-import { mergeExtractedData } from "./mergeExtractedData";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { parseXFormDoc } from "@ght/xformparser";
+import { Menubar } from "@radix-ui/react-menubar";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { useEffect, useState } from "react";
+import Dropzone from 'react-dropzone';
+import { useParams } from "react-router";
+import File from "../../../../components/functional/File";
+import NewFormDialog from "../NewFormDialog";
+import { BodyNode } from "./extractBody";
+import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -55,23 +51,28 @@ const FormCard = ({ updateView }: any) => {
             {forms.map((form, index) => (
                 <div key={index}>
                     <File name={form} isFolder={false} isForm />
-
                 </div>
             ))}
 
             <Dropzone onDrop={(i) => {
                 const reader = new FileReader();
+                const fileName = i[0].name;
                 reader.readAsText(i[0]);
 
-                reader.onload = (e) => {
+                reader.onload = async (e) => {
                     var contents = e.target?.result;
+                    console.log("e:", e);
                     if (!contents) {
                         console.error("No contents found in file");
                         return;
                     }
                     const fullModel = parseXFormDoc([new DOMParser().parseFromString(contents as string, "text/xml")]);
                     setImportedModel(fullModel);
-
+                    //TODO: Save the form to the project folder
+                    console.log("Full model extracted:", fullModel);
+                    const saveResult = await writeTextFile(`tauri/projects/${projectName}/forms/${fileName}.json`, contents as string, { baseDir: BaseDirectory.AppLocalData });
+                    // const result = await invoke('save_json_form', { path: `./projects/${projectName}/forms/${fileName}.json`, content: JSON.stringify(fullModel) });
+                    console.log("Form saved:", saveResult);
                 };
 
             }}>
