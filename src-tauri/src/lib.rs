@@ -59,10 +59,44 @@ fn create_folder(name: &str) -> Result<(), String> {
     Ok(())
 }
 
+// #[tauri::command]
+// fn create_json_file(path: &str, content: &str) -> Result<(), String> {
+//     use std::fs;
+//     use std::path::PathBuf;
+//     // use tauri::api::path::app_data_dir;
+
+//     let base_dir =
+//         app_data_dir(&tauri::Config::default()).ok_or("Failed to get app data directory")?;
+//     let mut file_path = PathBuf::from(base_dir);
+//     file_path.push("forms");
+//     file_path.push(path);
+
+//     if let Some(parent) = file_path.parent() {
+//         fs::create_dir_all(parent).map_err(|e| format!("Failed to create directories: {}", e))?;
+//     }
+
+//     fs::write(&file_path, content).map_err(|e| format!("Failed to create file: {}", e))?;
+//     // let path_obj = std::path::Path::new(path);
+//     // if let Some(parent) = path_obj.parent() {
+//     //     if !parent.exists() {
+//     //         if let Err(e) = std::fs::create_dir_all(parent) {
+//     //             return Err(format!("Failed to create directories: {}", e));
+//     //         }
+//     //     }
+//     // } else {
+//     //     return Err("Invalid path: no parent directory found".to_string());
+//     // }
+
+//     // if let Err(e) = std::fs::write(path_obj, content) {
+//     //     return Err(format!("Failed to create file: {}", e));
+//     // }
+//     Ok(())
+// }
+
 #[tauri::command]
-fn create_json_file(path: &str, content: &str) -> Result<(), String> {
+fn save_json_form(path: &str, content: &str) -> Result<(), String> {
     if let Err(e) = std::fs::write(path, content) {
-        return Err(format!("Failed to create file: {}", e));
+        return Err(format!("Failed to save file: {}", e));
     }
     Ok(())
 }
@@ -79,13 +113,15 @@ fn create_json_file(path: &str, content: &str) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
         // .invoke_handler(tauri::generate_handler![greet])
         .invoke_handler(tauri::generate_handler![
             open_folder,
             create_folder,
             greet,
             list_xml_files,
-            create_json_file,
+            // create_json_file,
+            save_json_form,
         ])
         // .invoke_handler(tauri::generate_handler![list_xml_files])
         .run(tauri::generate_context!())
