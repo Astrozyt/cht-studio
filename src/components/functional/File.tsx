@@ -5,17 +5,23 @@ import { Separator } from "../ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { BaseDirectory, remove } from "@tauri-apps/plugin-fs";
 
 type FileProps = {
     name: string;
     isFolder: boolean;
     isForm?: boolean;
+    projectName?: string; // Optional, used for forms
+    updateFn?: (path: string) => void; // Optional, used to refresh the file list after deletion
 };
 
-const File = ({ isFolder, name, isForm }: FileProps) => {
-
-    const handleDelete = (fileName: string) => {
-        alert("Deleted " + fileName);
+const File = ({ projectName, isFolder, name, isForm, updateFn }: FileProps) => {
+    console.log("projectName", projectName);
+    const handleDelete = async (fileName: string) => {
+        const result = await remove(`projects/${projectName}/forms/${fileName}`, { baseDir: BaseDirectory.AppLocalData })
+        //TODO: Feedback with toast or similar
+        console.log("Deleted " + fileName + " result", result);
+        updateFn && updateFn(`projects/${projectName}/forms`);
     }
 
     let navigate = useNavigate();
@@ -50,7 +56,7 @@ const File = ({ isFolder, name, isForm }: FileProps) => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => { setIsOpen(false) }}>Back</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => { handleDelete(name) }}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => { handleDelete(name); setIsOpen(false); }}>Delete</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

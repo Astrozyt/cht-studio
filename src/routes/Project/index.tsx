@@ -1,12 +1,8 @@
-import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate, useNavigation, useParams } from "react-router";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
-import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
 import { Menubar } from "@/components/ui/menubar";
-import File from "../../components/functional/File";
-import NewFormDialog from "./components/NewFormDialog";
+import { Link, useParams } from "react-router";
+import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
+import { Button } from "../../components/ui/button";
+import { Card } from "../../components/ui/card";
 import FormCard from "./components/FormCard";
 
 enum fileTypes {
@@ -22,7 +18,6 @@ enum fileTypes {
 const Project = () => {
 
   let { projectName } = useParams();
-  let navigate = useNavigate();
 
   return (
     <>

@@ -1,17 +1,14 @@
-import { FormEditor } from "@/components/projects/Formbuilder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { parseXFormDoc } from "@ght/xformparser";
 import { Menubar } from "@radix-ui/react-menubar";
-import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { BaseDirectory, readDir, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
 import Dropzone from 'react-dropzone';
 import { useParams } from "react-router";
 import File from "../../../../components/functional/File";
 import NewFormDialog from "../NewFormDialog";
-import { BodyNode } from "./extractBody";
-import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -25,11 +22,10 @@ const FormCard = ({ updateView }: any) => {
 
 
     const readForms = async (path: string) => {
-        const files: string[] = await invoke(`list_xml_files`, { path });
-        const formFileNames = files.map((fileName) => fileName.split("/").pop());
-        const filteredFormFileNames = formFileNames.filter((name) => name !== undefined);
-        setForms(filteredFormFileNames);
-        return files;
+        let files = await readDir(path, { baseDir: BaseDirectory.AppLocalData });
+        console.log("Files in forms folder:", files);
+        const fileNames = files.map(entry => entry.name);
+        setForms(fileNames);
     }
 
     useEffect(() => {
@@ -37,7 +33,7 @@ const FormCard = ({ updateView }: any) => {
     }, []);
 
     const [forms, setForms] = useState<string[]>([]);
-    const [importedModel, setImportedModel] = useState<BodyNode[] | null>(null);
+    // const [importedModel, setImportedModel] = useState<BodyNode[] | null>(null);
 
 
 
@@ -50,7 +46,7 @@ const FormCard = ({ updateView }: any) => {
         <CardContent>
             {forms.map((form, index) => (
                 <div key={index}>
-                    <File name={form} isFolder={false} isForm />
+                    <File projectName={projectName} name={form} isFolder={false} isForm updateFn={readForms} />
                 </div>
             ))}
 
@@ -67,12 +63,13 @@ const FormCard = ({ updateView }: any) => {
                         return;
                     }
                     const fullModel = parseXFormDoc([new DOMParser().parseFromString(contents as string, "text/xml")]);
-                    setImportedModel(fullModel);
-                    //TODO: Save the form to the project folder
+                    // setImportedModel(fullModel);
                     console.log("Full model extracted:", fullModel);
-                    const saveResult = await writeTextFile(`tauri/projects/${projectName}/forms/${fileName}.json`, contents as string, { baseDir: BaseDirectory.AppLocalData });
-                    // const result = await invoke('save_json_form', { path: `./projects/${projectName}/forms/${fileName}.json`, content: JSON.stringify(fullModel) });
+                    const fileNameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
+                    const saveResult = await writeTextFile(`projects/${projectName}/forms/${fileNameWithoutExtension}.json`, contents as string, { baseDir: BaseDirectory.AppLocalData });
+                    // TODO: Give Toast feedback
                     console.log("Form saved:", saveResult);
+                    readForms(`./projects/${projectName}/forms`)
                 };
 
             }}>
@@ -84,11 +81,12 @@ const FormCard = ({ updateView }: any) => {
                 )}
             </Dropzone>
 
-            {<FormEditor formModel={importedModel} />}
+            {/* {<FormEditor formModel={importedModel} />} */}
 
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
             <NewFormDialog updateFolder={readForms} />
+            {/* TODO: Use plugin-fs for reading */}
             <Button onClick={() => readForms(`./projects/${projectName}/forms`)} className="w-fit">Refresh</Button>
         </CardFooter>
     </Card>

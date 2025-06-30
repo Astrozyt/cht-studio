@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { invoke } from "@tauri-apps/api/core";
+import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useState } from "react";
 import { useParams } from "react-router";
 
@@ -11,8 +11,10 @@ const NewFormDialog = ({ updateFolder }: any) => {
 
 
     const createNewForm = async () => {
-        const result = await invoke("create_json_file", { path: `./projects/${projectName}/forms/${newFormName}.json`, content: JSON.stringify({}) });
-        // console.log("Result", result);
+        await writeTextFile(`projects/${projectName}/forms/${newFormName}.json`, JSON.stringify({}), { baseDir: BaseDirectory.AppLocalData });
+        console.log("Form created successfully");
+        //TODO: Toast message
+        updateFolder();
     }
 
     const [newFormName, setNewFormName] = useState("");

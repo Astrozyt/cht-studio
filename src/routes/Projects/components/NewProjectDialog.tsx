@@ -1,13 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { invoke } from "@tauri-apps/api/core";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { BaseDirectory, mkdir } from "@tauri-apps/plugin-fs";
 import { useState } from "react";
 
 const NewProjectDialog = ({ updateFolder }: any) => {
     const createNewFolder = async (name: string) => {
-        const result = await invoke("create_folder", { name: name });
-        console.log("Result", result);
+        mkdir(`projects/${name}/forms`, { recursive: true, baseDir: BaseDirectory.AppLocalData })
+            .then(() => {
+                console.log("Folder created successfully");
+                updateFolder();
+            })
+            .catch((error) => {
+                console.error("Error creating folder:", error);
+            });
     }
 
     const [newProjectName, setNewProjectName] = useState("");

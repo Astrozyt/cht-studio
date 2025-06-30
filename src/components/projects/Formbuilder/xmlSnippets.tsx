@@ -1,4 +1,4 @@
-
+// DELETE THIS FILE IF IT IS NOT USED ANYMORE
 
 const XmlOverview = () => {
   //Get projectName from URL

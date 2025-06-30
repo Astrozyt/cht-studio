@@ -1,8 +1,33 @@
 import { Link } from "react-router";
 import "./App.css";
+import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+import { useState } from "react";
+import { appLocalDataDir } from '@tauri-apps/api/path';
 
 function App() {
-  return <Link to="/projects">Projects</Link>
+  const [result, setResult] = useState<string>("");
+
+  const appDataDirPath = appLocalDataDir();
+  appDataDirPath.then((path) => {
+    console.log("App Data Directory:", path);
+  }).catch((error) => {
+    console.error("Error getting App Data Directory:", error);
+  });
+
+  const resultPromise = writeTextFile("test.txt", "Hello, world!", { baseDir: BaseDirectory.AppLocalData });
+  resultPromise.then(() => {
+    console.log("File written successfully");
+    setResult(resultPromise.toString());
+  }).catch((error) => {
+    console.error("Error writing file:", error);
+    setResult(error.toString());
+  });
+
+  return <><Link to="/projects">Projects</Link>
+    <textarea className="App">
+      {JSON.stringify(result, null, 2)}
+    </textarea>
+  </>;
 
 }
 

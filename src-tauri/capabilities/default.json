@@ -9,6 +9,8 @@
     "core:default",
     "fs:allow-app-write",
     "fs:allow-app-write-recursive",
+    "fs:allow-app-read",
+    "fs:allow-app-read-recursive",
     {
       "identifier": "fs:scope",
       "description": "File system access",
