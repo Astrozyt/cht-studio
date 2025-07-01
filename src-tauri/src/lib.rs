@@ -59,6 +59,17 @@ fn create_folder(name: &str) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn convert_to_xform(json: String) -> Result<String, String> {
+    let parsed: serde_json::Value =
+        serde_json::from_str(&json).map_err(|e| format!("JSON parse error: {}", e))?;
+
+    let xml =
+        xform_to_xml::generate_xform(parsed).map_err(|e| format!("Conversion error: {}", e))?;
+
+    Ok(xml)
+}
+
 // #[tauri::command]
 // fn create_json_file(path: &str, content: &str) -> Result<(), String> {
 //     use std::fs;

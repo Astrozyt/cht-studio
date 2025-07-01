@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src-tauri",
+    "packages/xform_to_xml"
+]

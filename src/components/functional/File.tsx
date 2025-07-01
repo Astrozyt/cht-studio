@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Separator } from "../ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { BaseDirectory, remove } from "@tauri-apps/plugin-fs";
 
 type FileProps = {
@@ -15,7 +15,10 @@ type FileProps = {
     updateFn?: (path: string) => void; // Optional, used to refresh the file list after deletion
 };
 
-const File = ({ projectName, isFolder, name, isForm, updateFn }: FileProps) => {
+const File = ({ isFolder, name, isForm, updateFn }: FileProps) => {
+
+    let { projectName } = useParams();
+
     console.log("projectName", projectName);
     const handleDelete = async (fileName: string) => {
         const result = await remove(`projects/${projectName}/forms/${fileName}`, { baseDir: BaseDirectory.AppLocalData })

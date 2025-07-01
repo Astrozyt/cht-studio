@@ -66,7 +66,7 @@ const FormCard = ({ updateView }: any) => {
                     // setImportedModel(fullModel);
                     console.log("Full model extracted:", fullModel);
                     const fileNameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
-                    const saveResult = await writeTextFile(`projects/${projectName}/forms/${fileNameWithoutExtension}.json`, contents as string, { baseDir: BaseDirectory.AppLocalData });
+                    const saveResult = await writeTextFile(`projects/${projectName}/forms/${fileNameWithoutExtension}.json`, JSON.stringify(fullModel), { baseDir: BaseDirectory.AppLocalData });
                     // TODO: Give Toast feedback
                     console.log("Form saved:", saveResult);
                     readForms(`./projects/${projectName}/forms`)
