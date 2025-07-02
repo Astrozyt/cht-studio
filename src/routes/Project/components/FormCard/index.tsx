@@ -64,9 +64,8 @@ const FormCard = ({ updateView }: any) => {
                     }
                     const fullModel = parseXFormDoc([new DOMParser().parseFromString(contents as string, "text/xml")]);
                     // setImportedModel(fullModel);
-                    console.log("Full model extracted:", fullModel);
-                    const fileNameWithoutExtension = fileName.replace(/\.[^/.]+$/, "");
-                    const saveResult = await writeTextFile(`projects/${projectName}/forms/${fileNameWithoutExtension}.json`, JSON.stringify(fullModel), { baseDir: BaseDirectory.AppLocalData });
+                    console.log("Full model extracted:", fullModel.title);
+                    const saveResult = await writeTextFile(`projects/${projectName}/forms/${fullModel.title}.json`, JSON.stringify(fullModel), { baseDir: BaseDirectory.AppLocalData });
                     // TODO: Give Toast feedback
                     console.log("Form saved:", saveResult);
                     readForms(`./projects/${projectName}/forms`)

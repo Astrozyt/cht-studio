@@ -1,0 +1,1512 @@
+{
+    "title": "Full TestForm",
+    "body": [
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/inputs",
+            "appearance": null,
+            "labelRef": "/bp_confirm/inputs:label",
+            "labels": [
+                {
+                    "id": "/bp_confirm/inputs:label",
+                    "lang": "en",
+                    "value": "Patient"
+                },
+                {
+                    "id": "/bp_confirm/inputs:label",
+                    "lang": "se",
+                    "value": "-"
+                }
+            ],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "children": [
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/inputs/contact",
+                    "appearance": null,
+                    "labelRef": "",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/inputs/contact:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/inputs/contact/_id",
+                            "appearance": "db-object",
+                            "labelRef": "/bp_confirm/inputs/contact/_id:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/inputs/contact/_id:label",
+                                    "lang": "en",
+                                    "value": "What is the patient's name?"
+                                },
+                                {
+                                    "id": "/bp_confirm/inputs/contact/_id:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/inputs/contact/_id:hint",
+                                    "lang": "en",
+                                    "value": "db-object"
+                                },
+                                {
+                                    "id": "/bp_confirm/inputs/contact/_id:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/inputs/contact/_id:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/inputs/contact/_id",
+                                "type": "db:person"
+                            }
+                        },
+                        {
+                            "tag": "group",
+                            "ref": "/bp_confirm/inputs/contact/parent",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/inputs/contact/parent:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/inputs/contact/parent:label",
+                                    "lang": "en",
+                                    "value": "Parent"
+                                },
+                                {
+                                    "id": "/bp_confirm/inputs/contact/parent:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "children": [
+                                {
+                                    "tag": "group",
+                                    "ref": "/bp_confirm/inputs/contact/parent/parent",
+                                    "appearance": null,
+                                    "labelRef": "/bp_confirm/inputs/contact/parent/parent:label",
+                                    "labels": [
+                                        {
+                                            "id": "/bp_confirm/inputs/contact/parent/parent:label",
+                                            "lang": "en",
+                                            "value": "Grandparent"
+                                        },
+                                        {
+                                            "id": "/bp_confirm/inputs/contact/parent/parent:label",
+                                            "lang": "se",
+                                            "value": "-"
+                                        }
+                                    ],
+                                    "hints": [],
+                                    "hintRef": "",
+                                    "items": [],
+                                    "bind": {
+                                        "nodeset": "/bp_confirm/inputs/contact/parent/parent"
+                                    }
+                                }
+                            ],
+                            "bind": {
+                                "nodeset": "/bp_confirm/inputs/contact/parent"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/inputs/contact",
+                        "readonly": "field-list"
+                    }
+                }
+            ],
+            "bind": {
+                "nodeset": "/bp_confirm/inputs",
+                "relevant": "./source = 'user'",
+                "constraintMsg": "jr:itext('/bp_confirm/inputs:jr:constraintMsg')"
+            }
+        },
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/group_clin_assess",
+            "appearance": null,
+            "labelRef": "/bp_confirm/group_clin_assess:label",
+            "labels": [
+                {
+                    "id": "/bp_confirm/group_clin_assess:label",
+                    "lang": "en",
+                    "value": "General Symptom Screening"
+                },
+                {
+                    "id": "/bp_confirm/group_clin_assess:label",
+                    "lang": "se",
+                    "value": "-"
+                }
+            ],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "children": [
+                {
+                    "tag": "select1",
+                    "ref": "/bp_confirm/group_clin_assess/any_symptoms",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/group_clin_assess/any_symptoms:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/group_clin_assess/any_symptoms:label",
+                            "lang": "en",
+                            "value": "Does the participant currently have any medical complaint?"
+                        },
+                        {
+                            "id": "/bp_confirm/group_clin_assess/any_symptoms:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/group_clin_assess/any_symptoms",
+                        "type": "select1",
+                        "required": "true()"
+                    }
+                },
+                {
+                    "tag": "select",
+                    "ref": "/bp_confirm/group_clin_assess/symptoms",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/group_clin_assess/symptoms:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms:label",
+                            "lang": "en",
+                            "value": "What kind of symptoms does the client report. You can also select more than one symptom."
+                        },
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms:hint",
+                            "lang": "en",
+                            "value": "You may select several symptoms"
+                        },
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms:hint",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hintRef": "/bp_confirm/group_clin_assess/symptoms:hint",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/group_clin_assess/symptoms",
+                        "type": "select",
+                        "required": "true()",
+                        "relevant": " /bp_confirm/group_clin_assess/any_symptoms  = '1'"
+                    }
+                },
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/group_clin_assess/other_symptom",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/group_clin_assess/other_symptom:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/group_clin_assess/other_symptom:label",
+                            "lang": "en",
+                            "value": "Specify the symptom:"
+                        },
+                        {
+                            "id": "/bp_confirm/group_clin_assess/other_symptom:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/group_clin_assess/other_symptom",
+                        "type": "string",
+                        "required": "true()",
+                        "relevant": "selected( /bp_confirm/group_clin_assess/symptoms ,'99')"
+                    }
+                },
+                {
+                    "tag": "trigger",
+                    "ref": "/bp_confirm/group_clin_assess/symptoms_warn",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/group_clin_assess/symptoms_warn:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms_warn:label",
+                            "lang": "en",
+                            "value": "The reported symptom is a danger sign. Please refer this client immediately to the health facility, organise transport and call the health facility and your supervisor."
+                        },
+                        {
+                            "id": "/bp_confirm/group_clin_assess/symptoms_warn:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/group_clin_assess/symptoms_warn",
+                        "required": "true()",
+                        "relevant": "(selected( /bp_confirm/group_clin_assess/symptoms ,'1')) or (selected( /bp_confirm/group_clin_assess/symptoms ,'2')) or (selected( /bp_confirm/group_clin_assess/symptoms ,'3')) or (selected( /bp_confirm/group_clin_assess/symptoms ,'4')) or (selected( /bp_confirm/group_clin_assess/symptoms ,'5')) or (selected( /bp_confirm/group_clin_assess/symptoms ,'6'))"
+                    }
+                }
+            ],
+            "bind": {
+                "nodeset": "/bp_confirm/group_clin_assess"
+            }
+        },
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/bp_confirm",
+            "appearance": "field-list",
+            "labelRef": "",
+            "labels": [],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "children": [
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/bp_confirm/bp_consent_equipment",
+                    "appearance": null,
+                    "labelRef": "",
+                    "labels": [],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "select1",
+                            "ref": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available:label",
+                                    "lang": "en",
+                                    "value": "Do you have a functioning blood pressure machine with you?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available",
+                                "type": "select1",
+                                "required": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_consent_equipment/note_missing_bp_machine",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_consent_equipment/note_missing_bp_machine:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/note_missing_bp_machine:label",
+                                    "lang": "en",
+                                    "value": "Finish and submit the form and then call you supervisor to inform him/her that you do not have a functioning blood pressure machine. Tell the participant that you will return and offer a measurement as soon as the blood pressure device is available again."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/note_missing_bp_machine:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment/note_missing_bp_machine",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available ='2' and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available !=''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_information",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_information:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_information:label",
+                                    "lang": "en",
+                                    "value": "Explain the participant that you would like to measure his/her blood pressure. It will not hurt."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_information:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_information",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available ='1' and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available !=''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "select1",
+                            "ref": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent:label",
+                                    "lang": "en",
+                                    "value": "Does the participant agree to have his/her blood pressure measured now?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_consent",
+                                "type": "select1",
+                                "required": "true()",
+                                "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available ='1' and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available !=''"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_refused",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_refused:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_refused:label",
+                                    "lang": "en",
+                                    "value": "Tell the participant that it would be very important to measure the blood pressure. The procedure is not painful. If the participant changes his/her mind go back one question and correct it. Submit this form if he/ she still refuses the measurement."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_refused:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment/bp_refused",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent ='2' or  /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent ='99') and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent !=''",
+                                "readonly": "true()"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bp_confirm/bp_consent_equipment"
+                    }
+                },
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/bp_confirm/bp_measurement",
+                    "appearance": null,
+                    "labelRef": "",
+                    "labels": [],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/bp_setting",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/bp_setting:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/bp_setting:label",
+                                    "lang": "en",
+                                    "value": "Make sure the participant is seated, with the back supported and the arm rested on his/her lap or on a table. Place the cuff around the upper arm. Make sure the patient is sitting without moving and talking during the measurements."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/bp_setting:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/bp_setting",
+                                "type": "string",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/sys_first",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/sys_first:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_first:label",
+                                    "lang": "en",
+                                    "value": "Systolic BP  arm, first measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_first:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/sys_first",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 60 and . < 300",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/sys_first:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/dia_first",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/dia_first:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_first:label",
+                                    "lang": "en",
+                                    "value": "Diastolic BP  arm, first measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_first:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/dia_first",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 40 and . < 180 and .< int( /bp_confirm/bp_confirm/bp_measurement/sys_first )",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/dia_first:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/sys_second",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/sys_second:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_second:label",
+                                    "lang": "en",
+                                    "value": "Systolic BP  arm, second measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_second:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/sys_second",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 60 and . < 300",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/sys_second:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "trigger",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:label",
+                                    "lang": "en",
+                                    "value": "Confirm that the second systolic BP measured was:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:hint",
+                                    "lang": "en",
+                                    "value": "If the value is not correct, adjust it."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_sec"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/dia_second",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/dia_second:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_second:label",
+                                    "lang": "en",
+                                    "value": "Diastolic BP  arm, second measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_second:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/dia_second",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 40 and . < 180 and .< int( /bp_confirm/bp_confirm/bp_measurement/sys_second )",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/dia_second:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "trigger",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:label",
+                                    "lang": "en",
+                                    "value": "Confirm that the second diastolic BP measured was:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:hint",
+                                    "lang": "en",
+                                    "value": "If the value is not correct, adjust it."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_sec"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/sys_third",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/sys_third:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_third:label",
+                                    "lang": "en",
+                                    "value": "Systolic BP  arm, third measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/sys_third:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/sys_third",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 60 and . < 300",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/sys_third:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "trigger",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:label",
+                                    "lang": "en",
+                                    "value": "Confirm that the third systolic BP measured was:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:hint",
+                                    "lang": "en",
+                                    "value": "If the value is not correct, adjust it."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/trigger_sys_third"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/dia_third",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/dia_third:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_third:label",
+                                    "lang": "en",
+                                    "value": "Diastolic BP  arm, third measurement:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/dia_third:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/dia_third",
+                                "type": "int",
+                                "required": "true()",
+                                "constraint": ". > 40 and . < 180 and .< int( /bp_confirm/bp_confirm/bp_measurement/sys_third )",
+                                "constraintMsg": "jr:itext('/bp_confirm/bp_confirm/bp_measurement/dia_third:jr:constraintMsg')"
+                            }
+                        },
+                        {
+                            "tag": "trigger",
+                            "ref": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:label",
+                                    "lang": "en",
+                                    "value": "Confirm that the third diastolic BP measured was:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:hint",
+                                    "lang": "en",
+                                    "value": "If the value is not correct, adjust it."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/bp_measurement/trigger_dia_third"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bp_confirm/bp_measurement",
+                        "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_equipment_consent ='1' and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_equipment_consent !=''"
+                    }
+                },
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/bp_confirm/evaluation",
+                    "appearance": "field-list",
+                    "labelRef": "/bp_confirm/bp_confirm/evaluation:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/bp_confirm/evaluation:label",
+                            "lang": "en",
+                            "value": "Evaluation of measurement"
+                        },
+                        {
+                            "id": "/bp_confirm/bp_confirm/evaluation:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/normal_bp",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/normal_bp:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/normal_bp:label",
+                                    "lang": "en",
+                                    "value": "The participant has a normal blood pressure. No further action is required. Congratulate the participant to the good value and tell him to keep adhering to a healthy life-style with a balanced diet, no smoking and regular physical activity. The blood pressure should be checked again in one year."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/normal_bp:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/normal_bp",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/evaluation/sys_average  < 130 and  /bp_confirm/bp_confirm/evaluation/dia_average  < 85 and  /bp_confirm/bp_confirm/evaluation/sys_average  !='' and  /bp_confirm/bp_confirm/evaluation/dia_average  !=''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/highnormal_bp",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/highnormal_bp:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/highnormal_bp:label",
+                                    "lang": "en",
+                                    "value": "The participant has a highnormal blood pressure. Advice the participant to keep adhering to a healthy life-style with a balanced diet, no smoking and regular physical activity. The blood pressure should be checked again in one year."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/highnormal_bp:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/highnormal_bp",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  < 140 and  /bp_confirm/bp_confirm/evaluation/sys_average  >= 130 and  /bp_confirm/bp_confirm/evaluation/dia_average  < 90) or ( /bp_confirm/bp_confirm/evaluation/dia_average  < 90 and  /bp_confirm/bp_confirm/evaluation/dia_average  >= 85 and  /bp_confirm/bp_confirm/evaluation/sys_average  < 140) and  /bp_confirm/bp_confirm/evaluation/sys_average  !='' and  /bp_confirm/bp_confirm/evaluation/dia_average  !=''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t1",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t1:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t1:label",
+                                    "lang": "en",
+                                    "value": "The participant has arterial hypertension, because he/she has had two elevated blood pressure measurements. Treatment is recommended. Finish this form, submit it and then open the Hypertension Treatment Initiation Form in the task list"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t1:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t1",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  >= 140 or  /bp_confirm/bp_confirm/evaluation/dia_average  >= 90) and  /bp_confirm/trial_arm ='1'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t2",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t2:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t2:label",
+                                    "lang": "en",
+                                    "value": "The participant has arterial hypertension, because he/she has had two elevated blood pressure measurements. Treatment is recommended. Finish this form, submit it and then refer the participant to the health facility for initiation of hypertension treatment"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t2:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t2",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  >= 140 or  /bp_confirm/bp_confirm/evaluation/dia_average  >= 90) and  /bp_confirm/trial_arm ='2'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t3",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t3:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t3:label",
+                                    "lang": "en",
+                                    "value": "The participant has arterial hypertension, because he/she has had two elevated blood pressure measurements. Treatment is recommended. Finish this form, submit it and then refer the participant to the health facility for initiation of hypertension treatment. Offer the participant that you would accompany him/her to the Health Center."
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t3:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/note_bp_diagnosed_t3",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  >= 140 or  /bp_confirm/bp_confirm/evaluation/dia_average  >= 90) and  /bp_confirm/trial_arm ='3'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "select1",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_bp_acc",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_bp_acc:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_acc:label",
+                                    "lang": "en",
+                                    "value": "Does the participant agree to go to the Health Center?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_acc:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_bp_acc",
+                                "type": "select1",
+                                "required": "true()",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  >= 140 or  /bp_confirm/bp_confirm/evaluation/dia_average  >= 90) and ( /bp_confirm/trial_arm ='3' or  /bp_confirm/trial_arm ='2')"
+                            }
+                        },
+                        {
+                            "tag": "select",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:label",
+                                    "lang": "en",
+                                    "value": "Why does the participant refuse to go to the Health Center / Hospital?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:hint",
+                                    "lang": "en",
+                                    "value": "You may select several reasons"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref",
+                                "type": "select",
+                                "required": "true()",
+                                "relevant": " /bp_confirm/bp_confirm/evaluation/ref_bp_acc ='2' and  /bp_confirm/bp_confirm/evaluation/ref_bp_acc !=''"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref_other",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref_other:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref_other:label",
+                                    "lang": "en",
+                                    "value": "Specifiy the other reason for refusing to go to the Health Center / Hospital:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref_other:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_bp_ref_other",
+                                "type": "string",
+                                "required": "true()",
+                                "relevant": "selected( /bp_confirm/bp_confirm/evaluation/ref_bp_ref , '99')"
+                            }
+                        },
+                        {
+                            "tag": "select1",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_escort",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_escort:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort:label",
+                                    "lang": "en",
+                                    "value": "Does the participant want you to accompany him/her to the Health Center?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_escort",
+                                "type": "select1",
+                                "required": "true()",
+                                "relevant": "( /bp_confirm/bp_confirm/evaluation/sys_average  >= 140 or  /bp_confirm/bp_confirm/evaluation/dia_average  >= 90) and  /bp_confirm/trial_arm ='3' and  /bp_confirm/bp_confirm/evaluation/ref_bp_acc  ='1' and  /bp_confirm/bp_confirm/evaluation/ref_bp_acc  !=''"
+                            }
+                        },
+                        {
+                            "tag": "select",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:label",
+                                    "lang": "en",
+                                    "value": "Why does the participant not want to be accompanied by you?"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:hint",
+                                    "lang": "en",
+                                    "value": "You may select several reasons"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:hint",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hintRef": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref:hint",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref",
+                                "type": "select",
+                                "required": "true()",
+                                "relevant": " /bp_confirm/bp_confirm/evaluation/ref_escort ='2' and  /bp_confirm/bp_confirm/evaluation/ref_escort !=''"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref_other",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref_other:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref_other:label",
+                                    "lang": "en",
+                                    "value": "Specifiy the other reason:"
+                                },
+                                {
+                                    "id": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref_other:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bp_confirm/evaluation/ref_escort_ref_other",
+                                "type": "string",
+                                "required": "true()",
+                                "relevant": "selected( /bp_confirm/bp_confirm/evaluation/ref_escort_ref , '99')"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bp_confirm/evaluation",
+                        "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_equipment_consent ='1' and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_equipment_consent !=''"
+                    }
+                },
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/bp_confirm/generated_note_name_95",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/bp_confirm/generated_note_name_95:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/bp_confirm/generated_note_name_95:label",
+                            "lang": "en",
+                            "value": "BP diagnostic status:"
+                        },
+                        {
+                            "id": "/bp_confirm/bp_confirm/generated_note_name_95:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bp_confirm/generated_note_name_95",
+                        "type": "string",
+                        "readonly": "true()"
+                    }
+                }
+            ],
+            "bind": {
+                "nodeset": "/bp_confirm/bp_confirm",
+                "relevant": " /bp_confirm/group_clin_assess/warn_symptom ='2'"
+            }
+        },
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/bukana_bp_confirmation",
+            "appearance": "field-list",
+            "labelRef": "/bp_confirm/bukana_bp_confirmation:label",
+            "labels": [
+                {
+                    "id": "/bp_confirm/bukana_bp_confirmation:label",
+                    "lang": "en",
+                    "value": "Bukana Note"
+                },
+                {
+                    "id": "/bp_confirm/bukana_bp_confirmation:label",
+                    "lang": "se",
+                    "value": "-"
+                }
+            ],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "children": [
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/bukana_bp_confirmation/note_bp_confirmation",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/bukana_bp_confirmation/note_bp_confirmation:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_bp_confirmation:label",
+                            "lang": "en",
+                            "value": "Combacal Hypertension Confirm Visit"
+                        },
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_bp_confirmation:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bukana_bp_confirmation/note_bp_confirmation",
+                        "type": "string",
+                        "readonly": "true()"
+                    }
+                },
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/bukana_bp_confirmation/note_today",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/bukana_bp_confirmation/note_today:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_today:label",
+                            "lang": "en",
+                            "value": ""
+                        },
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_today:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bukana_bp_confirmation/note_today",
+                        "type": "string",
+                        "readonly": "true()"
+                    }
+                },
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:label",
+                            "lang": "en",
+                            "value": "Referral due to warn symptom:"
+                        },
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:hint",
+                            "lang": "en",
+                            "value": "Write down the warn symptom(s):"
+                        },
+                        {
+                            "id": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:hint",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hintRef": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom:hint",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bukana_bp_confirmation/note_warn_symptom",
+                        "type": "string",
+                        "relevant": " /bp_confirm/group_clin_assess/warn_symptom ='1'",
+                        "readonly": "true()"
+                    }
+                },
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results",
+                    "appearance": null,
+                    "labelRef": "",
+                    "labels": [],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_equipment_missing",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_equipment_missing:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_equipment_missing:label",
+                                    "lang": "en",
+                                    "value": "Equipment for blood pressure measurement was missing"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_equipment_missing:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_equipment_missing",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_consent_equipment/bp_machine_available ='2'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_refused",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_refused:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_refused:label",
+                                    "lang": "en",
+                                    "value": "Blood pressure measurement refused"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_refused:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_refused",
+                                "type": "string",
+                                "relevant": "( /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent ='2' or  /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent ='99') and  /bp_confirm/bp_confirm/bp_consent_equipment/bp_consent !=''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_value",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_value:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_value:label",
+                                    "lang": "en",
+                                    "value": "Blood pressure:  /"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_value:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_value",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/evaluation/sys_average !='' and  /bp_confirm/bp_confirm/evaluation/dia_average  != ''",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_diagnosed",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_diagnosed:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_diagnosed:label",
+                                    "lang": "en",
+                                    "value": "Diagnosis: Arterial Hypertension"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_diagnosed:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_diagnosed",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_diagnostic_status ='diagnosed'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_normal",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_normal:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_normal:label",
+                                    "lang": "en",
+                                    "value": "Normal blood pressure, next check in 1 year"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_normal:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_bp_normal",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_diagnostic_status ='highnormal'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_treatment_initiate",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_treatment_initiate:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_treatment_initiate:label",
+                                    "lang": "en",
+                                    "value": "After submission of this form, directly open the Hypertension Treatment Initiation Form from the task list."
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_treatment_initiate:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_treatment_initiate",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_diagnostic_status ='diagnosed' and  /bp_confirm/trial_arm ='1'",
+                                "readonly": "true()"
+                            }
+                        },
+                        {
+                            "tag": "input",
+                            "ref": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_ref_treatment_ini",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_ref_treatment_ini:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_ref_treatment_ini:label",
+                                    "lang": "en",
+                                    "value": "Referral to health facility for initiation of hypertension treatment"
+                                },
+                                {
+                                    "id": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_ref_treatment_ini:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results/note_ref_treatment_ini",
+                                "type": "string",
+                                "relevant": " /bp_confirm/bp_confirm/bp_diagnostic_status ='diagnosed' and ( /bp_confirm/trial_arm ='3' or  /bp_confirm/trial_arm ='2')",
+                                "readonly": "true()"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/bukana_bp_confirmation/confirmation_results",
+                        "relevant": " /bp_confirm/group_clin_assess/warn_symptom ='2'"
+                    }
+                }
+            ],
+            "bind": {
+                "nodeset": "/bp_confirm/bukana_bp_confirmation",
+                "required": "true()"
+            }
+        },
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/data",
+            "appearance": "hidden",
+            "labelRef": "",
+            "labels": [
+                {
+                    "id": "/bp_confirm/data:label",
+                    "lang": "se",
+                    "value": "-"
+                }
+            ],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "bind": {
+                "nodeset": "/bp_confirm/data"
+            }
+        }
+    ]
+}

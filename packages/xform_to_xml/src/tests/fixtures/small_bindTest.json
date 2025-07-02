@@ -1,0 +1,136 @@
+{
+    "tag": "group",
+    "ref": "/bp_confirm/inputs",
+    "appearance": null,
+    "labelRef": "/bp_confirm/inputs:label",
+    "labels": [
+        {
+            "id": "/bp_confirm/inputs:label",
+            "lang": "en",
+            "value": "Patient"
+        },
+        {
+            "id": "/bp_confirm/inputs:label",
+            "lang": "se",
+            "value": "-"
+        }
+    ],
+    "hints": [],
+    "hintRef": "",
+    "items": [],
+    "children": [
+        {
+            "tag": "group",
+            "ref": "/bp_confirm/inputs/contact",
+            "appearance": null,
+            "labelRef": "",
+            "labels": [
+                {
+                    "id": "/bp_confirm/inputs/contact:label",
+                    "lang": "se",
+                    "value": "-"
+                }
+            ],
+            "hints": [],
+            "hintRef": "",
+            "items": [],
+            "children": [
+                {
+                    "tag": "input",
+                    "ref": "/bp_confirm/inputs/contact/_id",
+                    "appearance": "db-object",
+                    "labelRef": "/bp_confirm/inputs/contact/_id:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/inputs/contact/_id:label",
+                            "lang": "en",
+                            "value": "What is the patient's name?"
+                        },
+                        {
+                            "id": "/bp_confirm/inputs/contact/_id:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [
+                        {
+                            "id": "/bp_confirm/inputs/contact/_id:hint",
+                            "lang": "en",
+                            "value": "db-object"
+                        },
+                        {
+                            "id": "/bp_confirm/inputs/contact/_id:hint",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hintRef": "/bp_confirm/inputs/contact/_id:hint",
+                    "items": [],
+                    "bind": {
+                        "nodeset": "/bp_confirm/inputs/contact/_id",
+                        "type": "db:person"
+                    }
+                },
+                {
+                    "tag": "group",
+                    "ref": "/bp_confirm/inputs/contact/parent",
+                    "appearance": null,
+                    "labelRef": "/bp_confirm/inputs/contact/parent:label",
+                    "labels": [
+                        {
+                            "id": "/bp_confirm/inputs/contact/parent:label",
+                            "lang": "en",
+                            "value": "Parent"
+                        },
+                        {
+                            "id": "/bp_confirm/inputs/contact/parent:label",
+                            "lang": "se",
+                            "value": "-"
+                        }
+                    ],
+                    "hints": [],
+                    "hintRef": "",
+                    "items": [],
+                    "children": [
+                        {
+                            "tag": "group",
+                            "ref": "/bp_confirm/inputs/contact/parent/parent",
+                            "appearance": null,
+                            "labelRef": "/bp_confirm/inputs/contact/parent/parent:label",
+                            "labels": [
+                                {
+                                    "id": "/bp_confirm/inputs/contact/parent/parent:label",
+                                    "lang": "en",
+                                    "value": "Grandparent"
+                                },
+                                {
+                                    "id": "/bp_confirm/inputs/contact/parent/parent:label",
+                                    "lang": "se",
+                                    "value": "-"
+                                }
+                            ],
+                            "hints": [],
+                            "hintRef": "",
+                            "items": [],
+                            "bind": {
+                                "nodeset": "/bp_confirm/inputs/contact/parent/parent"
+                            }
+                        }
+                    ],
+                    "bind": {
+                        "nodeset": "/bp_confirm/inputs/contact/parent"
+                    }
+                }
+            ],
+            "bind": {
+                "nodeset": "/bp_confirm/inputs/contact",
+                "readonly": "field-list"
+            }
+        }
+    ],
+    "bind": {
+        "nodeset": "/bp_confirm/inputs",
+        "relevant": "./source = 'user'",
+        "constraintMsg": "jr:itext('/bp_confirm/inputs:jr:constraintMsg')"
+    }
+}
