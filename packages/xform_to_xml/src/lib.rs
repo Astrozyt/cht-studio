@@ -4,8 +4,10 @@ use quick_xml::events::{BytesDecl, BytesEnd, BytesStart, BytesText, Event};
 use quick_xml::Writer;
 mod bind;
 mod body;
+mod instance;
 mod translations;
 mod types;
+use instance::render_instance;
 
 use crate::bind::render_bind;
 use crate::types::{Bind, BodyNode, JSONXFormDoc};
@@ -39,6 +41,7 @@ pub fn generate_xform(inputDoc: JSONXFormDoc) -> Result<String, Box<dyn std::err
     for node in &inputDoc.body {
         crate::bind::collect_binds(node, &mut all_binds);
     }
+    render_instance(&mut writer, &all_binds)?;
     for b in &all_binds {
         render_bind(&mut writer, b)?;
     }
@@ -52,7 +55,11 @@ pub fn generate_xform(inputDoc: JSONXFormDoc) -> Result<String, Box<dyn std::err
     // End element of <h:html>
     writer.write_event(Event::End(BytesEnd::new("h:html")))?;
 
-    Ok(("Form generated successfully".to_string()))
+    let xml_buffer = writer.into_inner().into_inner();
+    let xml_string = String::from_utf8(xml_buffer)?;
+    println!("\n[Generated XML]:\n{}\n", xml_string);
+
+    Ok(xml_string)
 }
 
 #[cfg(test)]
@@ -66,9 +73,11 @@ mod tests {
         }
         let raw_mock = include_str!("tests/fixtures/bp_confirm_selftransformed.json");
         let mock_data: JSONXFormDoc = serde_json::from_str(raw_mock)?;
-        let result = generate_xform(mock_data)?;
-        println!("\n[Generated XML]:\n{}\n", result);
-        assert!(result.contains("<h:html"));
+        let generated_form = generate_xform(mock_data)?;
+        // let xml_string = writer.into_inner().into_inner();
+        // let result = String::from_utf8(xml_string)?;
+        println!("\n[Generated XML]:\n{}\n", generated_form);
+        assert!(generated_form.contains("<h:html"));
 
         Ok(())
     }
