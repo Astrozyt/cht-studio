@@ -28,6 +28,7 @@
   },
   "include": [
     "src",
-    "src/dev.ts"
+    "src/dev.ts",
+    "../formbuilder/src/Formbuilder"
   ]
 }

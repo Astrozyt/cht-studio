@@ -78,7 +78,9 @@ mod tests {
         // let result = String::from_utf8(xml_string)?;
         println!("\n[Generated XML]:\n{}\n", generated_form);
         assert!(generated_form.contains("<h:html"));
-
+        let raw_goal = std::fs::read_to_string("tests/fixtures/bp_confirm_selftransformed.json")?;
+        // let goal_data: JSONXFormDoc = serde_json::from_str(&raw_goal)?;
+        assert_eq!(&generated_form, raw_goal.trim());
         Ok(())
     }
 }
