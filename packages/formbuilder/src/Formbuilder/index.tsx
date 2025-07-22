@@ -7,9 +7,9 @@ import { Action, formReducer } from "./helpers/formState";
 import { nanoid } from 'nanoid'
 import { InsertNodeButton } from "./components/InsertNodeButton";
 import { NodeFormValues, NodeType } from "./Zod/zodTypes";
-import { Input } from "../components/input";
 import { RenderRequired } from "./Formfields/RenderRequired";
-import { RenderLabels, RenderRef } from "./Formfields";
+import { RenderLabels } from "./Formfields/RenderLabels";
+import { RenderRef } from "./Formfields/RenderRef";
 import { RenderType } from "./Formfields/RenderType";
 import { RenderAppearance } from "./Formfields/RenderAppearance";
 import { RenderRelevant } from "./Formfields/RenderRelevant";
@@ -20,55 +20,95 @@ import { RenderConstraint, RenderConstraintMessage } from "./Formfields/RenderCo
 import { RenderReadonly } from "./Formfields/RenderReadonly";
 import { RenderCalculate } from "./Formfields/RenderCalculate";
 import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
+import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
+import { UpdateNodeButton } from "./components/UpdateNodeButton";
+import { addUidsToNodes } from "./helpers";
+
+// Add Tauri to the global scope
+declare global {
+    interface Window {
+        __TAURI__?: {
+            invoke: (command: string, args?: Record<string, any>) => Promise<any>;
+        };
+    }
+}
+
 
 export const FormEditor = ({ formModel }: { formModel: NodeFormValues[] | null }) => {
     formModel = addUidsToNodes(formModel || []); // Ensure all nodes have uids
     const [formDataRed, dispatch] = useReducer(formReducer, formModel || []);
 
+    const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'formname'; // Default root reference
+
+    const onSave = (data: NodeFormValues[]) => {
+        console.log("Saved data:", data);
+        // Check if running in Tauri
+        if (formDataRed.length > 0) {
+            if (window.__TAURI__) {
+                window.__TAURI__.invoke('save_form', { formData: data });
+            } else {
+                console.log("Not running in Tauri, saving to browser.");
+            }
+        }
+    }
+
+    const onCancel = () => {
+        console.log("Cancelled editing.");
+        // Reset the form or navigate away
+        // This could be a state reset or a navigation action
+    };
+
     return (
         <div>
             <ul className=" border-2 rounded p-2">
-                <h2>Form Editor (Formname)</h2>
-                {renderChildren(formDataRed, null, 0, dispatch)}
-
+                <h2>Form Editor ({rootRef})</h2>
+                <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
+                <div className="w-full flex justify-items-center">
+                    <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave(formDataRed); }}>
+                        Save
+                    </Button>
+                    <Button onClick={onCancel} variant="default" className="bg-red-300 hover:bg-red-400">
+                        Cancel
+                    </Button>
+                </div>
             </ul>
         </div>
     );
 }
 
-const renderChildren = (children: NodeFormValues[], parentUid: string | null, level: number, dispatch: React.Dispatch<Action>) => {
+const RenderChildren = ({ children, parentUid, level, dispatch, parentRef }: { children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
     // const lastPostion = children.length;
     return children.flatMap((child, index) => [
         // InsertNodeButton({ dispatch, parentUid, index, level }),
-        <InsertNodeButton dispatch={dispatch} parentUid={parentUid} index={index} level={level} />,
+        <InsertNodeButton dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
 
-        renderNode(child, index, level, dispatch),
-    ]).concat(<InsertNodeButton dispatch={dispatch} parentUid={parentUid} index={children.length} level={level} />); // final + button
+        <RenderNode node={child} index={index} level={level} dispatch={dispatch} />,
+    ]).concat(<InsertNodeButton dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
 };
 
-const addUidsToNodes = (nodes: NodeFormValues[]): NodeFormValues[] => {
-    return nodes.map((node) => {
-        const newNode = { ...node, uid: node.uid || nanoid() }; // Ensure each node has a unique uid
-        if (newNode.tag === "group" && newNode.children) {
-            newNode.children = addUidsToNodes(newNode.children); // Recurse into children
-        }
-        return newNode;
-    });
-}
 
-const renderNode = (node: NodeFormValues, index: number, level: number, dispatch: React.ActionDispatch<[action: Action]>): JSX.Element => {
+
+const RenderNode = ({ node, index, level, dispatch }: { node: NodeFormValues, index: number, level: number, dispatch: React.Dispatch<Action> }) => {
 
     return (
         <>
             <Card key={index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
                 <CardContent className="px-2 flex justify-end w-full space-x-4">
                     {<RenderType type={node.tag} />}
-                    {node.ref && <RenderRef ref={node.ref} onSave={(newValue) => { dispatch({ type: "UPDATE_NODE", uid: node.uid, changes: { ref: newValue } }) }} />}
+                    {<RenderRef ref={node.ref} onSave={(newValue) => { dispatch({ type: "UPDATE_NODE", uid: node.uid, changes: { ref: newValue } }) }} />}
+
+                    {node.tag === "group" && (
+                        <>
+                            <RenderLabels labels={node.labels} />
+                            <RenderHints hints={node.hints} />
+                            <RenderRelevant relevant={node.bind?.relevant || "N/A"} />
+                        </>
+                    )}
 
                     {node.tag === 'input' && (<>
-                        {node.appearance && <RenderAppearance appearance={node.appearance} />}
-                        {node.labels && <RenderLabels labels={node.labels} />}
-                        {node.bind && <RenderRequired required={node.bind.required || false} />}
+                        {<RenderAppearance appearance={node.appearance} />}
+                        {<RenderLabels labels={node.labels} />}
+                        {<RenderRequired required={node.bind.required || false} />}
                         {<RenderRelevant relevant={node.bind.relevant || "N/A"} />}
                         {<RenderTypeSelect type={node.bind.type || 'none'} />}
                         {<RenderConstraint constraint={node.bind.constraint || "N/A"} />}
@@ -81,23 +121,26 @@ const renderNode = (node: NodeFormValues, index: number, level: number, dispatch
 
                     {["select", "select1"].includes(node.tag) && (
                         <>
-                            {node.labels && <RenderLabels labels={node.labels} />}
-                            {node.items && <RenderItems items={node.items} />}
+                            {<RenderLabels labels={node.labels} />}
+                            {<RenderItems items={node.items} />}
                             {<RenderRelevant relevant={node.bind.relevant || "N/A"} />}
                         </>
                     )}
                     {node.tag === "note" && (
                         <>
-                            {node.labels && <RenderLabels labels={node.labels} />}
-                            {node.hints && <RenderHints hints={node.hints} />}
+                            {<RenderLabels labels={node.labels} />}
+                            {<RenderHints hints={node.hints} />}
                         </>
                     )}
 
-
-                    {renderDeleteButton(() => {
+                    {/* TODO: Add the other types, like trigger, image, ... */}
+                    <span className="">
+                        <UpdateNodeButton existingNode={node} dispatch={dispatch} />
+                    </span>
+                    <RenderDeleteButton onDelete={() => {
                         // console.log("Delete node", node.uid);
                         dispatch({ type: 'DELETE_NODE', uid: node.uid || '' });
-                    })}
+                    }} />
                 </CardContent>
 
                 {node.tag === "group" && (
@@ -105,27 +148,11 @@ const renderNode = (node: NodeFormValues, index: number, level: number, dispatch
                         {(!node.children || node.children.length === 0) && (
                             <li>No children</li>
                         )}
-                        {renderChildren(node.children ?? [], node.uid!, level + 1, dispatch)}
+                        {<RenderChildren children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
                     </ul>
                 )}
             </Card>
         </>
-    );
-}
-
-
-
-
-
-
-
-const renderDeleteButton = (onDelete: () => void): JSX.Element => {
-    return (
-        <span className="w-20">
-            <Button className="bg-red-500" onClick={onDelete}>
-                <TrashIcon />
-            </Button>
-        </span>
     );
 }
 

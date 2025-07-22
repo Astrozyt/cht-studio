@@ -16,45 +16,20 @@ import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
 import { useState } from "react";
+import { PenToolIcon } from "lucide-react";
 
 
 type NodeFormValues = z.infer<typeof nodeSchema>;
 
-export const InsertNodeButton = ({
-    dispatch,
-    parentUid,
-    parentRef,
-    index,
-    level,
+export const UpdateNodeButton = ({
+    existingNode, dispatch
 }: {
     dispatch: React.Dispatch<Action>,
-    parentUid: string | null,
-    parentRef: string,
-    index: number,
-    level: number
+    existingNode: NodeFormValues,
 }) => {
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
-        defaultValues: {
-            uid: nanoid(),
-            tag: NodeType.Input, // default to Input type
-            labels: [],
-            // items: [{ value: 'test', labels: [{ lang: 'en', value: 'Test' }, { lang: 'se', value: 'testSE' }] }], // updated items structure
-            items: [],
-            ref: "",
-            bind: {
-                // nodeset: '',
-                required: false,
-                type: 'string',
-                constraint: '',
-                constraintMsg: '',
-                readonly: false,
-                relevant: '',
-                calculate: '',
-                preload: '',
-                preloadParams: ''
-            },
-        }
+        defaultValues: existingNode
     });
 
     const mytag = useWatch({
@@ -81,12 +56,14 @@ export const InsertNodeButton = ({
         console.log("Submitting new node", data);
         const result = nodeSchema.safeParse(data);
         if (result.success) {
-            result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
+            // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
             console.log("Parsed data", result.data);
-            if (parentUid) {
-                setOpenness(false);
-                dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
-            }
+            // if (parentUid) {
+            setOpenness(false);
+            // TODO: Dispatch update action instead of adding a new node
+            dispatch({ type: "UPDATE_NODE", uid: existingNode.uid, changes: { ...data } })
+            // dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
+            // }
         } else {
             console.error("Validation errors", result.error.errors);
             //TODO: Add Feedback via Toast
@@ -103,7 +80,12 @@ export const InsertNodeButton = ({
 
     return (
         <Dialog open={openness} onOpenChange={setOpenness}>
-            <DialogTrigger><InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /></DialogTrigger>
+            <DialogTrigger className="bg-blue-500 hover:bg-blue-600 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3" onClick={() => setOpenness(true)}>
+                {/* <InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /> */}
+                {/* <Button onClick={() => setOpenness(true)} > */}
+                <PenToolIcon />
+                {/* </Button> */}
+            </DialogTrigger>
             <DialogContent style={{ maxWidth: 'none', width: '90%', maxHeight: '90%', overflow: 'auto' }}>
                 <>
                     <DialogHeader>
@@ -144,7 +126,7 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem className="mb-8">
                                         <FormLabel>Field Name (Reference)</FormLabel>
-                                        <FormDescription className="text-xs">The parent's reference is: <span className="italic">{parentRef}</span></FormDescription>
+                                        {/* <FormDescription className="text-xs">The parent's reference is: <span className="italic">{parentRef}</span></FormDescription> */}
                                         <FormControl>
                                             <Input
                                                 placeholder="Choose the name"
@@ -169,14 +151,14 @@ export const InsertNodeButton = ({
                                             <FormControl>
                                                 <Checkbox
                                                     {...field}
-                                                    checked={field.value}
+                                                    checked={field.value === true || field.value === "true()"}
                                                     onCheckedChange={(checked) => field.onChange(checked)}
                                                 />
                                             </FormControl>
                                             <FormLabel>Field Required</FormLabel>
                                         </div>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage className="text-red-600" />
                                     </FormItem>
                                 }} />
                             <FormField
@@ -259,11 +241,11 @@ export const InsertNodeButton = ({
                                                 onChange={(e) => {
                                                     field.onChange(e);
                                                 }}
-                                                value={field.value}
+                                                value={field.value ?? ""}
                                             />
                                         </FormControl>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage className="text-red-500" />
                                     </FormItem>
                                 )} />
                             <FormField
@@ -291,7 +273,7 @@ export const InsertNodeButton = ({
                                             </Select>
                                         </FormControl>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage className="text-red-500" />
                                     </FormItem>
                                 }} />
                             <FormField
