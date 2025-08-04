@@ -52,7 +52,7 @@ const FormCard = ({ updateView }: any) => {
 
             <Dropzone onDrop={(i) => {
                 const reader = new FileReader();
-                const fileName = i[0].name;
+                // const fileName = i[0].name;
                 reader.readAsText(i[0]);
 
                 reader.onload = async (e) => {

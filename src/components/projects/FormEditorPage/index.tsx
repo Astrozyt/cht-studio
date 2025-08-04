@@ -1,5 +1,5 @@
 import { FormEditor } from "@ght/formbuilder";
-import { BaseDirectory, readFile, readTextFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { isTauri } from "@tauri-apps/api/core";

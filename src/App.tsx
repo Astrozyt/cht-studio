@@ -16,10 +16,12 @@ function App() {
 
   const resultPromise = writeTextFile("test.txt", "Hello, world!", { baseDir: BaseDirectory.AppLocalData });
   resultPromise.then(() => {
-    console.log("File written successfully");
+    console.log("File written successfully" + result);
+    //TODO: Give visual feedback
     setResult(resultPromise.toString());
   }).catch((error) => {
     console.error("Error writing file:", error);
+    //TODO: Give visual feedback
     setResult(error.toString());
   });
 

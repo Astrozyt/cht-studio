@@ -5,16 +5,6 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import FormCard from "./components/FormCard";
 
-enum fileTypes {
-  xml = "xml",
-  json = "json",
-  csv = "csv",
-  xlsx = "xlsx",
-  folder = "folder",
-}
-
-
-
 const Project = () => {
 
   let { projectName } = useParams();

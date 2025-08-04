@@ -34,14 +34,14 @@ declare global {
 }
 
 
-export const FormEditor = ({ _formInput, onSave }: { _formInput: FullForm | null, onSave: (data: NodeFormValues[]) => Promise<void> }) => {
+export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave: (data: NodeFormValues[]) => Promise<void> }) => {
     // console.log("FormEditor initialized with model:", formInput);
     // if (!formInput) {
     //     console.error("Form input is null or undefined");
-    const formInput = { title: "New Form", body: [] } as FullForm; // Default value if formInput is null
+    //     const formInput = { title: "New Form", body: [] } as FullForm; // Default value if formInput is null
     // }
-    const formModel = addUidsToNodes(formInput || {} as FullForm); // Ensure all nodes have uids
-    const [formDataRed, dispatch] = useReducer(formReducer, formModel.body || []);
+    // const formModel = addUidsToNodes(formInput || { title: "New Form", body: [] } as FullForm); // Ensure all nodes have uids
+    const [formDataRed, dispatch] = useReducer(formReducer, formInput.body || []);
 
     const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
 
