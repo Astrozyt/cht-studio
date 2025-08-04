@@ -145,3 +145,10 @@ nodeSchema = z.discriminatedUnion("tag", [
 export { nodeSchema };
 
 export type NodeFormValues = z.infer<typeof nodeSchema>;
+
+const FullFormSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    body: z.array(nodeSchema)
+});
+
+export type FullForm = z.infer<typeof FullFormSchema>;
