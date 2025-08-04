@@ -17,11 +17,11 @@ const AppLayout = () => {
                         {breadCrumbs.map((crumb, index) => {
                             const path = `/${breadCrumbs.slice(0, index + 1).join("/")}`;
                             return index + 1 === breadCrumbs.length ?
-                                <BreadcrumbItem key={path}>
+                                <BreadcrumbItem key={path + index}>
                                     {crumb}
                                 </BreadcrumbItem> :
                                 <>
-                                    <BreadcrumbItem key={path}>
+                                    <BreadcrumbItem key={path + 2 + index}>
                                         <Link to={path}>{crumb}</Link>
                                     </BreadcrumbItem>
                                     {index < breadCrumbs.length - 1 && <BreadcrumbSeparator />}

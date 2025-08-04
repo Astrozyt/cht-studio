@@ -9,8 +9,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../../../components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/select";
 import { Action } from "../../helpers/formState";
-import { NodeType } from "../../Zod/zodTypes";
-import { bindTypeOptions, nodeSchema } from "../../Zod/zodTypes";
+import { nodeSchema, NodeType } from "../../Zod/zodTypes";
+import { bindTypeOptions, type NodeFormValues } from "../../Zod/zodTypes";
 import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
@@ -19,7 +19,7 @@ import { useState } from "react";
 import { PenToolIcon } from "lucide-react";
 
 
-type NodeFormValues = z.infer<typeof nodeSchema>;
+// type NodeFormValues = z.infer<typeof nodeSchema>;
 
 export const UpdateNodeButton = ({
     existingNode, dispatch

@@ -30,9 +30,12 @@
       "@ght/formbuilder": [
         "./packages/formbuilder"
       ],
+      "@ght/logicbuilder": [
+        "./packages/logicbuilder"
+      ],
       "ght/xFormParser": [
         "./packages/xFormParser"
-      ],
+      ]
     }
   },
   "include": [
@@ -41,6 +44,9 @@
   "references": [
     {
       "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./packages/formbuilder"
     }
   ]
 }

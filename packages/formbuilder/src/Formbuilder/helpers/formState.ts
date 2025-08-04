@@ -36,15 +36,22 @@ const formReducer = (state: NodeFormValues[], action: Action): NodeFormValues[] 
                 break;
             case 'ADD_NODE_AT_INDEX': {
                 const { parentUid, index, newNode } = action;
-                if (parentUid === null) {
+                console.log('ADD_NODE_AT_INDEX', parentUid, index, newNode);
+                console.log('Current draft before ADD_NODE_AT_INDEX:', draft);
+                if (parentUid === 'root') {
                     draft.splice(index, 0, newNode); // top-level insert
-                } else {
-                    const parent = findNodeByUid(draft, parentUid);
+                    // draft.push(newNode); // also add to the end
+                } else if (parentUid) {
+                    const parent = findNodeByUid(draft, parentUid || "root");
                     if (parent) {
                         if (!parent.children) parent.children = [];
                         parent.children.splice(index, 0, newNode);
                     }
+                } else {
+                    console.warn('No parentUid provided for ADD_NODE_AT_INDEX');
                 }
+                console.log('Updated draft after ADD_NODE_AT_INDEX:', draft);
+                console.log('Current state:', state);
                 break;
             }
         }

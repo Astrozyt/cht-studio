@@ -11,7 +11,7 @@ const NewFormDialog = ({ updateFolder }: any) => {
 
 
     const createNewForm = async () => {
-        await writeTextFile(`projects/${projectName}/forms/${newFormName}.json`, JSON.stringify({}), { baseDir: BaseDirectory.AppLocalData });
+        await writeTextFile(`projects/${projectName}/forms/${newFormName}.json`, JSON.stringify({ title: newFormName, body: [] }), { baseDir: BaseDirectory.AppLocalData });
         console.log("Form created successfully");
         //TODO: Toast message
         updateFolder();

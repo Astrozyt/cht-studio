@@ -6,14 +6,18 @@ import exampleSchema from './bp_confirm_selftransformed.json'
 import { useState } from 'react'
 
 function App() {
-  const [useEmptyModel, setUseEmptyModel] = useState(true)
+  const useEmptyModel = true
+
+  const onSave = async (data: any) => {
+    console.log("Data to save:", data);
+  }
 
   return (
     <StrictMode>
       This is it:
       <p className='bg-red-400'>My Form</p>
 
-      <FormEditor formModel={useEmptyModel ? exampleSchema : []} />
+      <FormEditor onSave={onSave} formInput={{ title: 'asdf', body: [] }} />
     </StrictMode>
   )
 }

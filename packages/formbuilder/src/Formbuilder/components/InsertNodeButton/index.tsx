@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { nanoid } from "nanoid";
-import { useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
-import { set, z } from "zod";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "../../../components/button";
 import { Checkbox } from "../../../components/checkbox";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/dialog";
@@ -10,7 +10,7 @@ import { Input } from "../../../components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/select";
 import { Action } from "../../helpers/formState";
 import { NodeType } from "../../Zod/zodTypes";
-import { bindTypeOptions, nodeSchema } from "../../Zod/zodTypes";
+import { bindTypeOptions, type NodeFormValues, nodeSchema } from "../../Zod/zodTypes";
 import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
@@ -18,7 +18,7 @@ import { LabelFields } from "./LabelFields";
 import { useState } from "react";
 
 
-type NodeFormValues = z.infer<typeof nodeSchema>;
+// type NodeFormValues = z.infer<typeof nodeSchema>;
 
 export const InsertNodeButton = ({
     dispatch,
@@ -83,6 +83,7 @@ export const InsertNodeButton = ({
         if (result.success) {
             result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
             console.log("Parsed data", result.data);
+            console.log("Parent UID", parentUid);
             if (parentUid) {
                 setOpenness(false);
                 dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
@@ -102,7 +103,7 @@ export const InsertNodeButton = ({
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
 
     return (
-        <Dialog open={openness} onOpenChange={setOpenness}>
+        <Dialog key={parentUid + level + index} open={openness} onOpenChange={setOpenness}>
             <DialogTrigger><InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /></DialogTrigger>
             <DialogContent style={{ maxWidth: 'none', width: '90%', maxHeight: '90%', overflow: 'auto' }}>
                 <>

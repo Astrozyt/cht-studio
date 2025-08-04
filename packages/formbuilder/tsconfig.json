@@ -20,7 +20,8 @@
     "declarationDir": "./types",
     "emitDeclarationOnly": true,
     "composite": true,
-    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
+    "noEmit": false
   },
   "paths": {
     "@/components/*": [

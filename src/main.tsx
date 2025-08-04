@@ -13,12 +13,22 @@ import { FormEditorPage } from "./components/projects/FormEditorPage";
 const XmlConnector = () => <div>Xml Connector Placeholder</div>;
 const XmlOverview = () => <div>Xml Overview Placeholder</div>;
 
+const OldRefCheck = ({ children }: { children: React.ReactNode }) => {
+  React.Children.forEach(children, child => {
+    if (React.isValidElement(child) && typeof child.ref === "string") {
+      console.warn("String ref found!", child);
+    }
+  });
+  return <>{children}</>;
+};
+
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<OldRefCheck><App /></OldRefCheck>} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:projectName" element={<Project />} />
           <Route path="/projects/:projectName/forms" element={<XmlOverview />} />

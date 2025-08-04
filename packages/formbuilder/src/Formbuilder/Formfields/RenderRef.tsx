@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Input } from "../../components/input";
 
-export const RenderRef = ({ ref, onSave }: { ref: string, onSave: (newValue: string) => void }): JSX.Element => {
+export const RenderRef = ({ nodeRef, onSave }: { nodeRef: string, onSave: (newValue: string) => void }): JSX.Element => {
     const [isEditing, setIsEditing] = useState(false);
     // split ref at last slash, reetrieving both parts
     // const [baseRef, refPart] = ref.split("/"); // split ref and retrieve both parts
-    const lastSlashIndex = ref.lastIndexOf("/");
-    const baseRef = ref.substring(0, lastSlashIndex + 1);
-    const suffix = ref.substring(lastSlashIndex + 1);
+    const lastSlashIndex = nodeRef.lastIndexOf("/");
+    const baseRef = nodeRef.substring(0, lastSlashIndex + 1);
+    const suffix = nodeRef.substring(lastSlashIndex + 1);
     const [draft, setDraft] = useState(suffix); // update draft to use refPart
 
     const handleSave = () => {

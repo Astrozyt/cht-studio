@@ -84,7 +84,7 @@ const FormCard = ({ updateView }: any) => {
 
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
-            <NewFormDialog updateFolder={readForms} />
+            <NewFormDialog updateFolder={() => readForms(`./projects/${projectName}/forms`)} />
             {/* TODO: Use plugin-fs for reading */}
             <Button onClick={() => readForms(`./projects/${projectName}/forms`)} className="w-fit">Refresh</Button>
         </CardFooter>
