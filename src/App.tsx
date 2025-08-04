@@ -24,9 +24,7 @@ function App() {
   });
 
   return <><Link to="/projects">Projects</Link>
-    <textarea className="App">
-      {JSON.stringify(result, null, 2)}
-    </textarea>
+
   </>;
 
 }
