@@ -17,15 +17,17 @@ import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
 import { useState } from "react";
 import { PenToolIcon } from "lucide-react";
+import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 
 
 // type NodeFormValues = z.infer<typeof nodeSchema>;
 
 export const UpdateNodeButton = ({
-    existingNode, dispatch
+    existingNode, dispatch, existingNodes
 }: {
     dispatch: React.Dispatch<Action>,
     existingNode: NodeFormValues,
+    existingNodes: NodeFormValues[]
 }) => {
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
@@ -75,6 +77,7 @@ export const UpdateNodeButton = ({
     //     control,
     //     name: "labels"
     // });
+    const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
 
@@ -89,9 +92,9 @@ export const UpdateNodeButton = ({
             <DialogContent style={{ maxWidth: 'none', width: '90%', maxHeight: '90%', overflow: 'auto' }}>
                 <>
                     <DialogHeader>
-                        <DialogTitle>Create new Node</DialogTitle>
+                        <DialogTitle>Update Node</DialogTitle>
                         <DialogDescription>
-                            Click to create a new node. You can then edit its properties in the form editor. {mytag}
+                            Click to update the node. You can then edit its properties in the form editor. {mytag}
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
@@ -282,16 +285,37 @@ export const UpdateNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Relevant</FormLabel>
+                                        {/* <textarea value={JSON.stringify(field.value, null, 2)} readOnly className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-50" />
+                                         */}
+                                        {field.value == undefined || field.value.rules.length === 0 ? <span>No rule yet</span> : <span>Rule exists!</span>}
+                                        {showRelevantLogicBuilder && (
+                                            <div className="mt-4">
+                                                <LogicBuilder
+                                                    existingQuery={field.value}
+                                                    // onChange={(value) => {
+                                                    //     field.onChange(value);
+                                                    // }}
+                                                    formFields={existingNodes}
+                                                    saveFn={(query) => {
+                                                        field.onChange(query);
+                                                        setShowRelevantLogicBuilder(false);
+                                                    }}
+                                                    cancelFn={() => setShowRelevantLogicBuilder(false)}
+                                                // parentRef={parentRef}
+                                                // parentUid={parentUid || ''}
+                                                />
+                                            </div>
+                                        )}
                                         <FormControl>
-                                            <Input
-                                                placeholder="Relevancy condition"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value}
-                                            />
+                                            <>
+                                                {/* <p>{JSON.stringify(field.value)}</p>{ } */}
+                                                {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
+                                                    {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
+                                                </Button>
+                                                }
+                                            </>
                                         </FormControl>
+
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>

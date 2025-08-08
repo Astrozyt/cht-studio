@@ -161,7 +161,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
 
                 {/* TODO: Add the other types, like trigger, image, ... */}
                 <span className="">
-                    <UpdateNodeButton existingNode={node} dispatch={dispatch} />
+                    <UpdateNodeButton existingNode={node} dispatch={dispatch} existingNodes={existingFormFields} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
                     // console.log("Delete node", node.uid);
