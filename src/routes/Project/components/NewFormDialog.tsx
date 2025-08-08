@@ -5,7 +5,7 @@ import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useState } from "react";
 import { useParams } from "react-router";
 
-const NewFormDialog = ({ updateFolder }: any) => {
+const NewFormDialog = ({ updateFolder, TriggerElement }: { updateFolder: () => void, TriggerElement?: React.ReactNode }) => {
 
     let { projectName } = useParams();
 
@@ -32,7 +32,9 @@ const NewFormDialog = ({ updateFolder }: any) => {
 
     return (<Dialog>
         <DialogTrigger asChild>
-            <Button variant="outline">Create new Form</Button>
+            {TriggerElement ? TriggerElement :
+                <Button variant="outline">Create new Form</Button>
+            }
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

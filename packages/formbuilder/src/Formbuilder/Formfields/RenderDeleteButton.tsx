@@ -5,6 +5,7 @@ export const RenderDeleteButton = ({ onDelete }: { onDelete: () => void }): JSX.
     return (
         <span className="">
             <Button className="bg-red-500" onClick={onDelete}>
+                {/* TODO: Implement the delete function */}
                 <TrashIcon />
             </Button>
         </span>

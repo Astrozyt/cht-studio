@@ -9,6 +9,7 @@ import Dropzone from 'react-dropzone';
 import { useParams } from "react-router";
 import File from "../../../../components/functional/File";
 import NewFormDialog from "../NewFormDialog";
+import { FilePlus } from "lucide-react";
 
 
 const FormCard = ({ updateView }: any) => {
@@ -43,12 +44,24 @@ const FormCard = ({ updateView }: any) => {
                 <h1>Forms</h1>
             </Menubar>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-wrap justify-around">
             {forms.map((form, index) => (
                 <div key={index}>
                     <File projectName={projectName} name={form} isFolder={false} isForm updateFn={readForms} />
                 </div>
             ))}
+
+            <NewFormDialog updateFolder={() => readForms(`./projects/${projectName}/forms`)} TriggerElement={
+
+                <Card className="size-40 m-8 bg-gray-200">
+                    <CardContent className="flex justify-around">
+                        <FilePlus className="size-15" />
+                    </CardContent>
+                    <CardFooter className="text-center">
+                        Add new Form
+                    </CardFooter>
+                </Card>
+            } />
 
             <Dropzone onDrop={(i) => {
                 const reader = new FileReader();
@@ -84,7 +97,7 @@ const FormCard = ({ updateView }: any) => {
 
         </CardContent>
         <CardFooter className="border-t-1 pt-4">
-            <NewFormDialog updateFolder={() => readForms(`./projects/${projectName}/forms`)} />
+            {/* <NewFormDialog updateFolder={() => readForms(`./projects/${projectName}/forms`)} /> */}
             {/* TODO: Use plugin-fs for reading */}
             <Button onClick={() => readForms(`./projects/${projectName}/forms`)} className="w-fit">Refresh</Button>
         </CardFooter>

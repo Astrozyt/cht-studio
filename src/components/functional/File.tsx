@@ -45,6 +45,7 @@ const File = ({ isFolder, name, isForm, updateFn }: FileProps) => {
                 </Button>
                 <Separator className="h-8" orientation="vertical" />
                 <Button variant="ghost" onClick={() => setIsOpen(true)} className="w-1/3 border-t">
+                    {/* TODO: Implement delete functionality */}
                     <Trash />
                 </Button>
 

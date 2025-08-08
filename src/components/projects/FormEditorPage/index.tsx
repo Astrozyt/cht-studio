@@ -41,6 +41,7 @@ export const FormEditorPage = () => {
 
 
     {/* TODO: Add a save to disk function, which is passed to the formeditor */ }
+    // TODO: When saving, add the formfields to a JSON file in the project directory
     const saveFormData = async (data: any) => {
         console.log("Saving form data:", data);
         //TODO: Redirect to Forms overview
