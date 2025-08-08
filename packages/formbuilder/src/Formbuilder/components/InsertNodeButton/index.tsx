@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { nanoid } from "nanoid";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "../../../components/button";
 import { Checkbox } from "../../../components/checkbox";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/dialog";
@@ -16,6 +15,8 @@ import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
 import { useState } from "react";
+import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
+// import { LogicBuilder } from "../Logicbuilder"
 
 
 // type NodeFormValues = z.infer<typeof nodeSchema>;
@@ -26,12 +27,14 @@ export const InsertNodeButton = ({
     parentRef,
     index,
     level,
+    existingNodes
 }: {
     dispatch: React.Dispatch<Action>,
     parentUid: string | null,
     parentRef: string,
     index: number,
-    level: number
+    level: number,
+    existingNodes: NodeFormValues[]
 }) => {
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
@@ -49,7 +52,7 @@ export const InsertNodeButton = ({
                 constraint: '',
                 constraintMsg: '',
                 readonly: false,
-                relevant: '',
+                relevant: undefined,//{ combinator: 'and', rules: [] },
                 calculate: '',
                 preload: '',
                 preloadParams: ''
@@ -81,7 +84,8 @@ export const InsertNodeButton = ({
         console.log("Submitting new node", data);
         const result = nodeSchema.safeParse(data);
         if (result.success) {
-            result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
+            // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
+
             console.log("Parsed data", result.data);
             console.log("Parent UID", parentUid);
             if (parentUid) {
@@ -100,10 +104,12 @@ export const InsertNodeButton = ({
     //     name: "labels"
     // });
 
+    const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
+
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
 
     return (
-        <Dialog key={parentUid + level + index} open={openness} onOpenChange={setOpenness}>
+        <Dialog key={parentUid || '' + level + index} open={openness} onOpenChange={setOpenness}>
             <DialogTrigger><InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /></DialogTrigger>
             <DialogContent style={{ maxWidth: 'none', width: '90%', maxHeight: '90%', overflow: 'auto' }}>
                 <>
@@ -301,16 +307,37 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Relevant</FormLabel>
+                                        {/* <textarea value={JSON.stringify(field.value, null, 2)} readOnly className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-50" />
+                                         */}
+                                        {field.value == undefined || field.value.rules.length === 0 ? <span>No rule yet</span> : <span>Rule exists!</span>}
+                                        {showRelevantLogicBuilder && (
+                                            <div className="mt-4">
+                                                <LogicBuilder
+                                                    existingQuery={field.value}
+                                                    // onChange={(value) => {
+                                                    //     field.onChange(value);
+                                                    // }}
+                                                    formFields={existingNodes}
+                                                    saveFn={(query) => {
+                                                        field.onChange(query);
+                                                        setShowRelevantLogicBuilder(false);
+                                                    }}
+                                                    cancelFn={() => setShowRelevantLogicBuilder(false)}
+                                                // parentRef={parentRef}
+                                                // parentUid={parentUid || ''}
+                                                />
+                                            </div>
+                                        )}
                                         <FormControl>
-                                            <Input
-                                                placeholder="Relevancy condition"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value}
-                                            />
+                                            <>
+                                                {/* <p>{JSON.stringify(field.value)}</p>{ } */}
+                                                {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
+                                                    {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
+                                                </Button>
+                                                }
+                                            </>
                                         </FormControl>
+
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>

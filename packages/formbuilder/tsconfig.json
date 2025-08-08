@@ -25,7 +25,10 @@
   },
   "paths": {
     "@/components/*": [
-      "./src/components/*"
-    ]
+      "./src/components/*",
+    ],
+    "@ght/logicbuilder": [
+      "../logicbuilder"
+    ],
   },
 }

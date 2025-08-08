@@ -2,7 +2,7 @@ import { Button } from "../components/button";
 import { Card, CardContent } from "../components/card";
 // import { NodeFormValues } from "./types";
 import { TrashIcon } from "lucide-react";
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Action, formReducer } from "./helpers/formState";
 import { nanoid } from 'nanoid'
 import { InsertNodeButton } from "./components/InsertNodeButton";
@@ -42,6 +42,23 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
     // }
     // const formModel = addUidsToNodes(formInput || { title: "New Form", body: [] } as FullForm); // Ensure all nodes have uids
     const [formDataRed, dispatch] = useReducer(formReducer, formInput.body || []);
+    //TODO: Add a dependent state that extracts all input fields for the rule builder
+    // const [formFields, setFormFields] = useState<Field[]>([]); //
+    // const formFields = formDataRed.map((node) => ({
+    //     name: node.ref,
+    //     label: node.labels?.[0] || node.ref,
+    //     type: node.bind?.type || "text",
+    //     options: node.items?.map(item => ({ value: item.value, label: item.label })) || [],
+    // }));
+    const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
+
+
+    useEffect(() => {
+        const fields = formDataRed.filter((node) => {
+            return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
+        });
+        setExistingFormFields(fields);
+    }, [formDataRed]);
 
     const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
 
@@ -69,7 +86,7 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
         <div>
             <ul className=" border-2 rounded p-2">
                 <h2>Form Editor ({formInput.title})</h2>
-                <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
+                <RenderChildren existingFormFields={existingFormFields} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
                     <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave(formDataRed); }}>
                         Save
@@ -83,20 +100,22 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
     );
 }
 
-const RenderChildren = ({ children, parentUid, level, dispatch, parentRef }: { children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
+const RenderChildren = ({ children, parentUid, level, dispatch, parentRef, existingFormFields }: { existingFormFields: NodeFormValues[], children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
     // const lastPostion = children.length;
     return children.flatMap((child, index) => [
         // InsertNodeButton({ dispatch, parentUid, index, level }),
-        <InsertNodeButton key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
+        <InsertNodeButton existingNodes={existingFormFields} key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
 
-        <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} />,
-    ]).concat(<InsertNodeButton key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
+        <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} existingFormFields={existingFormFields} />,
+    ]).concat(<InsertNodeButton existingNodes={existingFormFields} key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
 };
 
 
 
-const RenderNode = ({ node, index, level, dispatch }: { node: NodeFormValues, index: number, level: number, dispatch: React.Dispatch<Action> }) => {
-
+const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node: NodeFormValues, index: number, level: number, dispatch: React.Dispatch<Action>, existingFormFields: NodeFormValues[] }) => {
+    if (["input", "select", "select1"].includes(node.tag)) {
+        console.log("Field to be listed: ", node.ref, node.tag, node.bind?.type);
+    }
     return (
 
         <Card key={index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
@@ -155,7 +174,7 @@ const RenderNode = ({ node, index, level, dispatch }: { node: NodeFormValues, in
                     {(!node.children || node.children.length === 0) && (
                         <li>No children</li>
                     )}
-                    {<RenderChildren children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
+                    {<RenderChildren existingFormFields={existingFormFields} children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
                 </ul>
             )}
         </Card>

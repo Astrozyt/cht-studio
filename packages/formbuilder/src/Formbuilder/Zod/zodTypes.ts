@@ -76,7 +76,8 @@ const hintSchema = z.object({
 const bindBase = z.object({
     required: z.boolean().optional(),
     readonly: z.boolean().optional(),
-    relevant: z.string().optional(),
+    // relevant: z.string().optional(),
+    relevant: z.object({}).passthrough().optional(),
     constraint: z.string().optional(),
     constraintMsg: z.string().optional(),
     calculate: z.string().optional(),
