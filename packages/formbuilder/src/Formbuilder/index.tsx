@@ -23,6 +23,7 @@ import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
 import { addUidsToNodes } from "./helpers";
+import { useNavigate, useParams } from "react-router";
 
 // Add Tauri to the global scope
 declare global {
@@ -35,23 +36,13 @@ declare global {
 
 
 export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave: (data: NodeFormValues[]) => Promise<void> }) => {
-    // console.log("FormEditor initialized with model:", formInput);
-    // if (!formInput) {
-    //     console.error("Form input is null or undefined");
-    //     const formInput = { title: "New Form", body: [] } as FullForm; // Default value if formInput is null
-    // }
+
     // const formModel = addUidsToNodes(formInput || { title: "New Form", body: [] } as FullForm); // Ensure all nodes have uids
     const [formDataRed, dispatch] = useReducer(formReducer, formInput.body || []);
-    //TODO: Add a dependent state that extracts all input fields for the rule builder
-    // const [formFields, setFormFields] = useState<Field[]>([]); //
-    // const formFields = formDataRed.map((node) => ({
-    //     name: node.ref,
-    //     label: node.labels?.[0] || node.ref,
-    //     type: node.bind?.type || "text",
-    //     options: node.items?.map(item => ({ value: item.value, label: item.label })) || [],
-    // }));
-    const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
 
+    const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
+    const { projectName } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fields = formDataRed.filter((node) => {
@@ -62,22 +53,9 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
 
     const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
 
-    // const onSave = (data: NodeFormValues[]) => {
-    //     console.log("Saved data:", data);
-    //     // Check if running in Tauri
-    //     if (formDataRed.length > 0) {
-    //         if (window.__TAURI__) {
-    //             window.__TAURI__.invoke('save_form', { formData: data });
-    //         } else {
-    //             console.log("Not running in Tauri, saving to browser.");
-    //         }
-    //     }
-    // }
-
     const onCancel = () => {
         console.log("Cancelled editing.");
-        // TODO: Reset the form or navigate away
-        // This could be a state reset or a navigation action
+        navigate(`/projects/${projectName}`); // Navigate back to the forms list
     };
 
     console.log("FormRed data after reducer:", formDataRed);
