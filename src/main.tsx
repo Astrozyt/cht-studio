@@ -8,6 +8,7 @@ import Emulator from "./components/projects/Emulator";
 import Projects from "./routes/Projects";
 // import { XmlConnector, XmlOverview } from "./components/projects/Formbuilder_old/xmlSnippets";
 import { FormEditorPage } from "./components/projects/FormEditorPage";
+import { Toaster } from "sonner";
 // import { FormEditor } from "@ght/formbuilder"
 
 const XmlConnector = () => <div>Xml Connector Placeholder</div>;
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
         </Route>
       </Routes>
+      <Toaster />
     </BrowserRouter>
   </React.StrictMode>,
 );

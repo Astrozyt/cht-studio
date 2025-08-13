@@ -16,6 +16,7 @@ import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
 import { useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
+import { toast, Toaster } from "sonner";
 // import { LogicBuilder } from "../Logicbuilder"
 
 
@@ -85,7 +86,7 @@ export const InsertNodeButton = ({
         const result = nodeSchema.safeParse(data);
         if (result.success) {
             // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
-
+            toast.success("Node created successfully!");
             console.log("Parsed data", result.data);
             console.log("Parent UID", parentUid);
             if (parentUid) {
@@ -95,6 +96,8 @@ export const InsertNodeButton = ({
         } else {
             console.error("Validation errors", result.error.errors);
             //TODO: Add Feedback via Toast
+            // <Toaster t position="top-right" richColors closeButton />
+            toast.error("Validation failed. Please check the form fields.");
         }
     }
 

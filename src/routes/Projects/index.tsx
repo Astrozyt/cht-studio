@@ -4,6 +4,7 @@ import { Menubar } from "@/components/ui/menubar";
 import { BaseDirectory, DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import File from "../../components/functional/File";
 import NewProjectDialog from "./components/NewProjectDialog";
+import { deleteFnFactory } from "@/lib/utils";
 
 
 const Projects = () => {
@@ -30,7 +31,7 @@ const Projects = () => {
                 <Button variant="outline" onClick={() => { readProjectsFolder() }} className="">Refresh</Button>
             </Menubar>
             <div className="App flex flex-wrap">
-                {projectNames.length > 0 ? projectNames.map((projectName, index) => <File key={index} name={projectName} isFolder />) : <div><p>No projects yet</p><NewProjectDialog updateFolder={readProjectsFolder} /></div>}
+                {projectNames.length > 0 ? projectNames.map((projectName, index) => <File key={index} deleteFn={deleteFnFactory(`projects/${projectName}`)} name={projectName} isFolder updateFn={readProjectsFolder} />) : <div><p>No projects yet</p><NewProjectDialog updateFolder={readProjectsFolder} /></div>}
             </div >
         </>
     );

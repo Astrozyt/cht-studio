@@ -6,33 +6,29 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { BaseDirectory, remove } from "@tauri-apps/plugin-fs";
+import { toast } from "sonner";
 
 type FileProps = {
     name: string;
     isFolder: boolean;
     isForm?: boolean;
     projectName?: string; // Optional, used for forms
-    updateFn?: (path: string) => void; // Optional, used to refresh the file list after deletion
+    updateFn?: () => void; // Optional, used to refresh the file list after deletion
+    deleteFn?: (path: string) => void;
 };
 
-const File = ({ isFolder, name, isForm, updateFn }: FileProps) => {
+const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
 
     let { projectName } = useParams();
 
     console.log("projectName", projectName);
-    const handleDelete = async (fileName: string) => {
-        const result = await remove(`projects/${projectName}/forms/${fileName}`, { baseDir: BaseDirectory.AppLocalData })
-        //TODO: Feedback with toast or similar
-        console.log("Deleted " + fileName + " result", result);
-        updateFn && updateFn(`projects/${projectName}/forms`);
-    }
 
     let navigate = useNavigate();
 
     const [isOpen, setIsOpen] = useState(false);
     return (
         <Card className="size-40 m-8 ">
-            <CardHeader className="text-center">{name}</CardHeader>
+            <CardHeader className="text-center p-0"><p className="w-36 text-nowrap overflow-hidden">{name}</p></CardHeader>
             <CardContent className="flex justify-around">{isFolder ? <Folder /> : <FileSpreadsheet />}</CardContent>
 
             <CardFooter className="text-center px-0">
@@ -60,7 +56,7 @@ const File = ({ isFolder, name, isForm, updateFn }: FileProps) => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => { setIsOpen(false) }}>Back</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => { handleDelete(name); setIsOpen(false); }}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => { deleteFn && deleteFn(name); setIsOpen(false); updateFn && updateFn(); }}>Delete</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

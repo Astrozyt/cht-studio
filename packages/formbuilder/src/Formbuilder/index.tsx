@@ -1,12 +1,9 @@
 import { Button } from "../components/button";
 import { Card, CardContent } from "../components/card";
-// import { NodeFormValues } from "./types";
-import { TrashIcon } from "lucide-react";
 import { useEffect, useReducer, useState } from "react";
 import { Action, formReducer } from "./helpers/formState";
-import { nanoid } from 'nanoid'
 import { InsertNodeButton } from "./components/InsertNodeButton";
-import { FullForm, NodeFormValues, NodeType } from "./Zod/zodTypes";
+import { FullForm, NodeFormValues } from "./Zod/zodTypes";
 import { RenderRequired } from "./Formfields/RenderRequired";
 import { RenderLabels } from "./Formfields/RenderLabels";
 import { RenderRef } from "./Formfields/RenderRef";
@@ -22,8 +19,8 @@ import { RenderCalculate } from "./Formfields/RenderCalculate";
 import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
-import { addUidsToNodes } from "./helpers";
 import { useNavigate, useParams } from "react-router";
+import { Toaster } from "sonner";
 
 // Add Tauri to the global scope
 declare global {
@@ -74,6 +71,7 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
                     </Button>
                 </div>
             </ul>
+            <Toaster />
         </div>
     );
 }
@@ -142,7 +140,6 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
                     <UpdateNodeButton existingNode={node} dispatch={dispatch} existingNodes={existingFormFields} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
-                    // console.log("Delete node", node.uid);
                     dispatch({ type: 'DELETE_NODE', uid: node.uid || '' });
                 }} />
             </CardContent>
