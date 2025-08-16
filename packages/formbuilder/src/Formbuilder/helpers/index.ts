@@ -14,3 +14,21 @@ export const addUidsToNodes = (nodes: FullForm): FullForm => {
         })
     };
 }
+
+import { RuleGroupType } from "react-querybuilder";
+
+export const countRules = (group: RuleGroupType): number => {
+    if (!group || !group.rules) {
+        return 0;
+    }
+    const count = group.rules.reduce((count, rule) => {
+        if ('rules' in rule) {
+            // It's a nested group
+            return count + countRules(rule);
+        } else {
+            // It's a single rule
+            return count + 1;
+        }
+    }, 0);
+    return count;
+}

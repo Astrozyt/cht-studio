@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { NodeFormValues } from "../Zod/zodTypes";
 
 export type Action =
+    | { type: 'INIT_STATE'; nodes: NodeFormValues[] } // New action type to initialize state
     | { type: 'UPDATE_NODE'; uid: string; changes: Partial<NodeFormValues> }
     | { type: 'ADD_NODE'; parentUid: string; newNode: NodeFormValues }
     | { type: 'DELETE_NODE'; uid: string }
@@ -19,6 +20,9 @@ function visit(tree: NodeFormValues[], fn: (node: NodeFormValues) => void) {
 const formReducer = (state: NodeFormValues[], action: Action): NodeFormValues[] => {
     return produce(state, draft => {
         switch (action.type) {
+            case 'INIT_STATE':
+                // Initialize the state with the provided nodes
+                return action.nodes;
             case 'UPDATE_NODE':
                 visit(draft, n => {
                     if (n.uid === action.uid) { Object.assign(n, action.changes); }

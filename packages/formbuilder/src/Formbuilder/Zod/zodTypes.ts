@@ -148,7 +148,8 @@ export { nodeSchema };
 export type NodeFormValues = z.infer<typeof nodeSchema>;
 
 const FullFormSchema = z.object({
-    title: z.string().min(1, "Title is required"),
+    title: z.string().min(1, "Title is required").max(15, "Title must be less than 15 characters"),
+    root: z.string().optional(),
     body: z.array(nodeSchema)
 });
 

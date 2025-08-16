@@ -1,9 +1,13 @@
+import { countRules } from "../helpers";
+
 export const RenderRelevant = ({ relevant }: { relevant: string }): JSX.Element => {
+    console.log("Relevant:", JSON.stringify(relevant));
+
+    const numberOfRules = countRules(relevant as any);
     return (
         <span className="text-sm flex-1 border-r-1 truncate">
             <p className="text-sm">Relevant</p>
-            {/* TODO: Show number of rules in JSON */}
-            <p>{relevant ? 'Yes' : "N/A"}</p>
+            <p>{relevant ? numberOfRules : "-"}</p>
         </span>
     );
 }

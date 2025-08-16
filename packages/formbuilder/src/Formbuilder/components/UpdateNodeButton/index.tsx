@@ -18,6 +18,8 @@ import { LabelFields } from "./LabelFields";
 import { useState } from "react";
 import { PenToolIcon } from "lucide-react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
+import { countRules } from "../../helpers";
+import { toast } from "sonner";
 
 
 // type NodeFormValues = z.infer<typeof nodeSchema>;
@@ -62,13 +64,12 @@ export const UpdateNodeButton = ({
             console.log("Parsed data", result.data);
             // if (parentUid) {
             setOpenness(false);
-            // TODO: Dispatch update action instead of adding a new node
             dispatch({ type: "UPDATE_NODE", uid: existingNode.uid, changes: { ...data } })
             // dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
             // }
         } else {
             console.error("Validation errors", result.error.errors);
-            //TODO: Add Feedback via Toast
+            toast.error("There was a problem adding the node. Please check the form fields.");
         }
     }
 
@@ -287,7 +288,7 @@ export const UpdateNodeButton = ({
                                         <FormLabel>Relevant</FormLabel>
                                         {/* <textarea value={JSON.stringify(field.value, null, 2)} readOnly className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-50" />
                                          */}
-                                        {field.value == undefined || field.value.rules.length === 0 ? <span>No rule yet</span> : <span>Rule exists!</span>}
+                                        {<span>{countRules(field.value)}</span>}
                                         {showRelevantLogicBuilder && (
                                             <div className="mt-4">
                                                 <LogicBuilder

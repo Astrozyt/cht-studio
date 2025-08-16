@@ -1,9 +1,11 @@
 import { FormEditor } from "@ght/formbuilder";
-import { BaseDirectory, readTextFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, readTextFile, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { isTauri } from "@tauri-apps/api/core";
 import { FullForm } from "packages/formbuilder/src/Formbuilder/Zod/zodTypes";
+import { toast } from "sonner";
+import { f } from "node_modules/react-router/dist/development/components-CjQijYga.d.mts";
 
 export const FormEditorPage = () => {
 
@@ -13,7 +15,10 @@ export const FormEditorPage = () => {
 
     const [formData, setFormData] = useState<FullForm>({ title: "", body: [] });
 
-    {/* TODO: Load the form data from disk here (tauri-fs) */ }
+    const navigate = useNavigate();
+
+    const cancelFn = () => { navigate(`/projects/${projectName}`); };
+
     const loadFormData = async () => {
         // Check if running in Tauri
         if (await isTauri()) {
@@ -23,14 +28,18 @@ export const FormEditorPage = () => {
                 console.log("Loaded form data:", parsedData);
                 if (parsedData.body && Array.isArray(parsedData.body) && parsedData.title) {
                     setFormData(parsedData);
+                    console.log("Form data structure is valid.");
+
+                    // toast.success("Form data loaded successfully!");
                 } else {
                     console.error("Invalid form data structure.");
+                    toast.error("Invalid form data structure. Please check the file.");
                     setFormData({ title: "New Form", body: [] }); // Default value if structure is invalid
                 }
 
             }).catch((error) => {
-                //TODO: Implement proper error handling
                 console.error("Error loading form data:", error);
+                toast.error("Failed to load form data. Please try again.");
             })
 
         } else {
@@ -40,11 +49,21 @@ export const FormEditorPage = () => {
     };
 
 
-    {/* TODO: Add a save to disk function, which is passed to the formeditor */ }
-    // TODO: When saving, add the formfields to a JSON file in the project directory
     const saveFormData = async (data: any) => {
-        console.log("Saving form data:", data);
-        //TODO: Redirect to Forms overview
+        console.log("Saving form data:", JSON.stringify({ title: formName, body: data }));
+        writeTextFile(
+            `projects/${projectName}/forms/${formName}`,
+            JSON.stringify({ title: formName, body: data }),
+            { baseDir: BaseDirectory.AppLocalData }
+        ).then(() => {
+            console.log("Form data saved successfully.");
+            toast.success("Form data saved successfully!");
+            navigate(`/projects/${projectName}`); // Navigate back to the forms list
+
+        }).catch((error) => {
+            console.error("Error saving form data:", error);
+            toast.error("Failed to save form data. Please try again.");
+        });
     };
 
 
@@ -52,11 +71,17 @@ export const FormEditorPage = () => {
         loadFormData();
     }, []);
 
+    console.log("Form data in FormEditorPage:", formData);
     return (
-        <div>
-            <h1>Form Builderrr</h1>
-            <FormEditor onSave={saveFormData} formInput={formData} />
-            {/* <FormEditor /> */}
-        </div>
+        <>
+            {formData && formData.body && Array.isArray(formData.body) && formData.body.length > 0 ? (
+                <div>
+                    <h1>Form Builderrr</h1>
+                    <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} />
+                </div>
+            ) : (
+                <div>Loading your file....</div>
+            )}
+        </>
     );
 }

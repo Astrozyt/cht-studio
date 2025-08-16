@@ -17,6 +17,7 @@ import { LabelFields } from "./LabelFields";
 import { useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 import { toast, Toaster } from "sonner";
+import { countRules } from "../../helpers";
 // import { LogicBuilder } from "../Logicbuilder"
 
 
@@ -82,20 +83,19 @@ export const InsertNodeButton = ({
 
     const onSubmit = (data: any) => {
         // console.log("Data", data);
-        console.log("Submitting new node", data);
+        // console.log("Submitting new node", data);
         const result = nodeSchema.safeParse(data);
         if (result.success) {
             // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
             toast.success("Node created successfully!");
-            console.log("Parsed data", result.data);
-            console.log("Parent UID", parentUid);
+            // console.log("Parsed data", result.data);
+            // console.log("Parent UID", parentUid);
             if (parentUid) {
                 setOpenness(false);
                 dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
             }
         } else {
             console.error("Validation errors", result.error.errors);
-            //TODO: Add Feedback via Toast
             // <Toaster t position="top-right" richColors closeButton />
             toast.error("Validation failed. Please check the form fields.");
         }
@@ -310,9 +310,8 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Relevant</FormLabel>
-                                        {/* <textarea value={JSON.stringify(field.value, null, 2)} readOnly className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-50" />
-                                         */}
-                                        {field.value == undefined || field.value.rules.length === 0 ? <span>No rule yet</span> : <span>Rule exists!</span>}
+
+                                        {<span>{countRules(field.value)}</span>}
                                         {showRelevantLogicBuilder && (
                                             <div className="mt-4">
                                                 <LogicBuilder

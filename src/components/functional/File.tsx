@@ -19,9 +19,9 @@ type FileProps = {
 
 const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
 
-    let { projectName } = useParams();
+    // let { projectName } = useParams();
 
-    console.log("projectName", projectName);
+    // console.log("projectName", projectName);
 
     let navigate = useNavigate();
 
@@ -41,7 +41,6 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
                 </Button>
                 <Separator className="h-8" orientation="vertical" />
                 <Button variant="ghost" onClick={() => setIsOpen(true)} className="w-1/3 border-t">
-                    {/* TODO: Implement delete functionality */}
                     <Trash />
                 </Button>
 

@@ -21,6 +21,7 @@ import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
 import { useNavigate, useParams } from "react-router";
 import { Toaster } from "sonner";
+import { addUidsToNodes } from "./helpers";
 
 // Add Tauri to the global scope
 declare global {
@@ -32,30 +33,43 @@ declare global {
 }
 
 
-export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave: (data: NodeFormValues[]) => Promise<void> }) => {
-
-    // const formModel = addUidsToNodes(formInput || { title: "New Form", body: [] } as FullForm); // Ensure all nodes have uids
-    const [formDataRed, dispatch] = useReducer(formReducer, formInput.body || []);
-
+export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: NodeFormValues[]) => Promise<void>, cancelFn: () => void }) => {
+    console.log('Form Input:', formInput.body);
+    if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
+        console.error("Invalid form input structure:", formInput);
+        return <div>Error: Invalid form input structure.</div>;
+    }
+    const formModel = addUidsToNodes(formInput); // Ensure all nodes have uids
+    console.log("formModel after adding UIDs:", formModel);
+    const [formDataRed, dispatch] = useReducer(formReducer, formModel.body);
+    // console.log("FormRed data after reducer:", formDataRed);
+    // debugger
     const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
     const { projectName } = useParams();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
+    useEffect(() => {
+        console.log("Dispatching INIT_STATE with nodes:", formModel.body);
+        dispatch({ type: 'INIT_STATE', nodes: formModel.body });
+    }, []);
 
     useEffect(() => {
         const fields = formDataRed.filter((node) => {
             return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
         });
-        setExistingFormFields(fields);
-    }, [formDataRed]);
 
-    const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
+        setExistingFormFields(fields);
+    }, []);
+
+    const rootRef = 'root'; // Default root reference
+    // const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
+
 
     const onCancel = () => {
         console.log("Cancelled editing.");
-        navigate(`/projects/${projectName}`); // Navigate back to the forms list
+        // navigate(`/projects/${projectName}`); // Navigate back to the forms list
+        cancelFn(); // Call the provided cancel function
     };
 
-    console.log("FormRed data after reducer:", formDataRed);
 
     return (
         <div>
@@ -66,7 +80,7 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
                     <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave(formDataRed); }}>
                         Save
                     </Button>
-                    <Button onClick={onCancel} variant="default" className="bg-red-300 hover:bg-red-400">
+                    <Button onClick={() => { onCancel(); }} variant="default" className="bg-red-300 hover:bg-red-400">
                         Cancel
                     </Button>
                 </div>
@@ -78,6 +92,8 @@ export const FormEditor = ({ formInput, onSave }: { formInput: FullForm, onSave:
 
 const RenderChildren = ({ children, parentUid, level, dispatch, parentRef, existingFormFields }: { existingFormFields: NodeFormValues[], children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
     // const lastPostion = children.length;
+    console.log("Rendering children for parentUid:", parentUid, "with level:", level, "and existingFormFields:", existingFormFields);
+    console.log("Children:", children);
     return children.flatMap((child, index) => [
         // InsertNodeButton({ dispatch, parentUid, index, level }),
         <InsertNodeButton existingNodes={existingFormFields} key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
@@ -92,6 +108,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
     if (["input", "select", "select1"].includes(node.tag)) {
         console.log("Field to be listed: ", node.ref, node.tag, node.bind?.type);
     }
+    console.log("Rendering node:", node, "at level:", level, "with index:", index);
     return (
 
         <Card key={index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
