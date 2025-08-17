@@ -19,7 +19,7 @@ import { RenderCalculate } from "./Formfields/RenderCalculate";
 import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 
