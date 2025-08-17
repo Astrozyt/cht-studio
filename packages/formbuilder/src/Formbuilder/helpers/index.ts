@@ -16,6 +16,8 @@ export const addUidsToNodes = (nodes: FullForm): FullForm => {
 }
 
 import { RuleGroupType } from "react-querybuilder";
+import clsx, { ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export const countRules = (group: RuleGroupType): number => {
     if (!group || !group.rules) {
@@ -31,4 +33,8 @@ export const countRules = (group: RuleGroupType): number => {
         }
     }, 0);
     return count;
+}
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
 }

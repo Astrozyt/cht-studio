@@ -19,7 +19,6 @@ import { RenderCalculate } from "./Formfields/RenderCalculate";
 import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
-import { useParams } from "react-router";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 
@@ -45,7 +44,6 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     // console.log("FormRed data after reducer:", formDataRed);
     // debugger
     const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
-    const { projectName } = useParams();
     // const navigate = useNavigate();
     useEffect(() => {
         console.log("Dispatching INIT_STATE with nodes:", formModel.body);

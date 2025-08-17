@@ -18,6 +18,9 @@ import { useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 import { toast, Toaster } from "sonner";
 import { countRules } from "../../helpers";
+import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
+import { Label } from "../Label/index.tsx";
+import { Separator } from "../Separator/index.tsx";
 // import { LogicBuilder } from "../Logicbuilder"
 
 
@@ -148,6 +151,8 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="ref"
@@ -168,27 +173,74 @@ export const InsertNodeButton = ({
                                         <FormMessage className="text-red-600" />
                                     </FormItem>
                                 )} />
+                            <Separator className="my-16 bg-gray-500" />
 
                             <FormField
                                 control={form.control}
+                                //
                                 name="bind.required"
                                 render={({ field }) => {
                                     // console.log("Field value", field.value);
                                     return <FormItem className={`${mytag != 'group' && mytag != 'note' && mytag != 'trigger' && mytag != 'repeat' ? '' : 'hidden'}`}>
+                                        <FormLabel>Field Required</FormLabel>
                                         <div className="flex items-center space-x-2">
                                             <FormControl>
-                                                <Checkbox
-                                                    {...field}
-                                                    checked={field.value}
-                                                    onCheckedChange={(checked) => field.onChange(checked)}
-                                                />
+                                                <RadioGroup
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}>
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="yes"
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel>Yes</FormLabel>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="no"
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel>No</FormLabel>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="logic"
+                                                                checked={field.value != 'yes' && field.value != 'no'}
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                            />
+                                                        </FormControl>
+                                                        <Label htmlFor="logic">Logic</Label>
+                                                    </FormItem>
+                                                </RadioGroup>
                                             </FormControl>
-                                            <FormLabel>Field Required</FormLabel>
+                                            {field.value != 'yes' && field.value != 'no' && (
+
+                                                <LogicBuilder
+                                                    formFields={[]}
+                                                    existingQuery={typeof field.value === 'object' ? field.value : undefined}
+                                                    saveFn={(query) => {
+                                                        alert("Logic saved: " + JSON.stringify(query));
+                                                        field.onChange(query); // Save logic JSON
+
+                                                    }}
+                                                    cancelFn={() => null}
+                                                />
+
+
+                                            )}
                                         </div>
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>
                                 }} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="bind.readonly"
@@ -209,6 +261,7 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 }} />
+                            <Separator className="my-16 bg-gray-500" />
 
                             <FormField
                                 control={form.control}
@@ -252,10 +305,17 @@ export const InsertNodeButton = ({
                                     </FormItem>
                                 )} />
 
+                            <Separator className="my-16 bg-gray-500" />
 
                             <LabelFields />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <HintsFields />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <ItemFields mytag={mytag} items={items} append={append} remove={remove} register={form.register} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="appearance"
@@ -276,6 +336,8 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="bind.type"
@@ -304,6 +366,8 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 }} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="bind.relevant"
@@ -344,6 +408,8 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <Separator className="my-16 bg-gray-500" />
+
 
                             <FormField
                                 control={form.control}
@@ -365,6 +431,8 @@ export const InsertNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <Separator className="my-16 bg-gray-500" />
+
                             <FormField
                                 control={form.control}
                                 name="bind.preload"

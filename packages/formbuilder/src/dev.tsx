@@ -2,11 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { FormEditor } from './Formbuilder'
-import exampleSchema from './bp_confirm_selftransformed.json'
-import { useState } from 'react'
 
 function App() {
-  const useEmptyModel = true
 
   const onSave = async (data: any) => {
     // TODO: Implement Tauri-independent save logic here
