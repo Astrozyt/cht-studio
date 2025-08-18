@@ -16,14 +16,16 @@ const LogicBuilder = ({
   saveFn,
   cancelFn = () => console.log("cancel"),
   existingQuery,
+  updateFn,
 }: {
   formFields?: any[];
-  saveFn: (
+  saveFn?: (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: RuleGroupType<RuleType<string, string, any, string>, string>
   ) => void;
   cancelFn?: () => void;
   existingQuery?: RuleGroupType<RuleType<string, string, any, string>, string>;
+  updateFn?: (query: RuleGroupType<RuleType<string, string, any, string>, string>) => void;
 }) => {
   const [query, setQuery] = React.useState<RuleGroupType>(
     existingQuery || {
@@ -53,11 +55,20 @@ const LogicBuilder = ({
       <QueryBuilder
         fields={fields}
         query={query}
-        onQueryChange={(q) => setQuery(q)}
+        onQueryChange={(q) => {
+          if (updateFn) {
+            updateFn(q);
+          }
+          setQuery(q);
+        }}
         controlElements={{ ...defaultControlElements }}
       />
-      <button onClick={() => saveFn(query)}>Save</button>
-      <button onClick={() => { console.log(query); cancelFn(); }}>Cancel</button>
+      {saveFn && (
+        <>
+          <button type='button' onClick={() => saveFn(query)}>Save</button>
+          <button onClick={() => { console.log(query); cancelFn(); }}>Cancel</button>
+        </>
+      )}
     </>
   );
 };

@@ -74,8 +74,10 @@ const hintSchema = z.object({
 });
 
 const bindBase = z.object({
-    required: z.boolean().optional(),
-    readonly: z.boolean().optional(),
+    //required can be 'yes', 'no' or a JSON object
+    // required: z.literal("yes").or(z.literal("no")).or(z.object({}).passthrough()).optional(),
+    required: z.any(),
+    // readonly: z.boolean().optional(),
     // relevant: z.string().optional(),
     relevant: z.object({}).passthrough().optional(),
     constraint: z.string().optional(),

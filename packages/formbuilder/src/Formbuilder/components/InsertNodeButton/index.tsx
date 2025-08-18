@@ -52,7 +52,7 @@ export const InsertNodeButton = ({
             ref: "",
             bind: {
                 // nodeset: '',
-                required: false,
+                required: 'no',
                 type: 'string',
                 constraint: '',
                 constraintMsg: '',
@@ -86,8 +86,9 @@ export const InsertNodeButton = ({
 
     const onSubmit = (data: any) => {
         // console.log("Data", data);
-        // console.log("Submitting new node", data);
+        console.log("Submitting new node", data);
         const result = nodeSchema.safeParse(data);
+        console.log("Result", result);
         if (result.success) {
             // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
             toast.success("Node created successfully!");
@@ -113,6 +114,9 @@ export const InsertNodeButton = ({
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
+
+    const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
+
 
     return (
         <Dialog key={parentUid || '' + level + index} open={openness} onOpenChange={setOpenness}>
@@ -186,8 +190,19 @@ export const InsertNodeButton = ({
                                         <div className="flex items-center space-x-2">
                                             <FormControl>
                                                 <RadioGroup
-                                                    value={field.value}
-                                                    onValueChange={field.onChange}>
+                                                    value={requiredMode}
+                                                    onValueChange={(val) => {
+                                                        console.log("Selected value", val);
+                                                        // setRequiredMode(val);
+                                                        if (val === 'yes' || val === 'no') {
+                                                            setRequiredMode(val);
+                                                            field.onChange(val);
+                                                        } else {
+                                                            field.onChange({}); // Save logic JSON
+                                                            setRequiredMode('logic');
+                                                        }
+                                                    }}
+                                                    defaultValue="no">
                                                     <FormItem className="flex items-center space-x-2">
                                                         <FormControl>
                                                             <RadioGroupItem
@@ -219,15 +234,19 @@ export const InsertNodeButton = ({
                                                     </FormItem>
                                                 </RadioGroup>
                                             </FormControl>
-                                            {field.value != 'yes' && field.value != 'no' && (
+                                            {typeof requiredMode == 'object' || requiredMode === 'logic' && (
 
                                                 <LogicBuilder
                                                     formFields={[]}
-                                                    existingQuery={typeof field.value === 'object' ? field.value : undefined}
+                                                    // existingQuery={field.value}
                                                     saveFn={(query) => {
-                                                        alert("Logic saved: " + JSON.stringify(query));
-                                                        field.onChange(query); // Save logic JSON
+                                                        // alert("Logic saved: " + JSON.stringify(query));
+                                                        // field.onChange(query); // Save logic JSON
+                                                        console.log("Logic saved", query);
 
+                                                    }}
+                                                    updateFn={(query) => {
+                                                        field.onChange(query); // Save logic JSON}
                                                     }}
                                                     cancelFn={() => null}
                                                 />
@@ -236,7 +255,7 @@ export const InsertNodeButton = ({
                                             )}
                                         </div>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage className="text-red-500" />
                                     </FormItem>
                                 }} />
                             <Separator className="my-16 bg-gray-500" />
@@ -395,13 +414,10 @@ export const InsertNodeButton = ({
                                             </div>
                                         )}
                                         <FormControl>
-                                            <>
-                                                {/* <p>{JSON.stringify(field.value)}</p>{ } */}
-                                                {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
-                                                    {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
-                                                </Button>
-                                                }
-                                            </>
+                                            {/* <p>{JSON.stringify(field.value)}</p>{ } */}
+                                            {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
+                                                {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
+                                            </Button>}
                                         </FormControl>
 
                                         <FormDescription />

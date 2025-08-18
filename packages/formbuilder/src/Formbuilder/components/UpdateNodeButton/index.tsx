@@ -20,6 +20,9 @@ import { PenToolIcon } from "lucide-react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 import { countRules } from "../../helpers";
 import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
+import { Label } from "../Label/index.tsx";
+import { Separator } from "../Separator/index.tsx";
 
 
 // type NodeFormValues = z.infer<typeof nodeSchema>;
@@ -81,6 +84,8 @@ export const UpdateNodeButton = ({
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
+
+    const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
 
     return (
         <Dialog open={openness} onOpenChange={setOpenness}>
@@ -147,24 +152,79 @@ export const UpdateNodeButton = ({
 
                             <FormField
                                 control={form.control}
+                                //
                                 name="bind.required"
                                 render={({ field }) => {
                                     // console.log("Field value", field.value);
                                     return <FormItem className={`${mytag != 'group' && mytag != 'note' && mytag != 'trigger' && mytag != 'repeat' ? '' : 'hidden'}`}>
+                                        <FormLabel>Field Required</FormLabel>
                                         <div className="flex items-center space-x-2">
                                             <FormControl>
-                                                <Checkbox
-                                                    {...field}
-                                                    checked={field.value === true || field.value === "true()"}
-                                                    onCheckedChange={(checked) => field.onChange(checked)}
-                                                />
+                                                <RadioGroup
+                                                    value={requiredMode}
+                                                    onValueChange={(val) => {
+                                                        setRequiredMode(val as 'yes' | 'no' | 'logic');
+                                                        if (val === 'yes') {
+                                                            field.onChange('yes');
+                                                        } else if (val === 'no') {
+                                                            field.onChange('no');
+                                                        } else {
+                                                            field.onChange({}); // Logic mode
+                                                        }
+                                                    }}
+                                                    defaultValue="no">
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="yes"
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel>Yes</FormLabel>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="no"
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel>No</FormLabel>
+                                                    </FormItem>
+                                                    <FormItem className="flex items-center space-x-2">
+                                                        <FormControl>
+                                                            <RadioGroupItem
+                                                                value="logic"
+                                                                checked={field.value != 'yes' && field.value != 'no'}
+                                                                className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                            />
+                                                        </FormControl>
+                                                        <Label htmlFor="logic">Logic</Label>
+                                                    </FormItem>
+                                                </RadioGroup>
                                             </FormControl>
-                                            <FormLabel>Field Required</FormLabel>
+                                            {field.value != 'yes' && field.value != 'no' && (
+
+                                                <LogicBuilder
+                                                    formFields={[]}
+                                                    existingQuery={typeof field.value === 'object' ? field.value : undefined}
+                                                    saveFn={(query) => {
+                                                        alert("Logic saved: " + JSON.stringify(query));
+                                                        field.onChange(query); // Save logic JSON
+
+                                                    }}
+                                                    cancelFn={() => null}
+                                                />
+
+
+                                            )}
                                         </div>
                                         <FormDescription />
-                                        <FormMessage className="text-red-600" />
+                                        <FormMessage />
                                     </FormItem>
                                 }} />
+                            <Separator className="my-16 bg-gray-500" />
                             <FormField
                                 control={form.control}
                                 name="bind.readonly"
@@ -308,13 +368,13 @@ export const UpdateNodeButton = ({
                                             </div>
                                         )}
                                         <FormControl>
-                                            <>
-                                                {/* <p>{JSON.stringify(field.value)}</p>{ } */}
-                                                {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
-                                                    {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
-                                                </Button>
-                                                }
-                                            </>
+
+                                            {/* <p>{JSON.stringify(field.value)}</p>{ } */}
+                                            {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
+                                                {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
+                                            </Button>
+                                            }
+
                                         </FormControl>
 
                                         <FormDescription />
