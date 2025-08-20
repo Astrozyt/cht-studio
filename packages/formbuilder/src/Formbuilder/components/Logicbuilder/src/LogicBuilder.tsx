@@ -37,7 +37,7 @@ const LogicBuilder = ({
 
   const fields: Field[] = formFields?.map((field) => ({
     name: field.ref,
-    label: field.ref + 'label',
+    label: field.ref, // Use field.ref as the label
     value: field.ref + 'value',
     type: field.bind?.type || "text",
     placeholder: "This is a placeholder",

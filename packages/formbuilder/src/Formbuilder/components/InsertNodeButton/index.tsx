@@ -54,10 +54,10 @@ export const InsertNodeButton = ({
                 // nodeset: '',
                 required: 'no',
                 type: 'string',
-                constraint: '',
+                constraint: {},
                 constraintMsg: '',
                 readonly: false,
-                relevant: undefined,//{ combinator: 'and', rules: [] },
+                relevant: {},//{ combinator: 'and', rules: [] },
                 calculate: '',
                 preload: '',
                 preloadParams: ''
@@ -110,6 +110,7 @@ export const InsertNodeButton = ({
     //     control,
     //     name: "labels"
     // });
+    console.log("Existing nodes:", existingNodes);
 
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
@@ -288,16 +289,13 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem className={`${mytag === 'input' ? '' : 'hidden'}`}>
                                         <FormLabel>Constraint</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Type the Constraint"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value}
-                                            />
-                                        </FormControl>
+                                        {<span>{countRules(field.value)} rules.</span>}
+                                        <LogicBuilder
+                                            formFields={[{ ref: 'This Field', tag: 'thisField', uid: 'th15_f13ld' }]}
+                                            updateFn={(query) => {
+                                                field.onChange(query); // Save logic JSON}
+                                            }}
+                                        />
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>
@@ -394,7 +392,7 @@ export const InsertNodeButton = ({
                                     <FormItem>
                                         <FormLabel>Relevant</FormLabel>
 
-                                        {<span>{countRules(field.value)}</span>}
+                                        {<span>{countRules(field.value)} rules.</span>}
                                         {showRelevantLogicBuilder && (
                                             <div className="mt-4">
                                                 <LogicBuilder
@@ -449,6 +447,7 @@ export const InsertNodeButton = ({
                                 )} />
                             <Separator className="my-16 bg-gray-500" />
 
+                            {/* TODO: Add a preloadmechanism, once the implementation of datastructures is clearer. */}
                             <FormField
                                 control={form.control}
                                 name="bind.preload"

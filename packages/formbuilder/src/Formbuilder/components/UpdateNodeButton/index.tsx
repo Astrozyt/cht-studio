@@ -252,16 +252,15 @@ export const UpdateNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem className={`${mytag === 'input' ? '' : 'hidden'}`}>
                                         <FormLabel>Constraint</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Type the Constraint"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value}
-                                            />
-                                        </FormControl>
+                                        {<span>{countRules(field.value)} rules.</span>}
+                                        <LogicBuilder
+                                            formFields={[{ ref: 'This Field', tag: 'thisField', uid: 'th15_f13ld' }]}
+                                            existingQuery={field.value}
+                                            updateFn={(query) => {
+                                                field.onChange(query); // Save logic JSON}
+                                            }}
+                                        />
+
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>

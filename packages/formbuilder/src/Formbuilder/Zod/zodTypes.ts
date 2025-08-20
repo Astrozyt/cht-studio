@@ -80,7 +80,7 @@ const bindBase = z.object({
     // readonly: z.boolean().optional(),
     // relevant: z.string().optional(),
     relevant: z.object({}).passthrough().optional(),
-    constraint: z.string().optional(),
+    constraint: z.object({}).passthrough().optional(),
     constraintMsg: z.string().optional(),
     calculate: z.string().optional(),
     preload: z.string().optional(),

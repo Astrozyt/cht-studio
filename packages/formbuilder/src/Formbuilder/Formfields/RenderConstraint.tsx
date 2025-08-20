@@ -1,8 +1,12 @@
-export const RenderConstraint = ({ constraint }: { constraint: string }): JSX.Element => {
+import { RuleGroupType } from "react-querybuilder";
+import { countRules } from "../helpers";
+
+export const RenderConstraint = ({ constraint }: { constraint: RuleGroupType }): JSX.Element => {
+    const ruleNum = countRules(constraint);
     return (
         <span className="text-sm w-20 border-r-1 flex-1 overflow-hidden truncate">
             <p>Constraint</p>
-            <p>{constraint || "N/A"}</p>
+            <p>{ruleNum} rules</p>
         </span>
     );
 }
@@ -11,7 +15,7 @@ export const RenderConstraintMessage = ({ constraintMsg }: { constraintMsg: stri
     return (
         <span className="text-sm w-20 border-r-1 flex-1 overflow-hidden truncate">
             <p>Constraint Message</p>
-            <p>{constraintMsg || "N/A"}</p>
+            <p>{constraintMsg || "-"}</p>
         </span>
     );
 }

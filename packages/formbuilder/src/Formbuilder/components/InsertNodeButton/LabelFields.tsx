@@ -9,7 +9,7 @@ export const LabelFields = () => {
         control,
         name: "labels"
     });
-
+    //TODO: Instead of offering an add label button, prepopulate with options for each project language (Zustand).
     return (
         <div className="space-y-4">
             <FormLabel className="text-base">Labels</FormLabel>
