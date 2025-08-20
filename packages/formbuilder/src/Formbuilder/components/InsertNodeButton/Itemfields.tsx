@@ -4,12 +4,8 @@ import { Input } from "../../../components/input";
 import { FieldValues, UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form";
 
 export const ItemFields = ({ items, append, remove, mytag, register }: { register: any, items: { labels: { lang: string; value: string }[]; value: string }[], append: UseFieldArrayAppend<FieldValues, "items">, remove: UseFieldArrayRemove, mytag: string }) => {
-    // const { control, register } = useFormContext();
 
-    // const { fields, append, remove } = useFieldArray({
-    //     control,
-    //     name: "items",
-    // });
+    //TODO: Fix the language boxes to the languages of the project.
 
     return <div className={`space-y-2 ${mytag == 'select' || mytag == 'select1' ? '' : 'hidden'}`}>
         <div className="flex justify-between items-center">

@@ -9,7 +9,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../../../components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/select";
 import { Action } from "../../helpers/formState";
-import { nodeSchema, NodeType } from "../../Zod/zodTypes";
+import { appearanceOptions, nodeSchema, NodeType } from "../../Zod/zodTypes";
 import { bindTypeOptions, type NodeFormValues } from "../../Zod/zodTypes";
 import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
@@ -84,6 +84,11 @@ export const UpdateNodeButton = ({
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
+
+    const zodEnum = appearanceOptions[mytag as keyof typeof appearanceOptions] ?? [];
+
+    const appearanceChoices = zodEnum ? zodEnum.options as string[] : [];
+
 
     const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
 
@@ -297,16 +302,20 @@ export const UpdateNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Appearance Rule</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Choose the appearance rule"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value ?? ""}
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select the appearance mode" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="bg-white">
+                                                {appearanceChoices.map((choice) => (
+                                                    <SelectItem key={choice} value={choice}>
+                                                        {choice}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormDescription />
                                         <FormMessage className="text-red-500" />
                                     </FormItem>
@@ -345,8 +354,6 @@ export const UpdateNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Relevant</FormLabel>
-                                        {/* <textarea value={JSON.stringify(field.value, null, 2)} readOnly className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-50" />
-                                         */}
                                         {<span>{countRules(field.value)}</span>}
                                         {showRelevantLogicBuilder && (
                                             <div className="mt-4">
@@ -380,7 +387,7 @@ export const UpdateNodeButton = ({
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-
+                            {/* TODO: Create an expression builder for the calculate field. */}
                             <FormField
                                 control={form.control}
                                 name="bind.calculate"

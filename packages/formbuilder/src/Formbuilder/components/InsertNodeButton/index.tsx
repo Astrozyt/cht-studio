@@ -8,7 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../../../components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/select";
 import { Action } from "../../helpers/formState";
-import { NodeType } from "../../Zod/zodTypes";
+import { appearanceOptions, NodeType } from "../../Zod/zodTypes";
 import { bindTypeOptions, type NodeFormValues, nodeSchema } from "../../Zod/zodTypes";
 import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
@@ -115,6 +115,10 @@ export const InsertNodeButton = ({
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
     const bindTypes = bindTypeOptions[mytag as keyof typeof bindTypeOptions] ?? [];
+
+    const zodEnum = appearanceOptions[mytag as keyof typeof appearanceOptions] ?? [];
+
+    const appearanceChoices = zodEnum ? zodEnum.options as string[] : [];
 
     const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
 
@@ -339,16 +343,20 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Appearance Rule</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Choose the appearance rule"
-                                                {...field}
-                                                onChange={(e) => {
-                                                    field.onChange(e);
-                                                }}
-                                                value={field.value}
-                                            />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select the appearance mode" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="bg-white">
+                                                {appearanceChoices.map((choice) => (
+                                                    <SelectItem key={choice} value={choice}>
+                                                        {choice}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormDescription />
                                         <FormMessage />
                                     </FormItem>
@@ -491,10 +499,6 @@ export const InsertNodeButton = ({
 
 
                             <DialogFooter>
-                                {/* <Button type="submit" onClick={() => {
-                                    const data = form.getValues();
-                                    console.log("Data before dispatch", data);
-                                }}> */}
                                 <Button type="submit">
                                     Save
                                 </Button>

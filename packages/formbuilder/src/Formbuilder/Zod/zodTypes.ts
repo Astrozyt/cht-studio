@@ -91,11 +91,20 @@ const bindBase = z.object({
 const baseNode = z.object({
     uid: z.string(),
     ref: z.string().min(1, "Reference required"),
-    appearance: z.string().optional(),
+    // appearance: z.string().optional(),
     labels: z.array(labelSchema).optional(),
     hints: z.array(hintSchema).optional(),
     items: z.array(itemSchema).optional(),
 });
+
+export const appearanceOptions = {
+    input: z.enum(["hidden", "multiline", "numbers"]),
+    select: z.enum(["quick", "minimal", "autocomplete", "likert", "label", "list-nolabel"]),
+    select1: z.enum(["quick", "minimal", "autocomplete", "likert", "label", "list-nolabel"]),
+    image: z.enum(["annotate", "draw", "signature"]),
+    geopoint: z.enum(["maps", "placement-map"]),
+    note: z.enum(["minimal"]),
+};
 
 function bindSchemaForNodeType(nodeType: keyof typeof bindTypeOptions) {
     const types = bindTypeOptions[nodeType];
@@ -108,18 +117,21 @@ function bindSchemaForNodeType(nodeType: keyof typeof bindTypeOptions) {
 const inputNode = baseNode.extend({
     tag: z.literal(NodeType.Input),
     bind: bindSchemaForNodeType("input"),
+    appearance: appearanceOptions.input.optional(),
     children: z.never().optional(),
 });
 
 const selectNode = baseNode.extend({
     tag: z.literal(NodeType.Select),
     bind: bindSchemaForNodeType("select"),
+    appearance: appearanceOptions.select.optional(),
     children: z.never().optional(),
 });
 
 const select1Node = baseNode.extend({
     tag: z.literal(NodeType.Select1),
     bind: bindSchemaForNodeType("select1"),
+    appearance: appearanceOptions.select1.optional(),
     children: z.never().optional(),
 });
 
