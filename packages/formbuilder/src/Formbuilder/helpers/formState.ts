@@ -73,14 +73,13 @@ function findNodeByUid(tree: NodeFormValues[], uid: string): NodeFormValues | un
     return undefined;
 }
 
-function removeById(tree: NodeFormValues[], targetId: string): NodeFormValues[] {
-    return tree
-        .map(node => {
-            if (node.children) {
-                node.children = removeById(node.children, targetId);
-            }
-            return node;
-        })
-        .filter(node => node.uid !== targetId);
+function removeById(tree: NodeFormValues[], targetId: string): void {
+    for (let i = tree.length - 1; i >= 0; i--) {
+        if (tree[i].uid === targetId) {
+            tree.splice(i, 1);
+        } else if (tree[i].children) {
+            removeById(tree[i].children, targetId);
+        }
+    }
 }
 export { formReducer, visit, removeById };

@@ -300,7 +300,7 @@ export const UpdateNodeButton = ({
                                 control={form.control}
                                 name="appearance"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className={`${appearanceChoices && appearanceChoices.length > 0 ? '' : 'hidden'}`}>
                                         <FormLabel>Appearance Rule</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
@@ -309,7 +309,7 @@ export const UpdateNodeButton = ({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className="bg-white">
-                                                {appearanceChoices.map((choice) => (
+                                                {appearanceChoices && appearanceChoices.map((choice) => (
                                                     <SelectItem key={choice} value={choice}>
                                                         {choice}
                                                     </SelectItem>
