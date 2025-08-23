@@ -3,7 +3,7 @@ import { FormItem, FormLabel } from "../../../components/form";
 import { Input } from "../../../components/input";
 import { FieldValues, UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form";
 
-export const ItemFields = ({ items, append, remove, mytag, register }: { register: any, items: { labels: { lang: string; value: string }[]; value: string }[], append: UseFieldArrayAppend<FieldValues, "items">, remove: UseFieldArrayRemove, mytag: string }) => {
+export const ItemFields = ({ items = [], append, remove, mytag, register }: { register: any, items: { labels: { lang: string; value: string }[]; value: string }[], append: UseFieldArrayAppend<FieldValues, "items">, remove: UseFieldArrayRemove, mytag: string }) => {
 
     //TODO: Fix the language boxes to the languages of the project.
 
@@ -35,13 +35,13 @@ export const ItemFields = ({ items, append, remove, mytag, register }: { registe
                         <li key={labelIndex} className="flex items-center gap-2">
                             <div className="w-[100px]">
                                 <Input
-                                    {...register(`items.${index}.label.${labelIndex}.lang`)}
+                                    {...register(`items.${index}.labels.${labelIndex}.lang`)}
                                     placeholder="Lang"
                                 />
                             </div>
                             <div className="flex-1 min-w-[200px]">
                                 <Input
-                                    {...register(`items.${index}.label.${labelIndex}.value`)}
+                                    {...register(`items.${index}.labels.${labelIndex}.value`)}
                                     placeholder="Label"
                                 />
                             </div>

@@ -341,7 +341,7 @@ export const InsertNodeButton = ({
                                 control={form.control}
                                 name="appearance"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className={`${appearanceChoices && appearanceChoices.length > 0 ? '' : 'hidden'}`}>
                                         <FormLabel>Appearance Rule</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
@@ -350,7 +350,7 @@ export const InsertNodeButton = ({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className="bg-white">
-                                                {appearanceChoices.map((choice) => (
+                                                {appearanceChoices && appearanceChoices.map((choice) => (
                                                     <SelectItem key={choice} value={choice}>
                                                         {choice}
                                                     </SelectItem>
@@ -497,7 +497,19 @@ export const InsertNodeButton = ({
                                     </FormItem>
                                 )} />
 
-
+                            <FormItem className="mt-8">
+                                <FormLabel>Validation Errors</FormLabel>
+                                <FormDescription className="text-xs">Below are the validation errors detected:</FormDescription>
+                                <FormControl>
+                                    <ul className="text-red-600 text-sm">
+                                        {form.formState.errors && Object.entries(form.formState.errors).map(([key, error]) => (
+                                            <li key={key}>
+                                                <strong>{key}:</strong> {`${error?.message}`}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </FormControl>
+                            </FormItem>
                             <DialogFooter>
                                 <Button type="submit">
                                     Save
