@@ -32,22 +32,22 @@ declare global {
 }
 
 
-export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: NodeFormValues[]) => Promise<void>, cancelFn: () => void }) => {
+export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm) => Promise<void>, cancelFn: () => void }) => {
     console.log('Form Input:', formInput.body);
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
     }
-    const formModel = addUidsToNodes(formInput); // Ensure all nodes have uids
-    console.log("formModel after adding UIDs:", formModel);
-    const [formDataRed, dispatch] = useReducer(formReducer, formModel.body);
+    // const formModel = addUidsToNodes(formInput); // Ensure all nodes have uids
+    // console.log("formModel after adding UIDs:", formModel);
+    const [formDataRed, dispatch] = useReducer(formReducer, []/*formModel.body*/);
     // console.log("FormRed data after reducer:", formDataRed);
     // debugger
     const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
     // const navigate = useNavigate();
     useEffect(() => {
-        console.log("Dispatching INIT_STATE with nodes:", formModel.body);
-        dispatch({ type: 'INIT_STATE', nodes: formModel.body });
+        // console.log("Dispatching INIT_STATE with nodes:", formModel.body);
+        dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
     }, []);
 
     useEffect(() => {
@@ -75,7 +75,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
                 <h2>Form Editor ({formInput.title})</h2>
                 <RenderChildren existingFormFields={existingFormFields} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
-                    <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave(formDataRed); }}>
+                    <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>
                         Save
                     </Button>
                     <Button onClick={() => { onCancel(); }} variant="default" className="bg-red-300 hover:bg-red-400">
@@ -155,6 +155,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
                     <UpdateNodeButton existingNode={node} dispatch={dispatch} existingNodes={existingFormFields} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
+                    console.log('DELETE: ', node.uid);
                     dispatch({ type: 'DELETE_NODE', uid: node.uid || '' });
                 }} />
             </CardContent>

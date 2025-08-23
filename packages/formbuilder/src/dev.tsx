@@ -10,7 +10,7 @@ function App() {
     console.log("Data to save:", data);
   }
 
-  const body = [{ "uid": "h1TnqteWmZIPPcZqSoJB_", "ref": "un", "labels": [], "hints": [], "items": [], "tag": "input", "bind": { "required": false, "readonly": false, "constraint": "", "constraintMsg": "", "calculate": "", "preload": "", "preloadParams": "", "type": "string" } }];
+  const body = [{ "uid": "h1TnqteWmZIPPcZqSoJB_", "ref": "Example Input", "labels": [], "hints": [], "items": [], "tag": "input", "bind": { "required": false, "readonly": false, "constraint": "", "constraintMsg": "", "calculate": "", "preload": "", "preloadParams": "", "type": "string" } }];
 
 
   const cancelFn = () => {
@@ -20,10 +20,9 @@ function App() {
 
   return (
     <StrictMode>
-      This is it:
-      <p className='bg-red-400'>My Form</p>
+      Formbuilder in package mode:
 
-      <FormEditor onSave={onSave} cancelFn={cancelFn} formInput={{ title: 'asdf', body }} />
+      <FormEditor onSave={onSave} cancelFn={cancelFn} formInput={{ title: 'Example Form', body }} />
     </StrictMode>
   )
 }
