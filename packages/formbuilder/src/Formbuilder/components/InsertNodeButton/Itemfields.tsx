@@ -19,6 +19,7 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                         value: "123",
                     })
                 }
+                data-cy="item-add-button"
             >
                 Add Item
             </Button>
@@ -37,12 +38,14 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                                 <Input
                                     {...register(`items.${index}.labels.${labelIndex}.lang`)}
                                     placeholder="Lang"
+                                    data-cy={`item-label-lang-input-${index}-${labelIndex}`}
                                 />
                             </div>
                             <div className="flex-1 min-w-[200px]">
                                 <Input
                                     {...register(`items.${index}.labels.${labelIndex}.value`)}
                                     placeholder="Label"
+                                    data-cy={`item-label-value-input-${index}-${labelIndex}`}
                                 />
                             </div>
                         </li>
@@ -52,12 +55,14 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                     <Input
                         {...register(`items.${index}.value`)}
                         placeholder="Value"
+                        data-cy={`item-value-input-${index}`}
                     />
                 </div>
                 <Button
                     type="button"
                     variant="destructive"
                     onClick={() => remove(index)}
+                    data-cy={`item-remove-button-${index}`}
                 >
                     Remove
                 </Button>

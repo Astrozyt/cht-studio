@@ -20,6 +20,7 @@ export const LabelFields = () => {
                             {...register(`labels.${index}.lang`)}
                             placeholder="Lang (e.g. en)"
                             className="w-1/4"
+                            data-cy={`label-lang-input-${index}`}
                         />
                     </FormControl>
                     <FormControl>
@@ -27,12 +28,13 @@ export const LabelFields = () => {
                             {...register(`labels.${index}.value`)}
                             placeholder="Label text"
                             className="w-3/4"
+                            data-cy={`label-value-input-${index}`}
                         />
                     </FormControl>
-                    <Button type="button" variant="ghost" onClick={() => remove(index)}>
+                    <Button type="button" variant="ghost" onClick={() => remove(index)} data-cy={`label-remove-button-${index}`}>
                         ✕
                     </Button>
-                    <FormMessage className="text-red-600" />
+                    <FormMessage className="text-red-600" data-cy={`label-error-${index}`} />
                 </FormItem>
             ))}
 
@@ -41,6 +43,7 @@ export const LabelFields = () => {
                 variant="outline"
                 className="mt-2"
                 onClick={() => append({ lang: "", value: "" })}
+                data-cy="label-add-button"
             >
                 ➕ Add Label
             </Button>

@@ -75,10 +75,10 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
                 <h2>Form Editor ({formInput.title})</h2>
                 <RenderChildren existingFormFields={existingFormFields} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
-                    <Button variant="outline" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>
+                    <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>
                         Save
                     </Button>
-                    <Button onClick={() => { onCancel(); }} variant="default" className="bg-red-300 hover:bg-red-400">
+                    <Button onClick={() => { onCancel(); }} data-cy="cancel-button" variant="default" className="bg-red-300 hover:bg-red-400">
                         Cancel
                     </Button>
                 </div>
@@ -109,7 +109,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
     console.log("Rendering node:", node, "at level:", level, "with index:", index);
     return (
 
-        <Card key={index} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
+        <Card key={index} data-cy={`formnode-${index}.${node.ref}`} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
             <CardContent className="px-2 flex justify-end w-full space-x-4">
                 {<RenderType type={node.tag} />}
                 {<RenderRef nodeRef={node.ref} onSave={(newValue) => { dispatch({ type: "UPDATE_NODE", uid: node.uid, changes: { ref: newValue } }) }} />}

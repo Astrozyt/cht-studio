@@ -144,12 +144,12 @@ export const InsertNodeButton = ({
                                         <FormLabel>Node Type</FormLabel>
                                         <FormControl>
                                             <Select onValueChange={field.onChange} value={field.value}>
-                                                <SelectTrigger>
+                                                <SelectTrigger data-cy="node-type-select">
                                                     <SelectValue placeholder="Type of Node" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-white">
                                                     {Object.values(NodeType).map((type) => (
-                                                        <SelectItem className="bg-white  hover:bg-gray-400" key={type} value={type}>
+                                                        <SelectItem className="bg-white  hover:bg-gray-400" data-cy={`node-type-option-${type}`} key={type} value={type}>
                                                             {type}
                                                         </SelectItem>
                                                     ))}
@@ -157,7 +157,7 @@ export const InsertNodeButton = ({
                                             </Select>
                                         </FormControl>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage data-cy="node-type-error" />
                                     </FormItem>
                                 )} />
                             <Separator className="my-16 bg-gray-500" />
@@ -173,6 +173,7 @@ export const InsertNodeButton = ({
                                             <Input
                                                 placeholder="Choose the name"
                                                 {...field}
+                                                data-cy="field-name-input"
                                                 onChange={(e) => {
                                                     field.onChange(e);
                                                 }}
@@ -213,6 +214,7 @@ export const InsertNodeButton = ({
                                                             <RadioGroupItem
                                                                 value="yes"
                                                                 className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                                data-cy="field-required-yes"
                                                             />
                                                         </FormControl>
                                                         <FormLabel>Yes</FormLabel>
@@ -222,7 +224,7 @@ export const InsertNodeButton = ({
                                                             <RadioGroupItem
                                                                 value="no"
                                                                 className="aria-checked:bg-blue-500 aria-checked:text-white"
-
+                                                                data-cy="field-required-no"
                                                             />
                                                         </FormControl>
                                                         <FormLabel>No</FormLabel>
@@ -233,6 +235,7 @@ export const InsertNodeButton = ({
                                                                 value="logic"
                                                                 checked={field.value != 'yes' && field.value != 'no'}
                                                                 className="aria-checked:bg-blue-500 aria-checked:text-white"
+                                                                data-cy="field-required-logic"
                                                             />
                                                         </FormControl>
                                                         <Label htmlFor="logic">Logic</Label>
@@ -274,6 +277,7 @@ export const InsertNodeButton = ({
                                         <div className="flex items-center space-x-2">
                                             <FormControl>
                                                 <Checkbox
+                                                    data-cy="field-readonly-checkbox"
                                                     {...field}
                                                     checked={field.value}
                                                     onCheckedChange={(checked) => field.onChange(checked)}
@@ -318,6 +322,7 @@ export const InsertNodeButton = ({
                                                 onChange={(e) => {
                                                     field.onChange(e);
                                                 }}
+                                                data-cy="field-constraint-msg-input"
                                                 value={field.value}
                                             />
                                         </FormControl>
@@ -345,13 +350,13 @@ export const InsertNodeButton = ({
                                         <FormLabel>Appearance Rule</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger data-cy="appearance-trigger">
                                                     <SelectValue placeholder="Select the appearance mode" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className="bg-white">
                                                 {appearanceChoices && appearanceChoices.map((choice) => (
-                                                    <SelectItem key={choice} value={choice}>
+                                                    <SelectItem key={choice} value={choice} data-cy={`appearance-option-${choice}`}>
                                                         {choice}
                                                     </SelectItem>
                                                 ))}
@@ -372,14 +377,14 @@ export const InsertNodeButton = ({
                                         <FormLabel>Bind Type</FormLabel>
                                         <FormControl>
                                             <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger>
+                                                <SelectTrigger data-cy="bind-type-select">
                                                     <SelectValue placeholder="Type of Bind" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-white">
                                                     {bindTypes.map((type) => {
                                                         // console.log("Type", type);
                                                         return (
-                                                            <SelectItem className="bg-white  hover:bg-gray-400" key={nanoid()} value={type}>
+                                                            <SelectItem className="bg-white  hover:bg-gray-400" key={nanoid()} value={type} data-cy={`bind-type-option-${type}`}>
                                                                 {type}
                                                             </SelectItem>
                                                         );
@@ -421,7 +426,7 @@ export const InsertNodeButton = ({
                                         )}
                                         <FormControl>
                                             {/* <p>{JSON.stringify(field.value)}</p>{ } */}
-                                            {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)}>
+                                            {!showRelevantLogicBuilder && <Button type="button" variant="outline" onClick={() => setShowRelevantLogicBuilder(!showRelevantLogicBuilder)} data-cy="show-logic-builder-button">
                                                 {showRelevantLogicBuilder ? 'Hide Logic Builder' : 'Show Logic Builder'}
                                             </Button>}
                                         </FormControl>
@@ -447,6 +452,7 @@ export const InsertNodeButton = ({
                                                     field.onChange(e);
                                                 }}
                                                 value={field.value}
+                                                data-cy="field-calculate-input"
                                             />
                                         </FormControl>
                                         <FormDescription />
@@ -470,6 +476,7 @@ export const InsertNodeButton = ({
                                                     field.onChange(e);
                                                 }}
                                                 value={field.value}
+                                                data-cy="field-preload-input"
                                             />
                                         </FormControl>
                                         <FormDescription />
@@ -490,6 +497,7 @@ export const InsertNodeButton = ({
                                                     field.onChange(e);
                                                 }}
                                                 value={field.value}
+                                                data-cy="field-preload-params-input"
                                             />
                                         </FormControl>
                                         <FormDescription />
@@ -503,7 +511,7 @@ export const InsertNodeButton = ({
                                 <FormControl>
                                     <ul className="text-red-600 text-sm">
                                         {form.formState.errors && Object.entries(form.formState.errors).map(([key, error]) => (
-                                            <li key={key}>
+                                            <li key={key} data-cy={`validation-error-${key}`}>
                                                 <strong>{key}:</strong> {`${error?.message}`}
                                             </li>
                                         ))}
@@ -511,10 +519,10 @@ export const InsertNodeButton = ({
                                 </FormControl>
                             </FormItem>
                             <DialogFooter>
-                                <Button type="submit">
+                                <Button type="submit" data-cy="save-button">
                                     Save
                                 </Button>
-                                <DialogClose asChild><Button>Cancel</Button></DialogClose>
+                                <DialogClose asChild><Button data-cy="cancel-button">Cancel</Button></DialogClose>
                             </DialogFooter>
                         </form>
                     </Form>

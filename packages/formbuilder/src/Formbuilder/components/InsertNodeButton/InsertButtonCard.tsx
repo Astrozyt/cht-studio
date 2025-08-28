@@ -50,7 +50,7 @@ export const InsertButtonCard = ({
 
             className="py-0 flex justify-center w-full space-x-4 bg-green-200 hover:bg-green-400 cursor-pointer"
         >
-            <span className="pl-3">➕ Insert Here</span>
+            <span className="pl-3" data-cy={`insert-button-${index}`}>➕ Insert Here</span>
         </Card>
     );
 };

@@ -20,6 +20,7 @@ export const HintsFields = () => {
                             {...register(`hints.${index}.lang`)}
                             placeholder="Lang (e.g. en)"
                             className="w-1/4"
+                            data-cy={`hint-lang-input-${index}`}
                         />
                     </FormControl>
                     <FormControl>
@@ -27,9 +28,10 @@ export const HintsFields = () => {
                             {...register(`hints.${index}.value`)}
                             placeholder="Label text"
                             className="w-3/4"
+                            data-cy={`hint-value-input-${index}`}
                         />
                     </FormControl>
-                    <Button type="button" variant="ghost" onClick={() => remove(index)}>
+                    <Button type="button" variant="ghost" onClick={() => remove(index)} data-cy={`hint-remove-button-${index}`}>
                         ✕
                     </Button>
                 </FormItem>
@@ -40,8 +42,9 @@ export const HintsFields = () => {
                 variant="outline"
                 className="mt-2"
                 onClick={() => append({ lang: "", value: "" })}
+                data-cy="hint-add-button"
             >
-                ➕ Add Label
+                ➕ Add Hint
             </Button>
         </div>
     );
