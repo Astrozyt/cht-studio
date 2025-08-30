@@ -12,7 +12,8 @@ export default defineConfig(async () => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       '@ght/formbuilder': path.resolve(__dirname, './packages/formbuilder/src'),
-      '@ght/xFormParser': path.resolve(__dirname, './packages/xFormParser/src')
+      '@ght/xFormParser': path.resolve(__dirname, './packages/xFormParser/src'),
+      '@ght/stores': path.resolve(__dirname, './packages/stores/src'),
     },
   },
 

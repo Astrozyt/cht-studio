@@ -13,6 +13,7 @@
     "@bpmn-io/form-js-editor": "^1.15.1",
     "@ght/formbuilder": "workspace:*",
     "@ght/xformparser": "workspace:*",
+    "@ght/stores": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.7",

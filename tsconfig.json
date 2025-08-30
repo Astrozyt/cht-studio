@@ -33,8 +33,11 @@
       "@ght/logicbuilder": [
         "./packages/logicbuilder"
       ],
-      "ght/xFormParser": [
+      "@ght/xFormParser": [
         "./packages/xFormParser"
+      ],
+      "@ght/stores": [
+        "packages/stores/src"
       ]
     }
   },

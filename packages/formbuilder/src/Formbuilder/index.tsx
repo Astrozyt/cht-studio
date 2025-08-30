@@ -21,6 +21,10 @@ import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { UpdateNodeButton } from "./components/UpdateNodeButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
+import { useFormStore } from "@ght/stores";
+import { Input } from "@/components/input";
+import { LanguagesBox } from "./components/LanguagesBox";
+
 
 // Add Tauri to the global scope
 declare global {
@@ -45,16 +49,27 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     // debugger
     const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
     // const navigate = useNavigate();
+    const formLanguages = useFormStore(state => state.languages);
+    const initLanguages = useFormStore(state => state.initLanguages);
+    const removeLang = useFormStore(state => state.removeLanguage);
+
+    // const initLanguages = state => 
     useEffect(() => {
         // console.log("Dispatching INIT_STATE with nodes:", formModel.body);
         dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
+        initLanguages(formInput.languages || []);
+        // formLanguages.getState().initLanguages(formInput.languages || []);  
+
     }, []);
+
+    console.log('formDataRed:', formDataRed);
 
     useEffect(() => {
         const fields = formDataRed.filter((node) => {
             return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
         });
-
+        //Set initial languages to formLanguages
+        initLanguages(formInput.languages || []);
         setExistingFormFields(fields);
     }, []);
 
@@ -71,8 +86,11 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
 
     return (
         <div>
-            <ul className=" border-2 rounded p-2">
+            <Card className="flex">
                 <h2>Form Editor ({formInput.title})</h2>
+                <LanguagesBox />
+            </Card>
+            <ul className=" border-2 rounded p-2">
                 <RenderChildren existingFormFields={existingFormFields} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
                     <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>

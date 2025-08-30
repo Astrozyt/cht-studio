@@ -21,6 +21,7 @@ import { countRules } from "../../helpers";
 import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
+import { useFormStore } from "../../../../../stores/src/formStore.ts";
 // import { LogicBuilder } from "../Logicbuilder"
 
 
@@ -121,6 +122,8 @@ export const InsertNodeButton = ({
     const appearanceChoices = zodEnum ? zodEnum.options as string[] : [];
 
     const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
+
+    const formLanguages = useFormStore(state => state.languages);
 
 
     return (

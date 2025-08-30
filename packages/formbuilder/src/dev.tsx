@@ -22,7 +22,7 @@ function App() {
     <StrictMode>
       Formbuilder in package mode:
 
-      <FormEditor onSave={onSave} cancelFn={cancelFn} formInput={{ title: 'Example Form', body }} />
+      <FormEditor onSave={onSave} cancelFn={cancelFn} formInput={{ title: 'Example Form', languages: [{ shortform: 'en', language: 'English' }, { shortform: 'de', language: 'Deutsch' }], body }} />
     </StrictMode>
   )
 }

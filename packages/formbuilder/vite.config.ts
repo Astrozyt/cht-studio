@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@studio': path.resolve(__dirname, '../src'),
+      '@ght/stores': path.resolve(__dirname, '../stores/src'),
     }
   },
   optimizeDeps: {

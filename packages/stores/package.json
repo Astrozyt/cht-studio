@@ -1,0 +1,30 @@
+{
+    "name": "@ght/stores",
+    "version": "0.1.0",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.esm.js",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "peerDependencies": {
+        "react": "^18 || ^19",
+        "react-dom": "^18 || ^19",
+        "zustand": "^4.5.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.5.0",
+        "tsup": "^8.0.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
+    },
+    "scripts": {
+        "build_tsup": "tsup src/index.ts --format cjs,esm --dts --clean",
+        "build": "pnpm -F @ght/stores build"
+    }
+}

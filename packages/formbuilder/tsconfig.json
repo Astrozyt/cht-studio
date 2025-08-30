@@ -3,7 +3,8 @@
   "include": [
     "src/**/*",
     "types/**/*",
-    "src/bp_confirm_selftransformed.json"
+    "src/bp_confirm_selftransformed.json",
+    "../stores/src"
   ],
   "exclude": [
     "node_modules",
@@ -15,20 +16,24 @@
   ],
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "..",
     "declaration": true,
     "declarationDir": "./types",
     "emitDeclarationOnly": true,
     "composite": true,
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
-    "noEmit": false
-  },
-  "paths": {
-    "@/components/*": [
-      "./src/components/*",
-    ],
-    "@ght/logicbuilder": [
-      "../logicbuilder"
-    ],
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": [
+        "./src/components/*",
+      ],
+      "@ght/logicbuilder": [
+        "../logicbuilder"
+      ],
+      "@ght/stores": [
+        "../stores/src"
+      ],
+    },
   },
 }
