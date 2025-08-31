@@ -14,14 +14,14 @@ import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 import { toast, Toaster } from "sonner";
 import { countRules } from "../../helpers";
 import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
-import { useFormStore } from "../../../../../stores/src/formStore.ts";
+import { emptyLocalized, reconcileLocalized, useFormStore } from "../../../../../stores/src/formStore.ts";
 // import { LogicBuilder } from "../Logicbuilder"
 
 
@@ -42,14 +42,27 @@ export const InsertNodeButton = ({
     level: number,
     existingNodes: NodeFormValues[]
 }) => {
+
+    const formLanguages = useFormStore(state => state.languages);
+
+    const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
+
+
+    const labelsPreFill = emptyLocalized(allowedLangs);
+    const itemsPreFill = [{
+        value: "", labels: emptyLocalized(allowedLangs)
+    }];
+
+
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
         defaultValues: {
             uid: nanoid(),
             tag: NodeType.Input, // default to Input type
-            labels: [],
+            labels: labelsPreFill,
             // items: [{ value: 'test', labels: [{ lang: 'en', value: 'Test' }, { lang: 'se', value: 'testSE' }] }], // updated items structure
-            items: [],
+            items: itemsPreFill,
+            hints: emptyLocalized(allowedLangs),
             ref: "",
             bind: {
                 // nodeset: '',
@@ -65,6 +78,18 @@ export const InsertNodeButton = ({
             },
         }
     });
+
+    const { setValue, getValues } = form;
+    useEffect(() => {
+        setValue("labels", reconcileLocalized(getValues("labels"), allowedLangs), { shouldValidate: true });
+        setValue("hints", reconcileLocalized(getValues("hints"), allowedLangs), { shouldValidate: true });
+        const curItems = getValues("items") ?? [];
+        setValue("items",
+            curItems.map((it: any) => ({ ...it, labels: reconcileLocalized(it.labels, allowedLangs) })),
+            { shouldValidate: true }
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allowedLangs.join("|")]); // simple stable dep
 
     const mytag = useWatch({
         control: form.control,
@@ -106,12 +131,6 @@ export const InsertNodeButton = ({
         }
     }
 
-    // const { control, register } = useFormContext();
-    // const { fields, append, remove } = useFieldArray({
-    //     control,
-    //     name: "labels"
-    // });
-    console.log("Existing nodes:", existingNodes);
 
     const [showRelevantLogicBuilder, setShowRelevantLogicBuilder] = useState(false);
 
@@ -123,7 +142,7 @@ export const InsertNodeButton = ({
 
     const [requiredMode, setRequiredMode] = useState<'yes' | 'no' | 'logic'>('no');
 
-    const formLanguages = useFormStore(state => state.languages);
+
 
 
     return (

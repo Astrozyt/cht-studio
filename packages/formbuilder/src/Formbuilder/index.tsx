@@ -37,7 +37,7 @@ declare global {
 
 
 export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm) => Promise<void>, cancelFn: () => void }) => {
-    console.log('Form Input:', formInput.body);
+    // console.log('Form Input:', formInput.body);
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;

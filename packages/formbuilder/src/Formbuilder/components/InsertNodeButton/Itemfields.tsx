@@ -1,3 +1,4 @@
+import { emptyLocalized, useFormStore } from "@ght/stores";
 import { Button } from "../../../components/button";
 import { FormItem, FormLabel } from "../../../components/form";
 import { Input } from "../../../components/input";
@@ -7,6 +8,13 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
 
     //TODO: Fix the language boxes to the languages of the project.
 
+    // const formLanguages = useFormStore(state => state.languages);
+    console.log("ITEMS: ", items)
+
+    const formLanguages = useFormStore(state => state.languages);
+
+    const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
+
     return <div className={`space-y-2 ${mytag == 'select' || mytag == 'select1' ? '' : 'hidden'}`}>
         <div className="flex justify-between items-center">
             <FormLabel>Items</FormLabel>
@@ -15,8 +23,8 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                 variant="secondary"
                 onClick={() =>
                     append({
-                        labels: [{ lang: "en", value: "" }, { lang: "fr", value: "" }],
-                        value: "123",
+                        labels: emptyLocalized(allowedLangs),
+                        value: "",
                     })
                 }
                 data-cy="item-add-button"

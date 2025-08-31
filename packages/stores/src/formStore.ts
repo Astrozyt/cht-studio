@@ -59,3 +59,13 @@ export const useFormStore = create<State>()(
         }
     }))
 );
+
+export type LocalizedKV = { lang: string; value: string };
+
+export const emptyLocalized = (langs: string[]): LocalizedKV[] =>
+    langs.map(l => ({ lang: l, value: "" }));
+
+export const reconcileLocalized = (curr: LocalizedKV[] | undefined, langs: string[]): LocalizedKV[] => {
+    const map = new Map((curr ?? []).map(x => [x.lang, x.value]));
+    return langs.map(l => ({ lang: l, value: map.get(l) ?? "" }));
+};
