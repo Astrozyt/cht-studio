@@ -97,6 +97,7 @@ export const InsertNodeButton = ({
     const [openness, setOpenness] = useState(false);
 
     const onSubmit = (data: any) => {
+        //TODO: Is validation here needed or built into react-hook-form?
         const result = nodeSchema.safeParse(data);
         if (result.success) {
             toast.success("Node created successfully!");
@@ -241,7 +242,7 @@ export const InsertNodeButton = ({
                                             {typeof requiredMode == 'object' || requiredMode === 'logic' && (
 
                                                 <LogicBuilder
-                                                    formFields={[]}
+                                                    formFields={existingNodes}
                                                     saveFn={(query) => {
                                                         // field.onChange(query); // Save logic JSON
                                                         console.log("Logic saved", query);
@@ -292,7 +293,7 @@ export const InsertNodeButton = ({
                                         <FormLabel>Constraint</FormLabel>
                                         {<span data-cy="field-constraint-count">{countRules(field.value)} rules.</span>}
                                         <LogicBuilder
-                                            formFields={[{ ref: 'This Field', tag: 'thisField', uid: 'th15_f13ld' }]}
+                                            formFields={existingNodes}
                                             updateFn={(query) => {
                                                 field.onChange(query); // Save logic JSON}
                                             }}

@@ -23,6 +23,7 @@ import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 import { useFormStore } from "@ght/stores";
 import { LanguagesBox } from "./components/LanguagesBox";
+import { use } from "chai";
 
 
 // Add Tauri to the global scope
@@ -59,8 +60,14 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         });
         //Set initial languages to formLanguages
         initLanguages(formInput.languages || []);
-        setExistingFormFields(fields);
     }, []);
+
+    useEffect(() => {
+        const fields = formDataRed.filter((node) => {
+            return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
+        });
+        setExistingFormFields(fields);
+    }, [formDataRed]);
 
     const rootRef = 'root'; // Default root reference
 
