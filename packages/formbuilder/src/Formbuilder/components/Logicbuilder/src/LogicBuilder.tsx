@@ -3,13 +3,11 @@ import {
   defaultControlElements,
   QueryBuilder,
   type Field,
-  // type Field,
   type RuleGroupType,
   type RuleType,
 } from "react-querybuilder";
 
 import "react-querybuilder/dist/query-builder.css";
-// import { ExpressionBuilder } from "./ExpressionBuilder";
 
 const LogicBuilder = ({
   formFields,
@@ -33,7 +31,6 @@ const LogicBuilder = ({
       rules: [],
     }
   );
-  console.log("existing: ", formFields);
 
   const fields: Field[] = formFields?.map((field) => ({
     name: field.ref,
@@ -42,19 +39,24 @@ const LogicBuilder = ({
     type: field.bind?.type || "text",
     placeholder: "This is a placeholder",
     inputType: "number"
-    // options: field.tag === 'select' && field.items?.map((item) => ({
-    //   value: item.value,
-    //   label: item.label,
-    // })
-    // ) || [],
   })) || [];
+
+  // const fields = (
+  //   [
+  //     {
+  //       name: 'firstName',
+  //       label: 'First Name',
+  //       placeholder: 'Enter first name',
+  //     },
+  //   ]
+  // )
+
   return (
     <>
-      {/* <ExpressionBuilder fields={formFields || []} /> */}
-
       <QueryBuilder
         fields={fields}
         query={query}
+        data-yc="logic-builder-query-builder"
         onQueryChange={(q) => {
           if (updateFn) {
             updateFn(q);
@@ -65,8 +67,8 @@ const LogicBuilder = ({
       />
       {saveFn && (
         <>
-          <button type='button' onClick={() => saveFn(query)}>Save</button>
-          <button onClick={() => { console.log(query); cancelFn(); }}>Cancel</button>
+          <button data-cy="logic-builder-save" type='button' onClick={() => saveFn(query)}>Save</button>
+          <button data-cy="logic-builder-cancel" onClick={() => { console.log(query); cancelFn(); }}>Cancel</button>
         </>
       )}
     </>

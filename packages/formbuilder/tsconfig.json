@@ -4,7 +4,8 @@
     "src/**/*",
     "types/**/*",
     "src/bp_confirm_selftransformed.json",
-    "../stores/src"
+    "../stores/src",
+    "cypress/**/*.ts"
   ],
   "exclude": [
     "node_modules",
@@ -24,6 +25,9 @@
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
     "noEmit": false,
     "baseUrl": ".",
+    "types": [
+      "cypress"
+    ],
     "paths": {
       "@/components/*": [
         "./src/components/*",

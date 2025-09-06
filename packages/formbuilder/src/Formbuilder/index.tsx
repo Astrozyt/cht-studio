@@ -22,7 +22,6 @@ import { UpdateNodeButton } from "./components/UpdateNodeButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 import { useFormStore } from "@ght/stores";
-import { Input } from "@/components/input";
 import { LanguagesBox } from "./components/LanguagesBox";
 
 
@@ -37,29 +36,19 @@ declare global {
 
 
 export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm) => Promise<void>, cancelFn: () => void }) => {
-    // console.log('Form Input:', formInput.body);
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
     }
-    // const formModel = addUidsToNodes(formInput); // Ensure all nodes have uids
-    // console.log("formModel after adding UIDs:", formModel);
     const [formDataRed, dispatch] = useReducer(formReducer, []/*formModel.body*/);
-    // console.log("FormRed data after reducer:", formDataRed);
-    // debugger
     const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
-    // const navigate = useNavigate();
     const formLanguages = useFormStore(state => state.languages);
     const initLanguages = useFormStore(state => state.initLanguages);
     const removeLang = useFormStore(state => state.removeLanguage);
 
-    // const initLanguages = state => 
     useEffect(() => {
-        // console.log("Dispatching INIT_STATE with nodes:", formModel.body);
         dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
         initLanguages(formInput.languages || []);
-        // formLanguages.getState().initLanguages(formInput.languages || []);  
-
     }, []);
 
     console.log('formDataRed:', formDataRed);
@@ -74,12 +63,10 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     }, []);
 
     const rootRef = 'root'; // Default root reference
-    // const rootRef = formDataRed.length > 0 ? formDataRed[0].ref.split('/')[1] + '/' : 'root'; // Default root reference
 
 
     const onCancel = () => {
         console.log("Cancelled editing.");
-        // navigate(`/projects/${projectName}`); // Navigate back to the forms list
         cancelFn(); // Call the provided cancel function
     };
 
@@ -107,11 +94,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
 }
 
 const RenderChildren = ({ children, parentUid, level, dispatch, parentRef, existingFormFields }: { existingFormFields: NodeFormValues[], children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
-    // const lastPostion = children.length;
-    console.log("Rendering children for parentUid:", parentUid, "with level:", level, "and existingFormFields:", existingFormFields);
-    console.log("Children:", children);
     return children.flatMap((child, index) => [
-        // InsertNodeButton({ dispatch, parentUid, index, level }),
         <InsertNodeButton existingNodes={existingFormFields} key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
 
         <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} existingFormFields={existingFormFields} />,

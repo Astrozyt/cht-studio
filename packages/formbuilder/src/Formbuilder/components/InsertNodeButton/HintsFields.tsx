@@ -31,21 +31,8 @@ export const HintsFields = () => {
                             data-cy={`hint-value-input-${index}`}
                         />
                     </FormControl>
-                    <Button type="button" variant="ghost" onClick={() => remove(index)} data-cy={`hint-remove-button-${index}`}>
-                        ✕
-                    </Button>
                 </FormItem>
             ))}
-
-            <Button
-                type="button"
-                variant="outline"
-                className="mt-2"
-                onClick={() => append({ lang: "", value: "" })}
-                data-cy="hint-add-button"
-            >
-                ➕ Add Hint
-            </Button>
         </div>
     );
 };

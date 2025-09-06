@@ -22,10 +22,7 @@ import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
 import { emptyLocalized, reconcileLocalized, useFormStore } from "../../../../../stores/src/formStore.ts";
-// import { LogicBuilder } from "../Logicbuilder"
 
-
-// type NodeFormValues = z.infer<typeof nodeSchema>;
 
 export const InsertNodeButton = ({
     dispatch,
@@ -46,12 +43,9 @@ export const InsertNodeButton = ({
     const formLanguages = useFormStore(state => state.languages);
 
     const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
-
+    console.log("Existing nodes:", existingNodes)
 
     const labelsPreFill = emptyLocalized(allowedLangs);
-    const itemsPreFill = [{
-        value: "", labels: emptyLocalized(allowedLangs)
-    }];
 
 
     const form = useForm<NodeFormValues>({
@@ -60,8 +54,7 @@ export const InsertNodeButton = ({
             uid: nanoid(),
             tag: NodeType.Input, // default to Input type
             labels: labelsPreFill,
-            // items: [{ value: 'test', labels: [{ lang: 'en', value: 'Test' }, { lang: 'se', value: 'testSE' }] }], // updated items structure
-            items: itemsPreFill,
+            items: [],
             hints: emptyLocalized(allowedLangs),
             ref: "",
             bind: {
@@ -71,7 +64,7 @@ export const InsertNodeButton = ({
                 constraint: {},
                 constraintMsg: '',
                 readonly: false,
-                relevant: {},//{ combinator: 'and', rules: [] },
+                relevant: { combinator: 'and', rules: [] },
                 calculate: '',
                 preload: '',
                 preloadParams: ''
@@ -83,12 +76,7 @@ export const InsertNodeButton = ({
     useEffect(() => {
         setValue("labels", reconcileLocalized(getValues("labels"), allowedLangs), { shouldValidate: true });
         setValue("hints", reconcileLocalized(getValues("hints"), allowedLangs), { shouldValidate: true });
-        const curItems = getValues("items") ?? [];
-        setValue("items",
-            curItems.map((it: any) => ({ ...it, labels: reconcileLocalized(it.labels, allowedLangs) })),
-            { shouldValidate: true }
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // const curItems = getValues("items") ?? [];
     }, [allowedLangs.join("|")]); // simple stable dep
 
     const mytag = useWatch({
@@ -108,25 +96,15 @@ export const InsertNodeButton = ({
 
     const [openness, setOpenness] = useState(false);
 
-    // const { register } = useFormContext();
-
     const onSubmit = (data: any) => {
-        // console.log("Data", data);
-        console.log("Submitting new node", data);
         const result = nodeSchema.safeParse(data);
-        console.log("Result", result);
         if (result.success) {
-            // result.data.ref = `${parentRef}${result.data.ref}`; // prepend parentRef to the new node's ref
             toast.success("Node created successfully!");
-            // console.log("Parsed data", result.data);
-            // console.log("Parent UID", parentUid);
             if (parentUid) {
                 setOpenness(false);
                 dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
             }
         } else {
-            console.error("Validation errors", result.error.errors);
-            // <Toaster t position="top-right" richColors closeButton />
             toast.error("Validation failed. Please check the form fields.");
         }
     }
@@ -165,13 +143,13 @@ export const InsertNodeButton = ({
                                     <FormItem>
                                         <FormLabel>Node Type</FormLabel>
                                         <FormControl>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <SelectTrigger data-cy="node-type-select">
+                                            <Select data-cy="node-type-select" onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger data-cy="node-type-trigger">
                                                     <SelectValue placeholder="Type of Node" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-white">
+                                                <SelectContent data-cy="node-type-menu" className="bg-white">
                                                     {Object.values(NodeType).map((type) => (
-                                                        <SelectItem className="bg-white  hover:bg-gray-400" data-cy={`node-type-option-${type}`} key={type} value={type}>
+                                                        <SelectItem data-cy={`node-type-option-${type}`} className="bg-white  hover:bg-gray-400" key={type} value={type}>
                                                             {type}
                                                         </SelectItem>
                                                     ))}
@@ -202,17 +180,15 @@ export const InsertNodeButton = ({
                                                 value={field.value}
                                             />
                                         </FormControl>
-                                        <FormMessage className="text-red-600" />
+                                        <FormMessage data-cy="field-name-error" className="text-red-600" />
                                     </FormItem>
                                 )} />
                             <Separator className="my-16 bg-gray-500" />
 
                             <FormField
                                 control={form.control}
-                                //
                                 name="bind.required"
                                 render={({ field }) => {
-                                    // console.log("Field value", field.value);
                                     return <FormItem className={`${mytag != 'group' && mytag != 'note' && mytag != 'trigger' && mytag != 'repeat' ? '' : 'hidden'}`}>
                                         <FormLabel>Field Required</FormLabel>
                                         <div className="flex items-center space-x-2">
@@ -220,8 +196,6 @@ export const InsertNodeButton = ({
                                                 <RadioGroup
                                                     value={requiredMode}
                                                     onValueChange={(val) => {
-                                                        console.log("Selected value", val);
-                                                        // setRequiredMode(val);
                                                         if (val === 'yes' || val === 'no') {
                                                             setRequiredMode(val);
                                                             field.onChange(val);
@@ -268,9 +242,7 @@ export const InsertNodeButton = ({
 
                                                 <LogicBuilder
                                                     formFields={[]}
-                                                    // existingQuery={field.value}
                                                     saveFn={(query) => {
-                                                        // alert("Logic saved: " + JSON.stringify(query));
                                                         // field.onChange(query); // Save logic JSON
                                                         console.log("Logic saved", query);
 
@@ -285,7 +257,7 @@ export const InsertNodeButton = ({
                                             )}
                                         </div>
                                         <FormDescription />
-                                        <FormMessage className="text-red-500" />
+                                        <FormMessage data-cy="field-name-error" className="text-red-500" />
                                     </FormItem>
                                 }} />
                             <Separator className="my-16 bg-gray-500" />
@@ -294,8 +266,7 @@ export const InsertNodeButton = ({
                                 control={form.control}
                                 name="bind.readonly"
                                 render={({ field }) => {
-                                    // console.log("Field value", field.value);
-                                    return <FormItem className={`${mytag != 'group' && mytag != 'note' && mytag != 'trigger' && mytag != 'repeat' ? '' : 'hidden'} mb-8`}>
+                                    return <FormItem data-cy="field-readonly" className={`${mytag != 'group' && mytag != 'note' && mytag != 'trigger' && mytag != 'repeat' ? '' : 'hidden'} mb-8`}>
                                         <div className="flex items-center space-x-2">
                                             <FormControl>
                                                 <Checkbox
@@ -319,7 +290,7 @@ export const InsertNodeButton = ({
                                 render={({ field }) => (
                                     <FormItem className={`${mytag === 'input' ? '' : 'hidden'}`}>
                                         <FormLabel>Constraint</FormLabel>
-                                        {<span>{countRules(field.value)} rules.</span>}
+                                        {<span data-cy="field-constraint-count">{countRules(field.value)} rules.</span>}
                                         <LogicBuilder
                                             formFields={[{ ref: 'This Field', tag: 'thisField', uid: 'th15_f13ld' }]}
                                             updateFn={(query) => {
@@ -327,7 +298,7 @@ export const InsertNodeButton = ({
                                             }}
                                         />
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage data-cy="field-constraint-error" />
                                     </FormItem>
                                 )} />
 
@@ -385,7 +356,7 @@ export const InsertNodeButton = ({
                                             </SelectContent>
                                         </Select>
                                         <FormDescription />
-                                        <FormMessage />
+                                        <FormMessage data-cy="appearance-error" />
                                     </FormItem>
                                 )} />
                             <Separator className="my-16 bg-gray-500" />
@@ -395,18 +366,17 @@ export const InsertNodeButton = ({
                                 name="bind.type"
                                 render={({ field }) => {
                                     // console.log("Field value", field);
-                                    return <FormItem className={`${mytag != 'group' && mytag != 'repeat' ? '' : 'hidden'}`}>
+                                    return <FormItem data-cy="bind-type" className={`${mytag != 'group' && mytag != 'repeat' ? '' : 'hidden'}`}>
                                         <FormLabel>Bind Type</FormLabel>
-                                        <FormControl>
-                                            <Select value={field.value} onValueChange={field.onChange}>
-                                                <SelectTrigger data-cy="bind-type-select">
+                                        <FormControl data-cy="bind-type-control"                                                                                                                                                                                                >
+                                            <Select data-cy="bind-type-select" value={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger data-cy="bind-type-trigger">
                                                     <SelectValue placeholder="Type of Bind" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-white">
+                                                <SelectContent data-cy="bind-type-menu" className="bg-white">
                                                     {bindTypes.map((type) => {
-                                                        // console.log("Type", type);
                                                         return (
-                                                            <SelectItem className="bg-white  hover:bg-gray-400" key={nanoid()} value={type} data-cy={`bind-type-option-${type}`}>
+                                                            <SelectItem data-cy={`bind-type-option-${type}`} className="bg-white  hover:bg-gray-400" key={nanoid()} value={type}>
                                                                 {type}
                                                             </SelectItem>
                                                         );
@@ -441,8 +411,6 @@ export const InsertNodeButton = ({
                                                         setShowRelevantLogicBuilder(false);
                                                     }}
                                                     cancelFn={() => setShowRelevantLogicBuilder(false)}
-                                                // parentRef={parentRef}
-                                                // parentUid={parentUid || ''}
                                                 />
                                             </div>
                                         )}
@@ -541,7 +509,7 @@ export const InsertNodeButton = ({
                                 </FormControl>
                             </FormItem>
                             <DialogFooter>
-                                <Button type="submit" data-cy="save-button">
+                                <Button type="submit" data-cy="save-element-button">
                                     Save
                                 </Button>
                                 <DialogClose asChild><Button data-cy="cancel-button">Cancel</Button></DialogClose>
