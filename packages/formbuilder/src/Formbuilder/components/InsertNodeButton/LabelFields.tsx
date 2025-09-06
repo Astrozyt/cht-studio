@@ -19,8 +19,10 @@ export const LabelFields = () => {
                         <Input
                             {...register(`labels.${index}.lang`)}
                             placeholder="Lang (e.g. en)"
-                            className="w-1/4"
+                            className="w-1/4 focus-visible:ring-0"
                             data-cy={`label-lang-input-${index}`}
+                            readOnly={true}
+                            tabIndex={-1}
                         />
                     </FormControl>
                     <FormControl>

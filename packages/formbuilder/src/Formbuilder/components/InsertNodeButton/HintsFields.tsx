@@ -19,8 +19,10 @@ export const HintsFields = () => {
                         <Input
                             {...register(`hints.${index}.lang`)}
                             placeholder="Lang (e.g. en)"
-                            className="w-1/4"
+                            className="w-1/4 focus-visible:ring-0"
                             data-cy={`hint-lang-input-${index}`}
+                            readOnly={true}
+                            tabIndex={-1}
                         />
                     </FormControl>
                     <FormControl>

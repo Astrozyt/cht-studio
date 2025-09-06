@@ -34,10 +34,6 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
         </div>
 
         {items.map((item, index) => (
-            // Label Logic
-
-            // console.log("Field", index, field),
-            // console.log("Field label", field.labels),
             <FormItem key={index} className={`flex flex-wrap gap-2 items-end ${mytag == 'select' || mytag == 'select1' ? '' : 'hidden'}`}>
                 <ul className="flex flex-col gap-2 items-center">
                     {item.labels.map((label, labelIndex) => (
@@ -47,6 +43,9 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                                     {...register(`items.${index}.labels.${labelIndex}.lang`)}
                                     placeholder="Lang"
                                     data-cy={`item-label-lang-input-${index}-${labelIndex}`}
+                                    className="w-1/4 focus-visible:ring-0"
+                                    readOnly={true}
+                                    tabIndex={-1}
                                 />
                             </div>
                             <div className="flex-1 min-w-[200px]">
