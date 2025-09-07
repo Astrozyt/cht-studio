@@ -22,6 +22,8 @@ import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
 import { emptyLocalized, reconcileLocalized, useFormStore } from "../../../../../stores/src/formStore.ts";
+import { PenToolIcon } from "lucide-react";
+import { FormHeader } from "./helpers/FormHeader.tsx";
 
 
 export const InsertNodeButton = ({
@@ -30,6 +32,7 @@ export const InsertNodeButton = ({
     parentRef,
     index,
     level,
+    existingNode,
     existingNodes
 }: {
     dispatch: React.Dispatch<Action>,
@@ -37,6 +40,7 @@ export const InsertNodeButton = ({
     parentRef: string,
     index: number,
     level: number,
+    existingNode?: NodeFormValues,
     existingNodes: NodeFormValues[]
 }) => {
 
@@ -50,7 +54,7 @@ export const InsertNodeButton = ({
 
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
-        defaultValues: {
+        defaultValues: existingNode || {
             uid: nanoid(),
             tag: NodeType.Input, // default to Input type
             labels: labelsPreFill,
@@ -100,10 +104,19 @@ export const InsertNodeButton = ({
         //TODO: Is validation here needed or built into react-hook-form?
         const result = nodeSchema.safeParse(data);
         if (result.success) {
-            toast.success("Node created successfully!");
-            if (parentUid) {
+            if (existingNode) {
+                // Editing an existing node
+                setOpenness(false);
+                dispatch({ type: "UPDATE_NODE", uid: existingNode.uid, changes: { ...data } });
+                toast.success("Node updated successfully!");
+                return;
+            }
+            // Creating a new node  
+            else if (parentUid) {
                 setOpenness(false);
                 dispatch({ type: 'ADD_NODE_AT_INDEX', newNode: { ...result.data, uid: nanoid() }, parentUid, index });
+                toast.success("Node created successfully!");
+                return;
             }
         } else {
             toast.error("Validation failed. Please check the form fields.");
@@ -126,15 +139,14 @@ export const InsertNodeButton = ({
 
     return (
         <Dialog key={parentUid || '' + level + index} open={openness} onOpenChange={setOpenness}>
-            <DialogTrigger><InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /></DialogTrigger>
+            {existingNode ? <DialogTrigger data-cy='update-node-button' className="bg-blue-500 hover:bg-blue-600 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3" onClick={() => setOpenness(true)}>
+                <PenToolIcon data-cy="update-node-icon" />
+            </DialogTrigger> :
+                <DialogTrigger><InsertButtonCard dispatch={dispatch} parentUid={parentUid} index={index} level={level} /></DialogTrigger>}
+
             <DialogContent style={{ maxWidth: 'none', width: '90%', maxHeight: '90%', overflow: 'auto' }}>
                 <>
-                    <DialogHeader>
-                        <DialogTitle>Create new Node</DialogTitle>
-                        <DialogDescription>
-                            Click to create a new node. You can then edit its properties in the form editor. {mytag}
-                        </DialogDescription>
-                    </DialogHeader>
+                    <FormHeader update={!!existingNode} insert={!existingNode} mytag={mytag} />
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} onInvalid={() => { console.log('error!') }} className="space-y-4">
                             <FormField

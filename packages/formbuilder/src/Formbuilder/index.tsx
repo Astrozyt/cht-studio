@@ -18,12 +18,10 @@ import { RenderReadonly } from "./Formfields/RenderReadonly";
 import { RenderCalculate } from "./Formfields/RenderCalculate";
 import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
-import { UpdateNodeButton } from "./components/UpdateNodeButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 import { useFormStore } from "@ght/stores";
 import { LanguagesBox } from "./components/LanguagesBox";
-import { use } from "chai";
 
 
 // Add Tauri to the global scope
@@ -160,7 +158,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
 
                 {/* TODO: Add the other types, like trigger, image, ... */}
                 <span className="">
-                    <UpdateNodeButton existingNode={node} dispatch={dispatch} existingNodes={existingFormFields} />
+                    <InsertNodeButton existingNode={node} existingNodes={existingFormFields} dispatch={dispatch} parentUid={node.uid || null} parentRef={node.ref} index={0} level={level + 1} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
                     console.log('DELETE: ', node.uid);
