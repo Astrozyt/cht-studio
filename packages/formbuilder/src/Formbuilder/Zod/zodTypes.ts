@@ -58,7 +58,7 @@ export type NodeTypeType = typeof NodeType[keyof typeof NodeType];
 
 const labelSchema = z.object({
     lang: z.string().min(2, "Language code required"),
-    value: z.string().min(2, "Label value required"),
+    value: z.string().min(2, "Label value required").max(50, "Label must be less than 50 characters"),
 });
 
 const itemSchema = z.object({
@@ -70,7 +70,7 @@ export type Item = z.infer<typeof itemSchema>;
 
 const hintSchema = z.object({
     lang: z.string().min(2),
-    value: z.string().min(1),
+    value: z.string().min(0).max(100, "Hint must be less than 100 characters"),
 });
 
 const bindBase = z.object({
