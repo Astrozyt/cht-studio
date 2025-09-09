@@ -21,7 +21,7 @@ import { countRules } from "../../helpers";
 import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
-import { emptyLocalized, reconcileLocalized, useFormStore } from "../../../../../stores/src/formStore.ts";
+import { emptyLocalized, reconcileLocalized, useExistingNodesStore, useFormStore } from "../../../../../stores/src/formStore.ts";
 import { PenToolIcon } from "lucide-react";
 import { FormHeader } from "./helpers/FormHeader.tsx";
 
@@ -33,7 +33,7 @@ export const InsertNodeButton = ({
     index,
     level,
     existingNode,
-    existingNodes
+    // existingNodes
 }: {
     dispatch: React.Dispatch<Action>,
     parentUid: string | null,
@@ -41,15 +41,17 @@ export const InsertNodeButton = ({
     index: number,
     level: number,
     existingNode?: NodeFormValues,
-    existingNodes: NodeFormValues[]
+    // existingNodes: NodeFormValues[]
 }) => {
 
     const formLanguages = useFormStore(state => state.languages);
 
     const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
-    console.log("Existing nodes:", existingNodes)
+    // console.log("Existing nodes:", existingNodes)
 
     const labelsPreFill = emptyLocalized(allowedLangs);
+
+    // const existingNodes = useExistingNodesStore(state => state.existingNodes);
 
 
     const form = useForm<NodeFormValues>({
@@ -254,7 +256,7 @@ export const InsertNodeButton = ({
                                             {typeof requiredMode == 'object' || requiredMode === 'logic' && (
 
                                                 <LogicBuilder
-                                                    formFields={existingNodes}
+                                                    // formFields={existingNodes}
                                                     saveFn={(query) => {
                                                         // field.onChange(query); // Save logic JSON
                                                         console.log("Logic saved", query);
@@ -305,7 +307,7 @@ export const InsertNodeButton = ({
                                         <FormLabel>Constraint</FormLabel>
                                         {<span data-cy="field-constraint-count">{countRules(field.value)} rules.</span>}
                                         <LogicBuilder
-                                            formFields={existingNodes}
+                                            // formFields={existingNodes}
                                             updateFn={(query) => {
                                                 field.onChange(query); // Save logic JSON}
                                             }}
@@ -418,7 +420,7 @@ export const InsertNodeButton = ({
                                                     // onChange={(value) => {
                                                     //     field.onChange(value);
                                                     // }}
-                                                    formFields={existingNodes}
+                                                    // formFields={existingNodes}
                                                     saveFn={(query) => {
                                                         field.onChange(query);
                                                         setShowRelevantLogicBuilder(false);

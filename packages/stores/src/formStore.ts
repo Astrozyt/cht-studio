@@ -69,3 +69,12 @@ export const reconcileLocalized = (curr: LocalizedKV[] | undefined, langs: strin
     const map = new Map((curr ?? []).map(x => [x.lang, x.value]));
     return langs.map(l => ({ lang: l, value: map.get(l) ?? "" }));
 };
+
+export const useExistingNodesStore = create<{ existingNodes: Node[]; setExistingNodes: (nodes: Node[]) => void }>()(
+    devtools(
+        (set) => ({
+            existingNodes: [],
+            setExistingNodes: (nodes) => set({ existingNodes: nodes })
+        })
+    )
+);

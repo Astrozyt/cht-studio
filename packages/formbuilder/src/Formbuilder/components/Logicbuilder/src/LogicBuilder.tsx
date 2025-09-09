@@ -6,17 +6,17 @@ import {
   type RuleGroupType,
   type RuleType,
 } from "react-querybuilder";
-
+import { useExistingNodesStore } from "../../../../../../stores/src/formStore.ts";
 import "react-querybuilder/dist/query-builder.css";
 
 const LogicBuilder = ({
-  formFields,
+  // formFields,
   saveFn,
   cancelFn = () => console.log("cancel"),
   existingQuery,
   updateFn,
 }: {
-  formFields?: any[];
+  // formFields?: any[];
   saveFn?: (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: RuleGroupType<RuleType<string, string, any, string>, string>
@@ -31,6 +31,8 @@ const LogicBuilder = ({
       rules: [],
     }
   );
+
+  const formFields = useExistingNodesStore(state => state.existingNodes);
 
   const fields: Field[] = formFields?.map((field) => ({
     name: field.ref,

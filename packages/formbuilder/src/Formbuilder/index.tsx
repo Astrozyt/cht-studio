@@ -20,11 +20,10 @@ import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
-import { useFormStore } from "@ght/stores";
+import { useExistingNodesStore, useFormStore } from "@ght/stores";
 import { LanguagesBox } from "./components/LanguagesBox";
 
-
-// Add Tauri to the global scope
+// Add Tauri type to the global scope
 declare global {
     interface Window {
         __TAURI__?: {
@@ -40,23 +39,15 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         return <div>Error: Invalid form input structure.</div>;
     }
     const [formDataRed, dispatch] = useReducer(formReducer, []/*formModel.body*/);
-    const [existingFormFields, setExistingFormFields] = useState<NodeFormValues[]>([]); // Initialize formFields state
-    const formLanguages = useFormStore(state => state.languages);
     const initLanguages = useFormStore(state => state.initLanguages);
-    const removeLang = useFormStore(state => state.removeLanguage);
+    const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
 
     useEffect(() => {
         dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
         initLanguages(formInput.languages || []);
     }, []);
 
-    console.log('formDataRed:', formDataRed);
-
     useEffect(() => {
-        const fields = formDataRed.filter((node) => {
-            return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
-        });
-        //Set initial languages to formLanguages
         initLanguages(formInput.languages || []);
     }, []);
 
@@ -64,11 +55,10 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         const fields = formDataRed.filter((node) => {
             return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
         });
-        setExistingFormFields(fields);
+        setExistingNodes(fields);
     }, [formDataRed]);
 
     const rootRef = 'root'; // Default root reference
-
 
     const onCancel = () => {
         console.log("Cancelled editing.");
@@ -83,7 +73,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
                 <LanguagesBox />
             </Card>
             <ul className=" border-2 rounded p-2">
-                <RenderChildren existingFormFields={existingFormFields} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
+                <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
                     <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>
                         Save
@@ -98,17 +88,17 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     );
 }
 
-const RenderChildren = ({ children, parentUid, level, dispatch, parentRef, existingFormFields }: { existingFormFields: NodeFormValues[], children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
+const RenderChildren = ({ children, parentUid, level, dispatch, parentRef }: { children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
     return children.flatMap((child, index) => [
-        <InsertNodeButton existingNodes={existingFormFields} key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
+        <InsertNodeButton key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
 
-        <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} existingFormFields={existingFormFields} />,
-    ]).concat(<InsertNodeButton existingNodes={existingFormFields} key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
+        <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} />,
+    ]).concat(<InsertNodeButton key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
 };
 
 
 
-const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node: NodeFormValues, index: number, level: number, dispatch: React.Dispatch<Action>, existingFormFields: NodeFormValues[] }) => {
+const RenderNode = ({ node, index, level, dispatch, }: { node: NodeFormValues, index: number, level: number, dispatch: React.Dispatch<Action> }) => {
     if (["input", "select", "select1"].includes(node.tag)) {
         console.log("Field to be listed: ", node.ref, node.tag, node.bind?.type);
     }
@@ -158,7 +148,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
 
                 {/* TODO: Add the other types, like trigger, image, ... */}
                 <span className="">
-                    <InsertNodeButton existingNode={node} existingNodes={existingFormFields} dispatch={dispatch} parentUid={node.uid || null} parentRef={node.ref} index={0} level={level + 1} />
+                    <InsertNodeButton existingNode={node} dispatch={dispatch} parentUid={node.uid || null} parentRef={node.ref} index={0} level={level + 1} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
                     console.log('DELETE: ', node.uid);
@@ -171,7 +161,7 @@ const RenderNode = ({ node, index, level, dispatch, existingFormFields }: { node
                     {(!node.children || node.children.length === 0) && (
                         <li>No children</li>
                     )}
-                    {<RenderChildren existingFormFields={existingFormFields} children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
+                    {<RenderChildren children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
                 </ul>
             )}
         </Card>
