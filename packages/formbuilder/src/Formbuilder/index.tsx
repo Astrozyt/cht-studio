@@ -49,12 +49,21 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         initLanguages(formInput.languages || []);
     }, [formInput.languages, initLanguages]);
 
-    const filtered = useMemo(
-        () => formDataRed.filter(
-            n => ["input", "select", "select1"].includes(n.tag) && n.bind?.type !== "none"
-        ),
-        [formDataRed]
-    );
+    const filtered = useMemo(() => {
+        const result: NodeFormValues[] = [];
+        const visit = (nodes: NodeFormValues[]) => {
+            for (const n of nodes) {
+                if (["input", "select", "select1"].includes(n.tag) && n.bind?.type !== "none") {
+                    result.push(n);
+                }
+                if (n.tag === "group" && Array.isArray(n.children) && n.children.length) {
+                    visit(n.children);
+                }
+            }
+        };
+        visit(formDataRed);
+        return result;
+    }, [formDataRed]);
 
     useEffect(() => {
         setExistingNodes(filtered);
