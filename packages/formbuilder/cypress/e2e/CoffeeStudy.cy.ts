@@ -1,14 +1,3 @@
-describe('template spec', () => {
-  it('passes', () => {
-    cy.visit('http://localhost:5173/')
-  })
-});
-
-it('testtest', function () {
-  cy.visit('http://localhost:5173/')
-
-});
-
 it('Create Basic Form', function () {
   cy.visit('http://localhost:5173/')
   cy.get(':nth-child(2) > .inline-flex').click();
@@ -286,6 +275,30 @@ it('Create Basic Form', function () {
     });
 
   //Question shoul only be relevant if smoker question is yes
+  cy.get('[data-cy="show-logic-builder-button"]').scrollIntoView().click();
+
+  // cy.get('button').contains('+ Rule').scrollIntoView().click();
+
+  cy.get('[data-testid="add-rule"]').last().scrollIntoView().click();
+  cy.wait(500);
+  cy.get('[data-cy="logicbuilder-field-count"]')
+    .invoke('attr', 'data-count')
+    .then(Number)
+    .should('be.gt', 0);
+  cy.get('[data-testid="fields"]').select('Smoker');
+  // // See what options the select has
+  // cy.get('[data-testid="fields"]').click().wait(500);
+  // cy.get('[data-testid="fields-listbox"]').should('be.visible');
+  // cy.get('[data-testid="fields-listbox"]').contains('Smoker').click();
+  // cy.get('[data-testid="combinators"]').click().wait(500);
+  // cy.get('[data-testid="combinators-listbox"]').should('be.visible');
+  // cy.get('[data-testid="combinators-listbox"]').contains('equals').click();
+  // cy.get('data-testid="value-input"').should('be.visible').click().type('yes');
+  // // Save the logic
+  // cy.get('data-testid="save-logic-builder-button"').click();
+  // // Check that the logic was added to the question
+  // cy.get('[data-cy="logic-summary"]').should('contain', 'Smoker equals yes');
+  // cy.get('data-testid="fields"').should('contain', 'Smoker');
 
   // Scroll to save button and click it.
   cy.get('[data-cy="save-element-button"]').scrollIntoView().click().wait(500);
@@ -297,8 +310,34 @@ it('Create Basic Form', function () {
 
 });
 
-it('improvtest', function() {
-  cy.visit('http://localhost:5173')
-  
+it('Querytest', function () {
+  cy.visit('http://localhost:5173/')
+
 });
+
+it('testtest', function () {
+  cy.visit('http://localhost:5173/')
+  cy.get('.rounded').click();
+  cy.get('[data-cy="insert-button-0-1"]').click();
+  cy.get('[data-cy="field-name-input"]').click();
+  cy.get('[data-cy="field-name-input"]').clear();
+  cy.get('[data-cy="field-name-input"]').type('sag');
+  cy.get('[data-cy="field-name-input"]').clear();
+  cy.get('[data-cy="field-name-input"]').type('sagaesdf');
+  cy.get('[data-cy="label-value-input-0"]').click();
+  cy.get('[data-cy="label-value-input-0"]').clear();
+  cy.get('[data-cy="label-value-input-0"]').type('aewrg');
+  cy.get('[data-cy="label-value-input-1"]').click();
+  cy.get('[data-cy="label-value-input-1"]').clear();
+  cy.get('[data-cy="label-value-input-1"]').type('earg');
+  cy.get('[data-cy="save-element-button"]').click();
+  cy.get('[data-cy="insert-button-0-2"]').click();
+  cy.get('[data-cy="show-logic-builder-button"]').click();
+  cy.get('.mt-4 [data-testid="add-rule"]').click();
+  cy.get('[data-testid="fields"]').select('sagaesdf');
+  cy.get('[data-testid="fields"]').should('have.class', 'rule-fields');
+  cy.get('[data-cy="save-button"]').click();
+
+});
+
 

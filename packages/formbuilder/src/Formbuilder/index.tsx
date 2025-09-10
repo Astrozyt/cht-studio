@@ -1,6 +1,6 @@
 import { Button } from "../components/button";
 import { Card, CardContent } from "../components/card";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { Action, formReducer } from "./helpers/formState";
 import { InsertNodeButton } from "./components/InsertNodeButton";
 import { FullForm, NodeFormValues } from "./Zod/zodTypes";
@@ -32,31 +32,33 @@ declare global {
     }
 }
 
+const initFromForm = (formInput: FullForm) => addUidsToNodes(formInput).body;
+
 
 export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm) => Promise<void>, cancelFn: () => void }) => {
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
     }
-    const [formDataRed, dispatch] = useReducer(formReducer, []/*formModel.body*/);
+    const [formDataRed, dispatch] = useReducer(formReducer, formInput, initFromForm);
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
 
     useEffect(() => {
-        dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
+        // dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
         initLanguages(formInput.languages || []);
-    }, []);
+    }, [formInput.languages, initLanguages]);
+
+    const filtered = useMemo(
+        () => formDataRed.filter(
+            n => ["input", "select", "select1"].includes(n.tag) && n.bind?.type !== "none"
+        ),
+        [formDataRed]
+    );
 
     useEffect(() => {
-        initLanguages(formInput.languages || []);
-    }, []);
-
-    useEffect(() => {
-        const fields = formDataRed.filter((node) => {
-            return ["input", "select", "select1"].includes(node.tag) && node.bind?.type !== 'none';
-        });
-        setExistingNodes(fields);
-    }, [formDataRed]);
+        setExistingNodes(filtered);
+    }, [filtered, setExistingNodes]);
 
     const rootRef = 'root'; // Default root reference
 

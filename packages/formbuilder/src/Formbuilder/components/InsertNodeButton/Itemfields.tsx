@@ -41,9 +41,10 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
                             <div className="w-[100px]">
                                 <Input
                                     {...register(`items.${index}.labels.${labelIndex}.lang`)}
+                                    // value={label.lang}
                                     placeholder="Lang"
                                     data-cy={`item-label-lang-input-${index}-${labelIndex}`}
-                                    className="w-1/4 focus-visible:ring-0"
+                                    className="focus-visible:ring-0"
                                     readOnly={true}
                                     tabIndex={-1}
                                 />

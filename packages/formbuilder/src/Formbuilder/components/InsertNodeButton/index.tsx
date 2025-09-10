@@ -14,7 +14,7 @@ import { HintsFields } from "./HintsFields";
 import { InsertButtonCard } from "./InsertButtonCard";
 import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
 import { toast, Toaster } from "sonner";
 import { countRules } from "../../helpers";
@@ -53,11 +53,13 @@ export const InsertNodeButton = ({
 
     // const existingNodes = useExistingNodesStore(state => state.existingNodes);
 
+    const uidRef = useRef(existingNode?.uid ?? nanoid());
 
     const form = useForm<NodeFormValues>({
         resolver: zodResolver(nodeSchema),
+        // shouldUnregister: true,
         defaultValues: existingNode || {
-            uid: nanoid(),
+            uid: uidRef.current,
             tag: NodeType.Input, // default to Input type
             labels: labelsPreFill,
             items: [],
@@ -77,6 +79,10 @@ export const InsertNodeButton = ({
             },
         }
     });
+
+    useEffect(() => {
+        form.setValue('uid', uidRef.current, { shouldValidate: false, shouldDirty: false });
+    }, []);
 
     const { setValue, getValues } = form;
     useEffect(() => {
@@ -101,6 +107,8 @@ export const InsertNodeButton = ({
     });
 
     const [openness, setOpenness] = useState(false);
+
+    console.log("Form errors:", form.formState);
 
     const onSubmit = (data: any) => {
         //TODO: Is validation here needed or built into react-hook-form?
@@ -151,6 +159,7 @@ export const InsertNodeButton = ({
                     <FormHeader update={!!existingNode} insert={!existingNode} mytag={mytag} />
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} onInvalid={() => { console.log('error!') }} className="space-y-4">
+                            <input type="hidden" {...form.register('uid')} />
                             <FormField
                                 control={form.control}
                                 name="tag"
@@ -347,7 +356,7 @@ export const InsertNodeButton = ({
                             <HintsFields />
                             <Separator className="my-16 bg-gray-500" />
 
-                            <ItemFields mytag={mytag} items={items} append={append} remove={remove} register={form.register} />
+                            {(mytag === 'select' || mytag === 'select1') && <ItemFields mytag={mytag} items={items} append={append} remove={remove} register={form.register} />}
                             <Separator className="my-16 bg-gray-500" />
 
                             <FormField

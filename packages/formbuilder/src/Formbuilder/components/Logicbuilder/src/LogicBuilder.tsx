@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   defaultControlElements,
   QueryBuilder,
@@ -6,8 +6,9 @@ import {
   type RuleGroupType,
   type RuleType,
 } from "react-querybuilder";
-import { useExistingNodesStore } from "../../../../../../stores/src/formStore.ts";
+import { useExistingNodesStore, useFormStore } from "../../../../../../stores/src/formStore.ts";
 import "react-querybuilder/dist/query-builder.css";
+import { mapNodesToFields } from "./mapNodesToFields.ts";
 
 const LogicBuilder = ({
   // formFields,
@@ -33,28 +34,17 @@ const LogicBuilder = ({
   );
 
   const formFields = useExistingNodesStore(state => state.existingNodes);
+  const defaultLang = useFormStore.getState().languages[0]?.shortform ?? 'en';
 
-  const fields: Field[] = formFields?.map((field) => ({
-    name: field.ref,
-    label: field.ref, // Use field.ref as the label
-    value: field.ref + 'value',
-    type: field.bind?.type || "text",
-    placeholder: "This is a placeholder",
-    inputType: "number"
-  })) || [];
+  const fields: Field[] = useMemo(
+    () => mapNodesToFields(formFields, defaultLang),
+    [formFields, defaultLang]
+  );
 
-  // const fields = (
-  //   [
-  //     {
-  //       name: 'firstName',
-  //       label: 'First Name',
-  //       placeholder: 'Enter first name',
-  //     },
-  //   ]
-  // )
 
   return (
     <>
+      <div data-cy="logicbuilder-field-count" data-count={fields.length} style={{ display: 'none' }} />
       <QueryBuilder
         fields={fields}
         query={query}
