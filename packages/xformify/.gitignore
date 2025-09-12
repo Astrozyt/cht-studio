@@ -1,0 +1,15 @@
+# Rust build artifacts
+/target/
+*Cargo.lock
+Cargo.lock      # if it's a library-only repo, lockfiles are usually ignored
+                 # (if you add binaries / Tauri app, keep Cargo.lock)
+
+# Rust tooling
+**/*.rs.bk
+
+# wasm-pack output
+./*/pkg/
+*.wasm
+
+form*.xml
+form*.json

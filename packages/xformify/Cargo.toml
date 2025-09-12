@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "./xformify-core",
+  "./xformify-wasm",
+]
+resolver = "2"
