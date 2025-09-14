@@ -3,7 +3,13 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": [
-    "main"
+    "main",
+    "runner"
+  ],
+  "urls": [
+    "local://*",
+    "app://*",
+    "http://localhost:*"
   ],
   "permissions": [
     "core:default",
@@ -11,6 +17,9 @@
     "fs:allow-app-write-recursive",
     "fs:allow-app-read",
     "fs:allow-app-read-recursive",
+    "core:webview:allow-create-webview-window",
+    "core:event:allow-emit",
+    "core:event:allow-listen",
     {
       "identifier": "fs:scope",
       "description": "File system access",
