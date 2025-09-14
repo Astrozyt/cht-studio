@@ -4,10 +4,16 @@ import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import FormCard from "./components/FormCard";
+import { Badge } from "@/components/ui/badge";
+import NewLanguageDialog from "./components/NewLanguageDialog";
+import { useState } from "react";
 
 const Project = () => {
 
+  const [languages, setLanguages] = useState<{ short: string, long: string }[]>([]);
   let { projectName } = useParams();
+
+  //Load language files from project folder
 
   return (
     <>
@@ -15,9 +21,15 @@ const Project = () => {
         <Menubar className="">
 
           <h1>Overview of:  <span className="bold">{projectName}</span></h1>
-          <Button className="w-fit">Play project</Button>
-          <Button className="w-fit">Sync</Button>
-          <Button className="w-fit">New Branch</Button>
+          <Button className="w-fit" disabled>Play project</Button>
+          <Button className="w-fit" disabled>Sync</Button>
+          <Button className="w-fit" disabled>New Branch</Button>
+          <div>
+            {languages.map(lang => (
+              <Badge key={lang.short} variant="outline">{lang.long} <span onClick={() => setLanguages(languages.filter(l => l.short !== lang.short))}>X</span></Badge>
+            ))}
+            <NewLanguageDialog languages={languages} setLanguages={setLanguages} />
+          </div>
         </Menubar>
 
         <FormCard updateView={() => { }} />
