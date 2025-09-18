@@ -116,6 +116,9 @@ importers:
       zod:
         specifier: ^3.24.3
         version: 3.25.76
+      zustand:
+        specifier: ^5.0.8
+        version: 5.0.8(@types/react@18.3.23)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2
@@ -7373,6 +7376,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.9
 
+  use-sync-external-store@1.5.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+    optional: true
+
   use-sync-external-store@1.5.0(react@19.1.1):
     dependencies:
       react: 19.1.1
@@ -7561,6 +7569,13 @@ snapshots:
       '@types/react': 19.1.9
       immer: 10.1.1
       react: 19.1.1
+
+  zustand@5.0.8(@types/react@18.3.23)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
+    optionalDependencies:
+      '@types/react': 18.3.23
+      immer: 10.1.1
+      react: 18.3.1
+      use-sync-external-store: 1.5.0(react@18.3.1)
 
   zustand@5.0.8(@types/react@19.1.9)(immer@10.1.1)(react@19.1.1)(use-sync-external-store@1.5.0(react@19.1.1)):
     optionalDependencies:

@@ -4,12 +4,17 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { useLanguageStore } from "../stores/languageStore";
 
-const NewLanguageDialog = ({ languages, setLanguages }: { languages: { short: string, long: string }[], setLanguages: React.Dispatch<React.SetStateAction<{ short: string, long: string }[]>> }) => {
+const NewLanguageDialog = () => {
     const [shortName, setShortName] = useState("");
     const [longName, setLongName] = useState("");
     const [longError, setLongError] = useState(false);
     const [shortError, setShortError] = useState(false);
+
+    const languagesInStore = useLanguageStore(state => state.languages);
+
+    const setLanguages = useLanguageStore(state => state.setLanguages);
 
     return (
         <Dialog>
@@ -29,16 +34,14 @@ const NewLanguageDialog = ({ languages, setLanguages }: { languages: { short: st
                 <DialogFooter className="mt-8">
                     {/* <DialogClose asChild> */}
                     <Button type="submit" onClick={() => {
-                        if (languages.find(l => l.short === shortName || shortName.length !== 2)) {
+                        if (languagesInStore.find(l => l.short === shortName || shortName.length !== 2)) {
                             setShortError(true);
-
                         }
-                        if (languages.find(l => l.long === longName || longName.length < 3)) {
+                        if (languagesInStore.find(l => l.long === longName || longName.length < 3)) {
                             setLongError(true);
-                            // return;
                         }
                         if (!shortError && !longError && shortName && longName) {
-                            setLanguages([...languages, { short: shortName, long: longName }]);
+                            setLanguages([...languagesInStore, { short: shortName, long: longName }]);
                             setShortName("");
                             setLongName("");
                             setShortError(false);
@@ -47,7 +50,6 @@ const NewLanguageDialog = ({ languages, setLanguages }: { languages: { short: st
                             document.querySelector("body")?.click();
                         }
                     }}>Add Language</Button>
-                    {/* </DialogClose> */}
                     <DialogClose asChild>
                         <Button type="button" variant="outline" onClick={() => { setShortName(""); setLongName(""); setShortError(false); setLongError(false); }}>Close Window</Button>
                     </DialogClose>

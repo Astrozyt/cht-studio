@@ -22,7 +22,7 @@ export const FormEditorPage = () => {
             //   const formData = await window.__TAURI__.invoke('load_form', { formName: 'exampleForm' });
             readTextFile(`projects/${projectName}/forms/${formName}`, { baseDir: BaseDirectory.AppLocalData }).then((content) => {
                 const parsedData = JSON.parse(content);
-                console.log("Loaded form data:", parsedData);
+                // console.log("Loaded form data:", parsedData);
                 if (parsedData.body && Array.isArray(parsedData.body) && parsedData.title) {
                     setFormData(parsedData);
                     console.log("Form data structure is valid.");

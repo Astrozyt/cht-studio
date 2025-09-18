@@ -12,8 +12,8 @@
   "dependencies": {
     "@bpmn-io/form-js-editor": "^1.15.1",
     "@ght/formbuilder": "workspace:*",
-    "@ght/xformparser": "workspace:*",
     "@ght/stores": "workspace:*",
+    "@ght/xformparser": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.7",
@@ -44,7 +44,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
     "tw-animate-css": "^1.2.4",
-    "zod": "^3.24.3"
+    "zod": "^3.24.3",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
