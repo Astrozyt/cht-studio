@@ -5,7 +5,8 @@
     "types/**/*",
     "src/bp_confirm_selftransformed.json",
     "../stores/src",
-    "cypress/**/*.ts"
+    "cypress/**/*.ts",
+    "../db/src"
   ],
   "exclude": [
     "node_modules",
@@ -38,6 +39,9 @@
       "@ght/stores": [
         "../stores/src"
       ],
+      "@ght/db": [
+        "../db/src"
+      ]
     },
   },
 }

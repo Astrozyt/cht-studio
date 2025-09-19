@@ -6,14 +6,59 @@ import { Card } from "../../components/ui/card";
 import FormCard from "./components/FormCard";
 import { Badge } from "@/components/ui/badge";
 import NewLanguageDialog from "./components/NewLanguageDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { addLanguage, getProjectFieldDb, getLanguageDb, getLanguages, removeLanguage } from "@ght/db";
 
 const Project = () => {
-
-  const [languages, setLanguages] = useState<{ short: string, long: string }[]>([]);
   let { projectName } = useParams();
 
-  //Load language files from project folder
+  useEffect(() => {
+    if (!projectName) return; // wait until it's available
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const langs = await getLanguages(projectName);
+        if (!cancelled) {
+          console.log("Languages from DB:", langs);
+          setLanguages(langs);
+        }
+      } catch (e) {
+        console.error("Failed to load languages:", e);
+        if (!cancelled) setLanguages([]); // fallback
+      }
+    })();
+
+    return () => {
+      cancelled = true; // avoid setting state after unmount
+    };
+  }, [projectName]);
+
+
+  const formFieldDB = projectName && getProjectFieldDb(projectName);
+
+
+  const [languages, setLanguages] = useState<{ short: string, long: string }[]>([]);
+
+  const onSaveFn = async (shortform: string, longform: string) => {
+    addLanguage(projectName || "default", shortform, longform).then(() => {
+      setLanguages([...languages, { short: shortform, long: longform }]);
+    }).catch((error) => {
+      console.error("Error adding language to database:", error);
+    });
+  }
+
+  const onLanguageRemove = (shortform: string) => {
+    // Delete in DB
+    removeLanguage(projectName || "default", shortform).then(() => {
+      console.log(`Language with short code '${shortform}' removed from DB.`);
+    }).catch((err) => {
+      console.error("Error removing language:", err);
+    });
+    // Remove from state
+    setLanguages(languages.filter(lang => lang.short !== shortform));
+  }
 
   return (
     <>
@@ -26,9 +71,9 @@ const Project = () => {
           <Button className="w-fit" disabled>New Branch</Button>
           <div>
             {languages.map(lang => (
-              <Badge key={lang.short} variant="outline">{lang.long} <span onClick={() => setLanguages(languages.filter(l => l.short !== lang.short))}>X</span></Badge>
+              <Badge key={lang.short} variant="outline">{lang.long} <span onClick={() => onLanguageRemove(lang.short)}>X</span></Badge>
             ))}
-            <NewLanguageDialog languages={languages} setLanguages={setLanguages} />
+            <NewLanguageDialog languages={languages} onSaveFn={onSaveFn} />
           </div>
         </Menubar>
 
@@ -40,18 +85,6 @@ const Project = () => {
             <img className="size-xs" src={diagram} alt="Diagram" />
           </Link>
         </Card>
-        {/* <Tabs defaultValue="account" className="w-[400px]">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="forms">Forms</TabsTrigger>
-            <TabsTrigger value="connector">Connector</TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview"><XmlOverview/></TabsContent>
-          <TabsContent value="forms"><XmlEditor /></TabsContent>
-          <TabsContent value="connector"><XmlEmulator /></TabsContent>
-
-        </Tabs> */}
-        {/* {files.map((file, index) => <p key={index}>{file}</p>)} */}
       </div >
     </>
   );

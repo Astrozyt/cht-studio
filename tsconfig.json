@@ -38,6 +38,9 @@
       ],
       "@ght/stores": [
         "packages/stores/src"
+      ],
+      "@ght/db": [
+        "packages/db/src"
       ]
     }
   },

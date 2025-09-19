@@ -1,0 +1,8 @@
+{
+    "name": "@ght/db",
+    "version": "0.0.0",
+    "main": "src/index.ts",
+    "dependencies": {
+        "@tauri-apps/api": "^2"
+    }
+}

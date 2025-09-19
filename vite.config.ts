@@ -14,6 +14,7 @@ export default defineConfig(async () => ({
       '@ght/formbuilder': path.resolve(__dirname, './packages/formbuilder/src'),
       '@ght/xFormParser': path.resolve(__dirname, './packages/xFormParser/src'),
       '@ght/stores': path.resolve(__dirname, './packages/stores/src'),
+      '@ght/db': path.resolve(__dirname, './packages/db/src')
     },
   },
 

@@ -42,7 +42,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
     "tw-animate-css": "^1.2.4",
-    "@ght/stores": "workspace:*"
+    "@ght/stores": "workspace:*",
+    "@ght/db": "workspace:*"
   },
   "peerDependencies": {
     "@hookform/resolvers": "^5.0.1",

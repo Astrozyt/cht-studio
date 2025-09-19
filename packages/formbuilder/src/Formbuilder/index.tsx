@@ -1,6 +1,6 @@
 import { Button } from "../components/button";
 import { Card, CardContent } from "../components/card";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { Action, formReducer } from "./helpers/formState";
 import { InsertNodeButton } from "./components/InsertNodeButton";
 import { FullForm, NodeFormValues } from "./Zod/zodTypes";
@@ -21,7 +21,7 @@ import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
 import { useExistingNodesStore, useFormStore } from "@ght/stores";
-import { LanguagesBox } from "./components/LanguagesBox";
+import { useParams } from "react-router";
 
 // Add Tauri type to the global scope
 declare global {
@@ -35,12 +35,13 @@ declare global {
 const initFromForm = (formInput: FullForm) => addUidsToNodes(formInput).body;
 
 
-export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm) => Promise<void>, cancelFn: () => void }) => {
+export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm, projectName: string) => Promise<void>, cancelFn: () => void }) => {
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
     }
     const [formDataRed, dispatch] = useReducer(formReducer, formInput, initFromForm);
+    const { projectName } = useParams<{ projectName: string }>();
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
 
@@ -82,12 +83,11 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         <div>
             <Card className="flex">
                 <h2>Form Editor ({formInput.title})</h2>
-                <LanguagesBox />
             </Card>
             <ul className=" border-2 rounded p-2">
                 <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
-                    <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }); }}>
+                    <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }, projectName || "default"); }}>
                         Save
                     </Button>
                     <Button onClick={() => { onCancel(); }} data-cy="cancel-button" variant="default" className="bg-red-300 hover:bg-red-400">

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import { isTauri } from "@tauri-apps/api/core";
 import { FullForm } from "packages/formbuilder/src/Formbuilder/Zod/zodTypes";
 import { toast } from "sonner";
+import { addFormField, getProjectFieldDb, removeAllProjectFields } from "@ght/db";
 
 export const FormEditorPage = () => {
 
@@ -46,8 +47,32 @@ export const FormEditorPage = () => {
     };
 
 
-    const saveFormData = async (data: any) => {
+    const saveFormData = async (data: FullForm, projectName: string) => {
         console.log("Saving form data:", JSON.stringify({ title: formName, body: data }));
+        // Save fields to sqlite db here
+        const db = projectName && await getProjectFieldDb(projectName || "default");
+
+        if (db) {
+            const insertPromises = data.body.filter(node => ["input", "select", "select1"].includes(node.tag)).map(node => {
+                return addFormField(db, {
+                    form: formName || "default",
+                    name: node.name || "",
+                    label: node.label || "",
+                    type: node.bind?.type || "string",
+                    inputType: node.bind?.inputType || "text",
+                    operators: JSON.stringify(node.bind?.operators || []),
+                    valueEditorType: node.bind?.valueEditorType || "text",
+                    values: JSON.stringify(node.bind?.values || []),
+                    required: node.bind?.required || false
+                });
+            });
+            removeAllProjectFields(db, formName || "default").then(() => {
+                return Promise.all(insertPromises);
+            }).then(() => {
+                console.log("Form fields saved to database.");
+            });
+        }
+
         writeTextFile(
             `projects/${projectName}/forms/${formName}`,
             JSON.stringify({ title: formName, body: data }),
@@ -71,7 +96,7 @@ export const FormEditorPage = () => {
     console.log("Form data in FormEditorPage:", formData);
     return (
         <>
-            {formData && formData.body && Array.isArray(formData.body) && formData.body.length > 0 ? (
+            {formData && formData.body && Array.isArray(formData.body) ? (
                 <div>
                     <h1>Form Builderrr</h1>
                     <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} />

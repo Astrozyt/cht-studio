@@ -4,17 +4,13 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useLanguageStore } from "../stores/languageStore";
 
-const NewLanguageDialog = () => {
+const NewLanguageDialog = ({ languages, onSaveFn }: { languages: { short: string, long: string }[], onSaveFn: (short: string, long: string) => void }) => {
+
     const [shortName, setShortName] = useState("");
     const [longName, setLongName] = useState("");
     const [longError, setLongError] = useState(false);
     const [shortError, setShortError] = useState(false);
-
-    const languagesInStore = useLanguageStore(state => state.languages);
-
-    const setLanguages = useLanguageStore(state => state.setLanguages);
 
     return (
         <Dialog>
@@ -32,16 +28,15 @@ const NewLanguageDialog = () => {
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="mt-8">
-                    {/* <DialogClose asChild> */}
                     <Button type="submit" onClick={() => {
-                        if (languagesInStore.find(l => l.short === shortName || shortName.length !== 2)) {
+                        if (languages.find(l => l.short === shortName || shortName.length !== 2)) {
                             setShortError(true);
                         }
-                        if (languagesInStore.find(l => l.long === longName || longName.length < 3)) {
+                        if (languages.find(l => l.long === longName || longName.length < 3)) {
                             setLongError(true);
                         }
                         if (!shortError && !longError && shortName && longName) {
-                            setLanguages([...languagesInStore, { short: shortName, long: longName }]);
+                            onSaveFn(shortName, longName);
                             setShortName("");
                             setLongName("");
                             setShortError(false);
