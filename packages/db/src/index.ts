@@ -99,8 +99,13 @@ export const getFormFields = async (db: Database) => {
     return result as { id: number, name: string; type: string; form: string; label: string; inputType: string; operators: string; valueEditorType: string; values: string; required: boolean }[];
 }
 
-export const addFormField = async (db: Database, { name, type, form, label, inputType, operators, valueEditorType, values, required }: { name: string, type: string, form: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean }) => {
-    await db.execute("INSERT INTO project_fields (name, type, form, label, inputType, operators, valueEditorType, valueList, required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0]);
+export const addFormField = async (project: string, { name, type, form, label, inputType, operators, valueEditorType, values, required }: { name: string, type: string, form: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean }) => {
+    const db = await getProjectFieldDb(project || "default");
+    await db.execute("INSERT INTO project_fields (name, type, form, label, inputType, operators, valueEditorType, valueList, required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0]).then(() => {
+        console.log(`Form field '${name}' added to DB.`);
+    }).catch((err) => {
+        console.error("Error adding form field:", err);
+    });
 }
 
 export const removeFormField = async (db: Database, name: string, form: string) => {

@@ -28,33 +28,33 @@ export type Node = {
 };
 
 type State = {
-    languages: { shortform: string; language: string }[];
-    addLanguage: (shortform: string, language: string) => void;
-    removeLanguage: (shortform: string) => void;
-    initLanguages: (langs: { shortform: string; language: string }[]) => void;
+    languages: { short: string; long: string }[];
+    addLanguage: (short: string, long: string) => void;
+    removeLanguage: (short: string) => void;
+    initLanguages: (langs: { short: string; long: string }[]) => void;
 };
 
 export const useFormStore = create<State>()(
     devtools((set, get) => ({
         languages: [],
-        initLanguages: (langs: { shortform: string; language: string }[]) => set(() => ({ languages: langs })),
-        addLanguage: (shortform: string, language: string) => {
-            if (get().languages.some(lang => lang.shortform === shortform)) {
-                throw new Error(`Shortforms must be unique. Language with shortform "${shortform}" already exists.`);
+        initLanguages: (langs: { short: string; long: string }[]) => set(() => ({ languages: langs })),
+        addLanguage: (short: string, long: string) => {
+            if (get().languages.some(lang => lang.short === short)) {
+                throw new Error(`Shortforms must be unique. Language with shortform "${short}" already exists.`);
             }
-            if (!language) {
+            if (!long) {
                 throw new Error(`Language name cannot be empty.`);
             }
-            if (!shortform || shortform.length != 2) {
+            if (!short || short.length != 2) {
                 throw new Error(`Shortform must be exactly 2 characters.`);
             }
             set((state) => ({
-                languages: [...state.languages, { shortform, language }]
+                languages: [...state.languages, { short, long }]
             }));
         },
-        removeLanguage: (shortform: string) => {
+        removeLanguage: (short: string) => {
             set((state) => ({
-                languages: state.languages.filter(lang => lang.shortform !== shortform)
+                languages: state.languages.filter(lang => lang.short !== short)
             }));
         }
     }))

@@ -20,8 +20,9 @@ import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
-import { useExistingNodesStore, useFormStore } from "@ght/stores";
+import { Node, useExistingNodesStore, useFormStore } from "@ght/stores";
 import { useParams } from "react-router";
+import { getLanguages } from "@ght/db";
 
 // Add Tauri type to the global scope
 declare global {
@@ -35,21 +36,31 @@ declare global {
 const initFromForm = (formInput: FullForm) => addUidsToNodes(formInput).body;
 
 
-export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm, projectName: string) => Promise<void>, cancelFn: () => void }) => {
+export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm, projectName: string, logicFormNodes: Node[]) => Promise<void>, cancelFn: () => void }) => {
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
     }
     const [formDataRed, dispatch] = useReducer(formReducer, formInput, initFromForm);
+    console.log("Input: ", formInput, "vs state:", formDataRed);
     const { projectName } = useParams<{ projectName: string }>();
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
 
     // const storeLanguages = useLanguageStore(state => state.languages);
     useEffect(() => {
-        // dispatch({ type: 'INIT_STATE', nodes: addUidsToNodes(formInput).body });
-        initLanguages(formInput.languages || []);
-    }, [formInput.languages, initLanguages]);
+        getLanguages(projectName || "default").then((langs) => {
+            initLanguages(langs);
+        }).catch((err) => {
+            console.error("Failed to fetch languages:", err);
+            initLanguages([]); // Fallback to empty array on error
+        });
+    }, [projectName, initLanguages]);
+
+    // Reinitialize reducer state when formInput changes so state stays in sync
+    useEffect(() => {
+        dispatch({ type: 'INIT_STATE', nodes: initFromForm(formInput) });
+    }, [formInput]);
 
     const filtered = useMemo(() => {
         const result: NodeFormValues[] = [];
@@ -78,7 +89,8 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
         cancelFn(); // Call the provided cancel function
     };
 
-
+    console.log("Filtered nodes for existing fields:", filtered);
+    console.log("Form data in FormEditor:", formDataRed);
     return (
         <div>
             <Card className="flex">
@@ -87,7 +99,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
             <ul className=" border-2 rounded p-2">
                 <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
-                    <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }, projectName || "default"); }}>
+                    <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }, projectName || "default", filtered); }}>
                         Save
                     </Button>
                     <Button onClick={() => { onCancel(); }} data-cy="cancel-button" variant="default" className="bg-red-300 hover:bg-red-400">

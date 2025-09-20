@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "../../../components/button";
 import { Checkbox } from "../../../components/checkbox";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/dialog";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from "../../../components/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/form";
 import { Input } from "../../../components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/select";
@@ -16,12 +16,12 @@ import { ItemFields } from "./Itemfields";
 import { LabelFields } from "./LabelFields";
 import { useEffect, useRef, useState } from "react";
 import LogicBuilder from "../Logicbuilder/src/LogicBuilder";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { countRules } from "../../helpers";
 import { RadioGroup, RadioGroupItem } from "../radio-group.tsx";
 import { Label } from "../Label/index.tsx";
 import { Separator } from "../Separator/index.tsx";
-import { emptyLocalized, reconcileLocalized, useExistingNodesStore, useFormStore } from "../../../../../stores/src/formStore.ts";
+import { emptyLocalized, reconcileLocalized, useFormStore } from "../../../../../stores/src/formStore.ts";
 import { PenToolIcon } from "lucide-react";
 import { FormHeader } from "./helpers/FormHeader.tsx";
 
@@ -46,12 +46,9 @@ export const InsertNodeButton = ({
 
     const formLanguages = useFormStore(state => state.languages);
 
-    const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
-    // console.log("Existing nodes:", existingNodes)
+    const allowedLangs = (formLanguages ?? []).map(lang => lang.short);
 
     const labelsPreFill = emptyLocalized(allowedLangs);
-
-    // const existingNodes = useExistingNodesStore(state => state.existingNodes);
 
     const uidRef = useRef(existingNode?.uid ?? nanoid());
 

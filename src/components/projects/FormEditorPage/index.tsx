@@ -6,6 +6,7 @@ import { isTauri } from "@tauri-apps/api/core";
 import { FullForm } from "packages/formbuilder/src/Formbuilder/Zod/zodTypes";
 import { toast } from "sonner";
 import { addFormField, getProjectFieldDb, removeAllProjectFields } from "@ght/db";
+import { Node } from "@ght/stores";
 
 export const FormEditorPage = () => {
 
@@ -22,15 +23,16 @@ export const FormEditorPage = () => {
         if (await isTauri()) {
             //   const formData = await window.__TAURI__.invoke('load_form', { formName: 'exampleForm' });
             readTextFile(`projects/${projectName}/forms/${formName}`, { baseDir: BaseDirectory.AppLocalData }).then((content) => {
-                const parsedData = JSON.parse(content);
-                // console.log("Loaded form data:", parsedData);
+                let parsedData = JSON.parse(content);
+                console.log("Loaded form data:", parsedData);
+                parsedData.body = parsedData.body.body;
                 if (parsedData.body && Array.isArray(parsedData.body) && parsedData.title) {
                     setFormData(parsedData);
                     console.log("Form data structure is valid.");
 
                     // toast.success("Form data loaded successfully!");
                 } else {
-                    console.error("Invalid form data structure.");
+                    console.error("Invalid form data structure.", parsedData);
                     toast.error("Invalid form data structure. Please check the file.");
                     setFormData({ title: "New Form", body: [] }); // Default value if structure is invalid
                 }
@@ -47,17 +49,16 @@ export const FormEditorPage = () => {
     };
 
 
-    const saveFormData = async (data: FullForm, projectName: string) => {
-        console.log("Saving form data:", JSON.stringify({ title: formName, body: data }));
+    const saveFormData = async (data: FullForm, projectName: string, logicFormNodes: any[]) => {
         // Save fields to sqlite db here
         const db = projectName && await getProjectFieldDb(projectName || "default");
 
         if (db) {
-            const insertPromises = data.body.filter(node => ["input", "select", "select1"].includes(node.tag)).map(node => {
-                return addFormField(db, {
+            const insertPromises = logicFormNodes.map(node => {
+                return addFormField(projectName || "default", {
                     form: formName || "default",
-                    name: node.name || "",
-                    label: node.label || "",
+                    name: node.ref || "",
+                    label: JSON.stringify(node.labels) || "",
                     type: node.bind?.type || "string",
                     inputType: node.bind?.inputType || "text",
                     operators: JSON.stringify(node.bind?.operators || []),
@@ -67,9 +68,9 @@ export const FormEditorPage = () => {
                 });
             });
             removeAllProjectFields(db, formName || "default").then(() => {
-                return Promise.all(insertPromises);
+                Promise.all(insertPromises);
             }).then(() => {
-                console.log("Form fields saved to database.");
+                console.log("Form fields saved to database.", insertPromises);
             });
         }
 

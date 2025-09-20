@@ -34,13 +34,12 @@ const LogicBuilder = ({
   );
 
   const formFields = useExistingNodesStore(state => state.existingNodes);
-  const defaultLang = useFormStore.getState().languages[0]?.shortform ?? 'en';
+  const defaultLang = useFormStore.getState().languages[0]?.short ?? 'en';
 
   const fields: Field[] = useMemo(
     () => mapNodesToFields(formFields, defaultLang),
     [formFields, defaultLang]
   );
-
 
   return (
     <>
