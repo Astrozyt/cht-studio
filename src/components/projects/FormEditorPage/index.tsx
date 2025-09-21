@@ -6,7 +6,6 @@ import { isTauri } from "@tauri-apps/api/core";
 import { FullForm } from "packages/formbuilder/src/Formbuilder/Zod/zodTypes";
 import { toast } from "sonner";
 import { addFormField, getProjectFieldDb, removeAllProjectFields } from "@ght/db";
-import { Node } from "@ght/stores";
 
 export const FormEditorPage = () => {
 
@@ -25,7 +24,7 @@ export const FormEditorPage = () => {
             readTextFile(`projects/${projectName}/forms/${formName}`, { baseDir: BaseDirectory.AppLocalData }).then((content) => {
                 let parsedData = JSON.parse(content);
                 console.log("Loaded form data:", parsedData);
-                parsedData.body = parsedData.body.body;
+                // parsedData.body = parsedData.body.body;
                 if (parsedData.body && Array.isArray(parsedData.body) && parsedData.title) {
                     setFormData(parsedData);
                     console.log("Form data structure is valid.");
@@ -76,7 +75,7 @@ export const FormEditorPage = () => {
 
         writeTextFile(
             `projects/${projectName}/forms/${formName}`,
-            JSON.stringify({ title: formName, body: data }),
+            JSON.stringify(data),
             { baseDir: BaseDirectory.AppLocalData }
         ).then(() => {
             console.log("Form data saved successfully.");

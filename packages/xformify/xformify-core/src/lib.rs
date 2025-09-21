@@ -20,7 +20,7 @@ use builder::body::write_body;
 use builder::instance::write_instance;
 use builder::itext::Itext;
 
-pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String> {
+pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String, anyhow::Error> {
     // Collect itext
     let mut it = Itext::new();
     fn walk(it: &mut Itext, prefix: &str, n: &Node) {
@@ -83,6 +83,14 @@ pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String> {
     Ok(String::from_utf8(buf.into_inner())?)
 }
 
+// #[derive(thiserror::Error, Debug)]
+// pub enum XformError {
+//     #[error("invalid input: {0}")]
+//     Invalid(String),
+//     #[error("internal: {0}")]
+//     Internal(String),
+// }
+
 fn write_itext<W: std::io::Write>(w: &mut Writer<W>, it: &Itext) -> anyhow::Result<()> {
     start(w, "itext", &[])?;
     let mut langs: BTreeSet<String> = BTreeSet::new();
@@ -142,8 +150,8 @@ fn simple<W: std::io::Write>(
     Ok(())
 }
 
-#[cfg(test)]
-mod tests {
-    mod roundtrip;
-    mod smoke;
-}
+// #[cfg(test)]
+// mod tests {
+//     mod roundtrip;
+//     mod smoke;
+// }

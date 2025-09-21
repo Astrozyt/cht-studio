@@ -1,3 +1,6 @@
+use tauri::Manager;
+use xformify_core::json_to_xform;
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -59,51 +62,17 @@ fn create_folder(name: &str) -> Result<(), String> {
     Ok(())
 }
 
-#[tauri::command]
-fn convert_to_xform(json: String) -> Result<String, String> {
-    let parsed: serde_json::Value =
-        serde_json::from_str(&json).map_err(|e| format!("JSON parse error: {}", e))?;
-
-    // let xml =
-    //     xform_to_xml::generate_xform(parsed).map_err(|e| format!("Conversion error: {}", e))?;
-
-    // Dummy response for now
-    let xml = "<h:html>Logic builder in progress</h:html>".to_string();
-    Ok(xml)
-}
-
 // #[tauri::command]
-// fn create_json_file(path: &str, content: &str) -> Result<(), String> {
-//     use std::fs;
-//     use std::path::PathBuf;
-//     // use tauri::api::path::app_data_dir;
+// fn convert_to_xform(json: String) -> Result<String, String> {
+//     let parsed: serde_json::Value =
+//         serde_json::from_str(&json).map_err(|e| format!("JSON parse error: {}", e))?;
 
-//     let base_dir =
-//         app_data_dir(&tauri::Config::default()).ok_or("Failed to get app data directory")?;
-//     let mut file_path = PathBuf::from(base_dir);
-//     file_path.push("forms");
-//     file_path.push(path);
+//     // let xml =
+//     //     xform_to_xml::generate_xform(parsed).map_err(|e| format!("Conversion error: {}", e))?;
 
-//     if let Some(parent) = file_path.parent() {
-//         fs::create_dir_all(parent).map_err(|e| format!("Failed to create directories: {}", e))?;
-//     }
-
-//     fs::write(&file_path, content).map_err(|e| format!("Failed to create file: {}", e))?;
-//     // let path_obj = std::path::Path::new(path);
-//     // if let Some(parent) = path_obj.parent() {
-//     //     if !parent.exists() {
-//     //         if let Err(e) = std::fs::create_dir_all(parent) {
-//     //             return Err(format!("Failed to create directories: {}", e));
-//     //         }
-//     //     }
-//     // } else {
-//     //     return Err("Invalid path: no parent directory found".to_string());
-//     // }
-
-//     // if let Err(e) = std::fs::write(path_obj, content) {
-//     //     return Err(format!("Failed to create file: {}", e));
-//     // }
-//     Ok(())
+//     // Dummy response for now
+//     let xml = "<h:html>Logic builder in progress</h:html>".to_string();
+//     Ok(xml)
 // }
 
 #[tauri::command]
@@ -114,13 +83,32 @@ fn save_json_form(path: &str, content: &str) -> Result<(), String> {
     Ok(())
 }
 
-//Function to save xml file
-// #[tauri::command]
-// fn save_xml_file(path: &str, content: &str) -> Result<(), String> {
-//     let mut file = std::fs::File::create(path).map_err(|e| e.to_string())?;
-//     // file.write_all(content.as_bytes()).map_err(|e| e.to_string())?;
-//     Ok(())
-// }
+#[tauri::command]
+fn xformify(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
+    // Resolve BaseDirectory::AppLocalData and join with the provided relative path
+    let base_dir = app.path().app_local_data_dir().map_err(|e| e.to_string())?;
+    // .ok_or_else(|| "Could not resolve AppLocalData directory".to_string())?;
+
+    let path = {
+        let p = std::path::Path::new(rel_path);
+        if p.is_absolute() {
+            p.to_path_buf()
+        } else {
+            base_dir.join(p)
+        }
+    };
+
+    let data = std::fs::read_to_string(&path)
+        .map_err(|e| format!("Failed to read file {}: {}", path.display(), e))?;
+
+    let form: xformify_core::Form =
+        serde_json::from_str(&data).map_err(|e| format!("Failed to parse JSON: {}", e))?;
+    let xml_id = form.title.replace(' ', "_").to_lowercase();
+    let xform =
+        json_to_xform(&xml_id, &form).map_err(|e| format!("Failed to convert to XForm: {}", e))?;
+
+    Ok(xform)
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -136,6 +124,7 @@ pub fn run() {
             list_xml_files,
             // create_json_file,
             save_json_form,
+            xformify,
         ])
         // .invoke_handler(tauri::generate_handler![list_xml_files])
         .run(tauri::generate_context!())

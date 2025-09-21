@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "src-tauri",
-    "packages/xform_to_xml"
+    "packages/xform_to_xml",
+    "packages/xformify/xformify-core"
 ]

@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 # rlib is fine for Rust usage AND as a dependency of the wasm wrapper
 crate-type = ["rlib"]
+path = "src/lib.rs"
 
 [dependencies]
 anyhow = "1"
