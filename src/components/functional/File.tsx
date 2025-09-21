@@ -28,7 +28,7 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <Card className="size-40 m-8 ">
-            <CardHeader className="text-center p-0"><p className="w-36 text-nowrap overflow-hidden">{name}</p></CardHeader>
+            <CardHeader className="text-center p-0"><p className="w-36 text-nowrap overflow-hidden">{name.replace(".json", "")}</p></CardHeader>
             <CardContent className="flex justify-around">{isFolder ? <Folder /> : <FileSpreadsheet />}</CardContent>
 
             <CardFooter className="text-center px-0">

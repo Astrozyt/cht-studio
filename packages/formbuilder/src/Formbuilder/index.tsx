@@ -94,7 +94,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     return (
         <div>
             <Card className="flex">
-                <h2>Form Editor ({formInput.title})</h2>
+                <h2>Form Editor ({formInput.title.replace(".json", "")})</h2>
             </Card>
             <ul className=" border-2 rounded p-2">
                 <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />

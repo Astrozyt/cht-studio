@@ -26,7 +26,7 @@ const FormCard = ({ updateView }: any) => {
     const readForms = async (path: string) => {
         let files = await readDir(path, { baseDir: BaseDirectory.AppLocalData });
         console.log("Files in forms folder:", files);
-        const fileNames = files.map(entry => entry.name);
+        const fileNames = files.filter(entry => entry.name && !entry.name.endsWith(".xml")).map(entry => entry.name);
         setForms(fileNames);
     }
 
