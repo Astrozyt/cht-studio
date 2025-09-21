@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { invoke } from "@tauri-apps/api/core";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
+import { openRunner } from "./RunnerWindow";
 
 type FileProps = {
     name: string;
@@ -39,6 +40,7 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
                     console.log("BB:", `projects/${projectName}/forms/${name}`);
                     invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${name}` }).then((xml) => {
                         console.log("Generated XML:", xml);
+                        openRunner(xml);
                     }).catch((error) => {
                         //TODO: Give feedback via toast
                         console.error("Error invoking xformify:", error);
