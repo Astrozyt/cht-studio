@@ -37,8 +37,13 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
                     // const xml = await invoke<string>("xformify", { input: JSON.stringify(name) });
                     console.log("AA:", BaseDirectory.AppLocalData, name);
                     console.log("BB:", `projects/${projectName}/forms/${name}`);
-                    const xml = await invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${name}` });
-                    console.log("Generated XML:", xml);
+                    invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${name}` }).then((xml) => {
+                        console.log("Generated XML:", xml);
+                    }).catch((error) => {
+                        //TODO: Give feedback via toast
+                        console.error("Error invoking xformify:", error);
+                    });
+                    // console.log("Generated XML:", xml);
                 }}>
                     <Play />
                 </Button>

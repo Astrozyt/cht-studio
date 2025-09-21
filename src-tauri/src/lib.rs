@@ -106,7 +106,10 @@ fn xformify(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
     let xml_id = form.title.replace(' ', "_").to_lowercase();
     let xform =
         json_to_xform(&xml_id, &form).map_err(|e| format!("Failed to convert to XForm: {}", e))?;
-
+    // Save the generated XForm XML to a file
+    let xform_path = path.with_extension("xml");
+    std::fs::write(&xform_path, &xform)
+        .map_err(|e| format!("Failed to write XForm file {}: {}", xform_path.display(), e))?;
     Ok(xform)
 }
 
