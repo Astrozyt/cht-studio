@@ -42,7 +42,7 @@ const FormCard = ({ updateView }: any) => {
     return <Card className="m-4">
         <CardHeader>
             <Menubar>
-                <h1>Forms</h1>
+                <h1 className="text-2xl font-semibold">Forms</h1>
             </Menubar>
         </CardHeader>
         <CardContent className="flex flex-wrap justify-around">

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import NewLanguageDialog from "./components/NewLanguageDialog";
 import { useEffect, useState } from "react";
 import { addLanguage, getProjectFieldDb, getLanguageDb, getLanguages, removeLanguage } from "@ght/db";
+import ContactSummaryEditorCard from "./components/ContactSummaryEditorCard";
 
 const Project = () => {
   let { projectName } = useParams();
@@ -76,6 +77,8 @@ const Project = () => {
             <NewLanguageDialog languages={languages} onSaveFn={onSaveFn} />
           </div>
         </Menubar>
+
+        <ContactSummaryEditorCard />
 
         <FormCard updateView={() => { }} />
 
