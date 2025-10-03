@@ -4,12 +4,15 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Download, Play, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CSEntryDetails } from "./components/CSEntryDetails";
 import { AnyRule, BaseRule, BooleanRule, CountRule, LastValueRule, RuleType, SummaryConfig } from "./types";
 import { uid } from "./helpers";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useParams } from "react-router";
+import { getContactSummaryDb, addContactSummaryRule, getContactSummaryRules } from "@ght/db";
+import { removeContactSummaryRule, updateContactSummaryRule } from "@ght/db";
 
 /**
  * CHT Contact-Summary Editor (MVP)
@@ -21,25 +24,43 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
  */
 export default function ContactSummaryEditor() {
     const [rules, setRules] = useState<AnyRule[]>([
-        {
-            id: uid(),
-            key: "last_bp_systolic",
-            type: "last_value",
-            form: "bp",
-            path: "fields.systolic",
-            withinDays: 365,
-            description: "Most recent systolic BP"
-        }
     ]);
+
+    const [refreshConstant, setRefreshConstant] = useState(0); // to force re-render
+
+    const { projectName } = useParams<{ projectName: string }>();
 
     const [newRuleKey, setNewRuleKey] = useState<string>("");
     const [newRuleType, setNewRuleType] = useState<RuleType | undefined>(undefined);
 
-    const config: SummaryConfig = useMemo(() => ({ fields: rules }), [rules]);
+    useEffect(() => {
+        if (!projectName) return;
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const dbRules = await getContactSummaryRules(projectName);
+                if (!cancelled) {
+                    console.log("Contact summary rules from DB:", dbRules);
+                    setRules(dbRules);
+                }
+            } catch (e) {
+                console.error("Failed to load contact summary rules:", e);
+                if (!cancelled) setRules([]); // fallback
+            }
+        })();
+
+        return () => {
+            cancelled = true; // avoid setting state after unmount
+        };
+    }, [projectName, refreshConstant]);
+
+    // const config: SummaryConfig = useMemo(() => ({ fields: rules }), [rules]);
     // const js = useMemo(() => generateContactSummaryJS(config), [config]);
+    // const db = getContactSummaryDb(projectName);
 
     function addRule() {
-        const base: BaseRule = { id: uid(), key: newRuleKey, type: newRuleType } as any;
+        const base: BaseRule = { key: newRuleKey, type: newRuleType } as any;
         let r: AnyRule;
         switch (newRuleType) {
             case "last_value":
@@ -52,40 +73,43 @@ export default function ContactSummaryEditor() {
                 r = { ...base, type: "boolean", logic: "reports.some(r => r.form==='dx')" } as BooleanRule;
                 break;
         }
-        setRules((rs) => [...rs, r!]);
-        setNewRuleKey("");
-        setNewRuleType(undefined);
+        console.log("Adding rule:", r!);
+        addContactSummaryRule(projectName!, r!).then(() => {
+            setRules((rs) => [...rs, r!]);
+            setNewRuleKey("");
+            setNewRuleType(undefined);
+        }).catch((err) => {
+            console.error("Error adding contact summary rule to DB:", err);
+        });
+
     }
 
-    function updateRule(id: string, patch: Partial<AnyRule>) {
-        setRules((rs) => rs.map((r) => (r.id === id ? ({ ...r, ...patch } as AnyRule) : r)));
+    function updateRule(id: number, patch: Partial<AnyRule>) {
+        console.log("Updating rule:", id, patch);
+        updateContactSummaryRule(projectName!, id, patch).then(() => {
+            setRules((rs) => rs.map((r) => (r.id === id ? ({ ...r, ...patch } as AnyRule) : r)));
+        }).catch((err) => {
+            console.error("Error updating contact summary rule in DB:", err);
+        });
     }
 
-    function removeRule(id: string) {
-        setRules((rs) => rs.filter((r) => r.id !== id));
+    function removeRule(id: number) {
+        console.log("Removing rule:", id);
+        removeContactSummaryRule(projectName!, id).then(() => {
+            setRules((rs) => rs.filter((r) => r.id !== id));
+        }).catch((err) => {
+            console.error("Error removing contact summary rule from DB:", err);
+        });
     }
 
-    // function downloadJS() {
-    //     const blob = new Blob([js], { type: "application/javascript;charset=utf-8" });
-    //     const url = URL.createObjectURL(blob);
-    //     const a = document.createElement("a");
-    //     a.href = url;
-    //     a.download = "contact-summary.templated.js";
-    //     a.click();
-    //     URL.revokeObjectURL(url);
-    // }
 
     return (
         <Card className="m-4">
             <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
-
                     <h1 className="text-2xl font-semibold">Contact-Summary Editor</h1>
                     <p className="text-sm text-muted-foreground">Define fields exposed under <code>instance('contact-summary')/context/*</code></p>
-
-
                 </div>
-
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <Table className="w-full">
@@ -99,15 +123,11 @@ export default function ContactSummaryEditor() {
                             </TableHeader>
                             <TableBody>
                                 {rules.map((r) => {
-                                    // const errs = validateRule(r);
-                                    // return (<CSEntryDetails key={r.id} r={r} updateRule={updateRule} removeRule={removeRule} />);
                                     return (<TableRow key={r.id} className="hover:bg-accent/50">
                                         <TableCell>{r.key}</TableCell>
-                                        {/* <TableCell>{r}</TableCell> */}
-
                                         <TableCell>{r.type}</TableCell>
                                         <TableCell>{r.description}</TableCell>
-                                        <TableCell>{<CSEntryDetails key={r.id} r={r} updateRule={updateRule} removeRule={removeRule} />}</TableCell>
+                                        <TableCell>{<CSEntryDetails key={r.id} r={r} removeRule={removeRule} refreshList={setRefreshConstant} />}</TableCell>
                                     </TableRow>);
                                 })}
                             </TableBody>

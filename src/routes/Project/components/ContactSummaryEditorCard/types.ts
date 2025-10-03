@@ -1,7 +1,7 @@
 export type RuleType = "last_value" | "count" | "boolean";
 
 export interface BaseRule {
-    id: string; // ui id
+    id: number; // ui id
     key: string; // exposed in contact-summary context
     type: RuleType;
     description?: string;

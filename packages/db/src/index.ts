@@ -2,6 +2,7 @@ import Database from "@tauri-apps/plugin-sql";
 import { appLocalDataDir, join } from "@tauri-apps/api/path";
 import { exists, mkdir } from "@tauri-apps/plugin-fs";
 
+export { addContactSummaryRule, getContactSummaryDb, getContactSummaryRules, removeContactSummaryRule, updateContactSummaryRule } from "./contact-summary";
 
 async function openLanguageDb(projectId: string) {
     const base = await appLocalDataDir();

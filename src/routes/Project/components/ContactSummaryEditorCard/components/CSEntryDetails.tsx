@@ -6,15 +6,89 @@ import { Label } from "@radix-ui/react-menubar";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
 import { Trash2, Save, PenIcon } from "lucide-react";
 import { useState } from "react";
-// import { RuleType, LastValueRule, CountRule, BooleanRule, AnyRule } from "..";
-// import { Dialog, DialogContent } from "packages/formbuilder/src/components/dialog";
 import { DialogTrigger, Dialog, DialogContent } from "@/components/ui/dialog";
 import { AnyRule, RuleType, LastValueRule, CountRule, BooleanRule } from "../types";
+import { updateContactSummaryRule } from "@ght/db";
+import { useParams } from "react-router";
+import { uid } from "../helpers";
 
-export const CSEntryDetails = ({ r, updateRule, removeRule }: { r: AnyRule; updateRule: (id: string, data: Partial<AnyRule>) => void; removeRule: (id: string) => void; }) => {
+export const CSEntryDetails = ({ r, removeRule, refreshList }: { r: AnyRule; removeRule: (id: number) => void; refreshList: (number: number) => void; }) => {
+    const [rule, setRule] = useState<AnyRule>(r);
+
+    const { projectId } = useParams<{ projectId: string }>();
+
+    const returnSpecificCardContent = (type: AnyRule["type"]) => {
+        console.log("Rendering specific card content for type:", type, rule);
+        switch (rule.type) {
+            case "last_value":
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <Label>Form code</Label>
+                            <Input id={`form-${r.id}`} value={(rule.form)} onChange={(e) => {
+                                setRule({ ...rule, form: e.target.value });
+                            }} placeholder="bp" />
+                        </div>
+                        <div>
+                            <Label>Field path</Label>
+                            <Input id={`path-${r.id}`} value={(rule.path)} onChange={(e) => {
+                                setRule({ ...rule, path: e.target.value });
+                            }} placeholder="fields.systolic" />
+                        </div>
+                        <div>
+                            <Label>Within days</Label>
+                            <Input id={`days-${r.id}`} type="number" value={(rule.withinDays ?? 0)} onChange={(e) => {
+                                setRule({ ...rule, withinDays: Number(e.target.value) || undefined });
+                            }} />
+                        </div>
+                    </div>
+
+                );
+            case "count":
+                return (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            {/* TODO: Implement form code input from global form fields */}
+                            <Label>Form code</Label>
+                            <Input id={`form-${r.id}`} value={(rule).form} onChange={(e) => {
+                                setRule({ ...rule, form: e.target.value });
+                            }} placeholder="anc_visit" />
+                        </div>
+                        <div>
+                            <Label>Where (JS expression)</Label>
+                            <Input id={`where-${r.id}`} value={(rule).where || ""} onChange={(e) => {
+                                setRule({ ...rule, where: e.target.value });
+                            }} placeholder="r.fields.completed === true" />
+                        </div>
+                        <div>
+                            <Label>Within days</Label>
+                            <Input id={`days-${r.id}`} type="number" value={(rule).withinDays ?? 0} onChange={(e) => {
+                                setRule({ ...rule, withinDays: Number(e.target.value) || undefined });
+                            }} />
+                        </div>
+                    </div>
+                );
+            case "boolean":
+                return (
+                    <div className="grid grid-cols-1 gap-3">
+                        <div>
+                            <Label>Logic (JS expression)</Label>
+                            <Textarea id={`logic-${r.id}`} rows={3} value={(rule.logic)} onChange={(e: any) => {
+                                setRule({ ...rule, logic: e.target.value });
+                            }} placeholder="reports.some(r => r.form==='dx' && r.fields.dx_code==='E11')" />
+                        </div>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    }
+
+    const [open, setOpen] = useState(false);
+
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size='sm'><PenIcon className="h-4 w-4 mr-2" />See Details</Button>
             </DialogTrigger>
@@ -23,12 +97,6 @@ export const CSEntryDetails = ({ r, updateRule, removeRule }: { r: AnyRule; upda
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center justify-between text-base">
                             <span>{r.key || <span className="italic text-muted-foreground">(new field)</span>}</span>
-                            {/* <div className="flex items-center gap-2">
-                                <span className="text-xs rounded-full bg-muted px-2 py-0.5">{r.type}</span> */}
-                            {/* <Button size="icon" variant="ghost" onClick={() => removeRule(r.id)} aria-label="Remove rule">
-                                    <Trash2 className="w-4 h-4" />
-                                </Button> */}
-                            {/* </div> */}
                         </CardTitle>
                         <CardDescription>
                             Exposed as <code>context.{r.key || "<key>"}</code>
@@ -37,79 +105,26 @@ export const CSEntryDetails = ({ r, updateRule, removeRule }: { r: AnyRule; upda
                     <CardContent className="space-y-3">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
-                                <Label htmlFor={`key-${r.id}`}>Key</Label>
-                                <Input id={`key-${r.id}`} value={r.key} onChange={(e) => updateRule(r.id, { key: e.target.value })} placeholder="last_bp_systolic" />
+                                <Label>Key</Label>
+                                <Input id={`key-${r.id}`} value={rule.key} onChange={(e) => {
+                                    setRule({ ...rule, key: e.target.value });
+                                }} placeholder="key_of_this_field" />
                             </div>
                             <div>
                                 <Label>Type</Label>
-                                <span className="text-xs rounded-full bg-muted px-2 py-0.5">{r.type}</span>
-
-                                {/* <Select value={r.type} onValueChange={(v) => updateRule(r.id, { type: v as RuleType })}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select rule type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="last_value">last_value</SelectItem>
-                                        <SelectItem value="count">count</SelectItem>
-                                        <SelectItem value="boolean">boolean</SelectItem>
-                                    </SelectContent>
-                                </Select> */}
+                                <span className="text-xs rounded-full bg-muted px-2 py-0.5">{rule.type}</span>
                             </div>
                             <div>
-                                <Label htmlFor={`desc-${r.id}`}>Description (optional)</Label>
-                                <Input id={`desc-${r.id}`} value={r.description || ""} onChange={(e) => updateRule(r.id, { description: e.target.value })} placeholder="Most recent systolic BP" />
+                                <Label>Description (optional)</Label>
+                                <Input id={`desc-${r.id}`} value={rule.description || ""} onChange={(e) => {
+                                    setRule({ ...rule, description: e.target.value });
+                                }} placeholder="Description of this field" />
                             </div>
                         </div>
-
-                        {r.type === "last_value" && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div>
-                                    <Label htmlFor={`form-${r.id}`}>Form code</Label>
-                                    <Input id={`form-${r.id}`} value={(r as LastValueRule).form} onChange={(e) => updateRule(r.id, { ...(r as LastValueRule), form: e.target.value })} placeholder="bp" />
-                                </div>
-                                <div>
-                                    <Label htmlFor={`path-${r.id}`}>Field path</Label>
-                                    <Input id={`path-${r.id}`} value={(r as LastValueRule).path} onChange={(e) => updateRule(r.id, { ...(r as LastValueRule), path: e.target.value })} placeholder="fields.systolic" />
-                                </div>
-                                <div>
-                                    <Label htmlFor={`days-${r.id}`}>Within days</Label>
-                                    <Input id={`days-${r.id}`} type="number" value={(r as LastValueRule).withinDays ?? 0} onChange={(e) => updateRule(r.id, { ...(r as LastValueRule), withinDays: Number(e.target.value) || undefined })} />
-                                </div>
-                            </div>
-                        )}
-
-                        {r.type === "count" && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div>
-                                    <Label htmlFor={`form-${r.id}`}>Form code</Label>
-                                    <Input id={`form-${r.id}`} value={(r as CountRule).form} onChange={(e) => updateRule(r.id, { ...(r as CountRule), form: e.target.value })} placeholder="anc_visit" />
-                                </div>
-                                <div>
-                                    <Label htmlFor={`where-${r.id}`}>Where (JS expression)</Label>
-                                    <Input id={`where-${r.id}`} value={(r as CountRule).where || ""} onChange={(e) => updateRule(r.id, { ...(r as CountRule), where: e.target.value })} placeholder="r.fields.completed === true" />
-                                </div>
-                                <div>
-                                    <Label htmlFor={`days-${r.id}`}>Within days</Label>
-                                    <Input id={`days-${r.id}`} type="number" value={(r as CountRule).withinDays ?? 0} onChange={(e) => updateRule(r.id, { ...(r as CountRule), withinDays: Number(e.target.value) || undefined })} />
-                                </div>
-                            </div>
-                        )}
-
-                        {r.type === "boolean" && (
-                            <div className="grid grid-cols-1 gap-3">
-                                <div>
-                                    <Label htmlFor={`logic-${r.id}`}>Logic (JS expression)</Label>
-                                    <Textarea id={`logic-${r.id}`} rows={3} value={(r as BooleanRule).logic} onChange={(e: any) => updateRule(r.id, { ...(r as BooleanRule), logic: e.target.value })} placeholder="reports.some(r => r.form==='dx' && r.fields.dx_code==='E11')" />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* {errs.length > 0 && (
-                    <div className="text-red-600 text-sm">{errs.map((e, i) => <div key={i}>• {e}</div>)}</div>
-                )} */}
+                        {returnSpecificCardContent(rule.type)}
                     </CardContent>
                     <CardFooter className="justify-end gap-2">
-                        <Button variant="outline" size="sm"><Save className="w-4 h-4 mr-2" />Save</Button>
+                        <Button variant="outline" size="sm" onClick={() => updateContactSummaryRule(projectId!, r.id, rule).then(() => { console.log("Rule updated:", rule); refreshList(Math.floor(Math.random() * 5000)); setOpen(false); }).catch((error) => console.error("Error updating rule:", error))}><Save className="w-4 h-4 mr-2" />Save</Button>
                         <Button size="sm" variant="outline" onClick={() => removeRule(r.id)} aria-label="Remove rule">
                             <Trash2 className="w-4 h-4" />
                             Delete
@@ -119,4 +134,6 @@ export const CSEntryDetails = ({ r, updateRule, removeRule }: { r: AnyRule; upda
             </DialogContent>
         </Dialog>
     );
-}
+};
+
+
