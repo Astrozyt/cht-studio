@@ -30,19 +30,31 @@ export async function initLanguageDb(db: Database) {
     CREATE TABLE IF NOT EXISTS languages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       short TEXT NOT NULL UNIQUE,
-      long TEXT NOT NULL UNIQUE
+      long TEXT NOT NULL UNIQUE,
+      is_default INT NOT NULL DEFAULT 0
     );
   `);
 }
 export async function getLanguages(projectId: string) {
     const db = await getLanguageDb(projectId);
-    const result = await db.select("SELECT short, long FROM languages", []);
+    const result = await db.select("SELECT short, long, is_default FROM languages", []);
     console.log("Fetched languages from DB:", result);
-    return result as { short: string; long: string }[];
+    return result as { short: string; long: string; is_default: number }[];
 }
-export async function addLanguage(projectId: string, short: string, long: string) {
+export async function addLanguage(projectId: string, short: string, long: string, is_default: boolean = false) {
     const db = await getLanguageDb(projectId);
-    await db.execute("INSERT INTO languages (short, long) VALUES (?, ?)", [short, long]);
+    await db.execute("INSERT INTO languages (short, long, is_default) VALUES (?, ?, ?)", [short, long, is_default ? 1 : 0]);
+}
+
+export async function setDefaultLanguage(projectId: string, short: string) {
+    const db = await getLanguageDb(projectId);
+    await db.execute("UPDATE languages SET is_default = 1 WHERE short = ?", [short]).then(res => {
+        console.log(`Language with short code '${short}' set as default in DB.`, res);
+        return short;
+    }).catch((err) => {
+        console.error("Error setting default language:", err);
+        throw err;
+    });
 }
 
 export async function removeLanguage(projectId: string, short: string) {
