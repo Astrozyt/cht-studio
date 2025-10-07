@@ -41,6 +41,9 @@
       ],
       "@ght/db": [
         "packages/db/src"
+      ],
+      "@ght/task-builder": [
+        "packages/task-builder"
       ]
     }
   },
