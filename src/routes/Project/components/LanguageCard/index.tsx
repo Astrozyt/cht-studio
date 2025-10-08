@@ -39,7 +39,7 @@ const LanguageCard = () => {
     const onSaveFn = async (shortform: string, longform: string) => {
         addLanguage(projectName || "default", shortform, longform).then(() => {
             setLanguages([...languages, { short: shortform, long: longform, is_default: 0 }]);
-        }).catch((error) => {
+        }).catch((error: Error) => {
             console.error("Error adding language to database:", error);
         });
     }
@@ -48,7 +48,7 @@ const LanguageCard = () => {
         // Delete in DB
         removeLanguage(projectName || "default", shortform).then(() => {
             console.log(`Language with short code '${shortform}' removed from DB.`);
-        }).catch((err) => {
+        }).catch((err: Error) => {
             console.error("Error removing language:", err);
         });
         // Remove from state

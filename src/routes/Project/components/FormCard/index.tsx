@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { parseXFormDoc } from "@ght/xformparser";
 import { Menubar } from "@radix-ui/react-menubar";
 import { listen } from "@tauri-apps/api/event";
-import { BaseDirectory, readDir, remove, writeTextFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, readDir, writeTextFile } from "@tauri-apps/plugin-fs";
 import { useEffect, useState } from "react";
 import Dropzone from 'react-dropzone';
 import { useParams } from "react-router";

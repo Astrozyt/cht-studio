@@ -24,3 +24,18 @@ dist-ssr
 *.sw?
 
 target
+
+.env*
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*service*account*.json
+credentials.json
+src-tauri/target
+src-tauri/*.key
+src-tauri/*.pem
+src-tauri/*.p12
+src-tauri/*.jks
+src-tauri/*.keystore

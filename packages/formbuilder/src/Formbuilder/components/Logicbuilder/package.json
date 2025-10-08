@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "license": "MIT OR Apache-2.0",
+  "repository": "github:Astrozyt/cht-studio",
+  "bugs": {
+    "url": "https://github.com/Astrozyt/cht-studio/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

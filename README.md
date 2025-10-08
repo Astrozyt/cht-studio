@@ -7,7 +7,8 @@
 > Contributions, feedback, and curiosity are very welcome — but please expect incomplete functionality and frequent updates.
 > Feedback and contributions are warmly welcome!
 
-
+[![CI](https://github.com/<you>/cht-studio/actions/workflows/ci.yml/badge.svg)](…)
+[![License: MIT/Apache-2.0](https://img.shields.io/badge/license-MIT%20or%20Apache--2.0-blue.svg)](#)
 
 **A desktop application for building, testing, and managing [Community Health Toolkit](https://communityhealthtoolkit.org/) (CHT) applications locally.**
 

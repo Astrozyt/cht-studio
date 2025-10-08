@@ -1,22 +1,18 @@
 import { Menubar } from "@/components/ui/menubar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// import { getProjectFieldDb } from "@ght/db";
 import { Link, useParams } from "react-router";
 import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import FormCard from "./components/FormCard";
-import { Badge } from "@/components/ui/badge";
-import NewLanguageDialog from "./components/NewLanguageDialog";
-import { useEffect, useState } from "react";
-import { addLanguage, getProjectFieldDb, getLanguageDb, getLanguages, removeLanguage, setDefaultLanguage } from "@ght/db";
 import ContactSummaryEditorCard from "./components/ContactSummaryEditorCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StarIcon } from "lucide-react";
+import FormCard from "./components/FormCard";
 import LanguageCard from "./components/LanguageCard";
 
 const Project = () => {
   let { projectName } = useParams();
 
-  const formFieldDB = projectName && getProjectFieldDb(projectName);
+  // const formFieldDB = projectName && getProjectFieldDb(projectName);
 
   return (
     <>

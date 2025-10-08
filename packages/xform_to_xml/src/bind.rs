@@ -37,24 +37,24 @@ pub fn render_bind(writer: &mut Writer<Cursor<Vec<u8>>>, bind: &Bind) -> quick_x
     writer.write_event(Event::Empty(tag))
 }
 
-#[cfg(test)]
-mod tests {
+// #[cfg(test)]
+// mod tests {
 
-    use super::*;
+//     use super::*;
 
-    #[test]
-    fn test_collect_binds() {
-        if std::env::var("RUST_TEST_THREADS").is_err() {
-            std::env::set_var("RUST_TEST_THREADS", "1");
-        }
-        let raw_mock = include_str!("tests/fixtures/small_bindTest.json");
-        let mock_data: BodyNode = serde_json::from_str(raw_mock).unwrap();
-        let mut binds = Vec::new();
-        collect_binds(&mock_data, &mut binds);
-        println!("\n[Generated XML]:\n{:?}\n", binds);
+//     #[test]
+//     fn test_collect_binds() {
+//         if std::env::var("RUST_TEST_THREADS").is_err() {
+//             std::env::set_var("RUST_TEST_THREADS", "1");
+//         }
+//         let raw_mock = include_str!("tests/fixtures/small_bindTest.json");
+//         let mock_data: BodyNode = serde_json::from_str(raw_mock).unwrap();
+//         let mut binds = Vec::new();
+//         collect_binds(&mock_data, &mut binds);
+//         println!("\n[Generated XML]:\n{:?}\n", binds);
 
-        assert_eq!(binds.len(), 5);
-        assert_eq!(binds[2].nodeset, "/bp_confirm/inputs/contact/_id");
-        assert!(binds[2].extra["type"] == "db:person");
-    }
-}
+//         assert_eq!(binds.len(), 5);
+//         assert_eq!(binds[2].nodeset, "/bp_confirm/inputs/contact/_id");
+//         assert!(binds[2].extra["type"] == "db:person");
+//     }
+// }

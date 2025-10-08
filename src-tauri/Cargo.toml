@@ -1,9 +1,12 @@
 [package]
-name = "studio"
+name = "cht_studio"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "A users application for creating and managing Community Health Toolkit applications."
+authors = ["Astrozyt"]
 edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Astrozyt/cht-studio"
+homepage = "https://github.com/Astrozyt/cht-studio"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
