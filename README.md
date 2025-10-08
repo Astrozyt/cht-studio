@@ -149,29 +149,3 @@ Built with ❤️ by @Astrozyt and contributors.
 Inspired by the incredible work of the [Community Health Toolkit](https://communityhealthtoolkit.org/) community.
 
 ---
-
-
-
-
-
-
-# ✅ Next steps before publishing
-
-1. **Add:**
-
-   * `LICENSE` file (choose license)
-   * `CONTRIBUTING.md` (how to fork, build, branch)
-   * `CODE_OF_CONDUCT.md` (Contributor Covenant)
-   * `.gitignore`, `.gitattributes`
-   * `ci.yml` for build + lint checks (optional but recommended)
-2. **Create GitHub repo** → **make public**
-3. Test:
-
-   ```bash
-   git clone https://github.com/<yourusername>/cht-studio
-   pnpm install
-   pnpm tauri dev
-   ```
-
-   on a clean machine or VM to verify reproducibility.
-4. Add screenshots or a short GIF to the README header for instant appeal.
