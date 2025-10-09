@@ -15,7 +15,8 @@ export default defineConfig(async () => ({
       '@ght/xFormParser': path.resolve(__dirname, './packages/xFormParser/src'),
       '@ght/stores': path.resolve(__dirname, './packages/stores/src'),
       '@ght/db': path.resolve(__dirname, './packages/db/src'),
-      '@ght/task-builder': path.resolve(__dirname, './packages/task-builder/src')
+      '@ght/task-builder': path.resolve(__dirname, './packages/task-builder/src'),
+      '@ght/contactmodeleditor': path.resolve(__dirname, './packages/contactmodeleditor/src'),
     },
   },
 

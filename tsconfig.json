@@ -44,6 +44,9 @@
       ],
       "@ght/task-builder": [
         "packages/task-builder"
+      ],
+      "@ght/contactmodeleditor": [
+        "packages/contactmodeleditor"
       ]
     }
   },

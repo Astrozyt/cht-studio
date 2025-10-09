@@ -24,7 +24,7 @@ async function saveJSON(path: string, obj: any) {
 type ModelInput = z.input<typeof ModelZ>;
 type ContactType = z.infer<typeof CTZ>;
 
-export default function ContactModelEditor() {
+export function ContactModelEditor() {
     const form = useForm<ModelInput>({
         resolver: zodResolver(ModelZ),
         shouldUnregister: false,

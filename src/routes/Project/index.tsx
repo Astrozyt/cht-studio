@@ -8,6 +8,7 @@ import { Card } from "../../components/ui/card";
 import ContactSummaryEditorCard from "./components/ContactSummaryEditorCard";
 import FormCard from "./components/FormCard";
 import LanguageCard from "./components/LanguageCard";
+import { ContactModelEditor } from "@ght/contactmodeleditor";
 
 const Project = () => {
   let { projectName } = useParams();
@@ -29,20 +30,24 @@ const Project = () => {
         <Tabs defaultValue="general" className="w-full mt-4">
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="forms">Forms</TabsTrigger>
+            <TabsTrigger value="contact-model">Contact Model</TabsTrigger>
             <TabsTrigger value="contact-summary">Contact-Summary</TabsTrigger>
+            <TabsTrigger value="forms">Forms</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="general">
             <LanguageCard />
           </TabsContent>
+          <TabsContent value="contact-model">
+            <Card className="m-4 p-4">
+              <ContactModelEditor />
+            </Card>
+          </TabsContent>
           <TabsContent value="forms">
-
             <FormCard updateView={() => { }} />
           </TabsContent>
           <TabsContent value="contact-summary">
-
             <ContactSummaryEditorCard />
           </TabsContent>
           <TabsContent value="tasks">

@@ -1,7 +1,6 @@
-import { Contact } from 'lucide-react'
 import './App.css'
 import { Card } from './components/ui/card'
-import ContactModelEditor from './components/BaseSettingsEditor'
+import ContactModelEditor from './components/ContactModelEditor'
 
 function App() {
 
