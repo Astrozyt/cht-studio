@@ -11,7 +11,7 @@ export const ContactAttr = z.object({
     // for select/select1
     options: z.array(z.object({ value: z.string(), label: z.string().min(1) })).default([]),
     // write to which field on the contact doc:
-    saveTo: z.string().regex(/^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$/i).default(""), // e.g. "sex" or "parent._id"
+    saveTo: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/).default(""), // e.g. "sex" or "parent._id"
     required: z.boolean().default(false),
     // optional constraints/hints
     hint: z.string().optional(),
