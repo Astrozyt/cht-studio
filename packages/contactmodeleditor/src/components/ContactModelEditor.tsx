@@ -24,7 +24,7 @@ async function saveJSON(path: string, obj: any) {
 type ModelInput = z.input<typeof ModelZ>;
 type ContactType = z.infer<typeof CTZ>;
 
-export function ContactModelEditor() {
+export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<void> }) {
     const form = useForm<ModelInput>({
         resolver: zodResolver(ModelZ),
         shouldUnregister: false,
@@ -66,14 +66,13 @@ export function ContactModelEditor() {
     const exportArtifacts = async (values: ModelInput) => {
         console.log("Exporting", values);
         const parsed = ModelZ.parse(values);
-
-        for (const ct of parsed.contact_types) {
-            await saveJSON(`forms/${ct.id}-create.json`, generateCreateForm(ct));
-            await saveJSON(`forms/${ct.id}-edit.json`, generateEditForm(ct));
+        if (!parsed.contact_types.length) {
+            alert("Define at least one contact type.");
+            return;
         }
-        await saveJSON(`configuration/contact-field-registry.json`, buildContactFieldRegistry(parsed));
-        const base = { contact_types: [] as any[] };
-        await saveJSON(`configuration/base_settings.patched.json`, patchBaseSettings(base, parsed));
+        await saveFn(parsed);
+        console.log("Contact model artifacts generated and saved.");
+
     };
 
     const onError = (errs: any) => {
@@ -110,7 +109,7 @@ export function ContactModelEditor() {
                                     </Button>
 
                                     {/* id inline edit */}
-                                    <Input {...form.register(`contact_types.${i}.id` as const)} placeholder="id (kebab-case)" />
+                                    <Input {...form.register(`contact_types.${i}.id` as const, { setValueAs: (v) => v.trim().toLowerCase().replace(/\s+/g, "-") })} placeholder="id (kebab-case)" />
 
                                     {/* label button to select row */}
                                     <Button
@@ -234,14 +233,26 @@ function AttributesEditor({
 
     console.log("Rerender AttributesEditor", fa);
 
+
+
     return (
         <Card className="border-dashed">
             <CardHeader><CardTitle className="text-base">Attributes</CardTitle></CardHeader>
             <CardContent className="space-y-3">
                 {fa.fields.map((row, i) => (
                     <div key={row.id} className="grid md:grid-cols-6 gap-2 items-end">
-                        <Input {...register(`${path}.${i}.key` as const)} placeholder="key" />
-                        <Input {...register(`${path}.${i}.label` as const)} placeholder="label" />
+                        <Input {...register(`${path}.${i}.key` as const, {
+                            setValueAs: v => (typeof v === "string" ? v.trim() : v),
+                        })} placeholder="key"
+                            onBlur={(e) => {
+                                const k = e.currentTarget.value.trim();
+                                const s = watch(`${path}.${i}.saveTo` as const) as string | undefined;
+                                if (!s) setValue(`${path}.${i}.saveTo` as const, k, { shouldValidate: true });
+                            }} />
+
+                        <Input {...register(`${path}.${i}.label` as const, {
+                            setValueAs: v => (typeof v === "string" ? v.trim() : v),
+                        })} placeholder="label" />
 
                         <Select
                             value={watch(`${path}.${i}.type` as const) as any}
@@ -261,7 +272,9 @@ function AttributesEditor({
 
 
                         <Input
-                            {...register(`${path}.${i}.saveTo` as const)}
+                            {...register(`${path}.${i}.saveTo` as const, {
+                                setValueAs: v => (typeof v === "string" ? v.trim() : v),
+                            })}
                             placeholder='saveTo (e.g. "sex" or "parent._id")'
                         />
                         <Input

@@ -5,13 +5,18 @@ import { useState } from "react";
 
 const NewProjectDialog = ({ updateFolder }: any) => {
     const createNewFolder = async (name: string) => {
-        mkdir(`projects/${name}/forms`, { recursive: true, baseDir: BaseDirectory.AppLocalData })
+        const setupRoutine = async () => {
+            await mkdir(`projects/${name}/forms/contact`, { recursive: true, baseDir: BaseDirectory.AppLocalData });
+            await mkdir(`projects/${name}/forms/app`, { recursive: true, baseDir: BaseDirectory.AppLocalData });
+            await mkdir(`projects/${name}/configuration`, { recursive: true, baseDir: BaseDirectory.AppLocalData });
+        };
+        setupRoutine()
             .then(() => {
-                console.log("Folder created successfully");
+                console.log("Folders created successfully");
                 updateFolder();
             })
             .catch((error) => {
-                console.error("Error creating folder:", error);
+                console.error("Error creating folders:", error);
             });
     }
 
