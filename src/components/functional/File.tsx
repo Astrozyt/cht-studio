@@ -16,9 +16,10 @@ type FileProps = {
     projectName?: string; // Optional, used for forms
     updateFn?: () => void; // Optional, used to refresh the file list after deletion
     deleteFn?: (path: string) => void;
+    isContactForm?: boolean;
 };
 
-const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
+const File = ({ isFolder, name, isForm, updateFn, deleteFn, isContactForm }: FileProps) => {
 
     let { projectName } = useParams();
 
@@ -38,7 +39,7 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
                     // const xml = await invoke<string>("xformify", { input: JSON.stringify(name) });
                     console.log("AA:", BaseDirectory.AppLocalData, name);
                     console.log("BB:", `projects/${projectName}/forms/${name}`);
-                    invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${name}` }).then((xml) => {
+                    invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${isContactForm ? 'contact/' : 'app'}${name}` }).then((xml) => {
                         console.log("Generated XML:", xml);
                         openRunner(xml);
                     }).catch((error) => {
@@ -49,14 +50,17 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn }: FileProps) => {
                 }}>
                     <Play />
                 </Button>
-                <Separator className="h-8" orientation="vertical" />
-                <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/' : ''}${name}`) }}>
-                    <Edit />
-                </Button>
-                <Separator className="h-8" orientation="vertical" />
-                <Button variant="ghost" onClick={() => setIsOpen(true)} className="w-1/3 border-t">
-                    <Trash />
-                </Button>
+                {!isContactForm && <>
+                    <Separator className="h-8" orientation="vertical" />
+                    <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/' : ''}${name}`) }}>
+                        <Edit />
+                    </Button>
+                    <Separator className="h-8" orientation="vertical" />
+                    <Button variant="ghost" onClick={() => setIsOpen(true)} className="w-1/3 border-t">
+                        <Trash />
+                    </Button>
+                </>
+                }
 
                 <AlertDialog open={isOpen}>
                     {/* <AlertDialogTrigger className="w-1/3 border-t justify-items-center h-full" variant="ghost"> <Trash /></AlertDialogTrigger> */}
