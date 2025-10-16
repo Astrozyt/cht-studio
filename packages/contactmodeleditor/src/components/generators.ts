@@ -34,20 +34,139 @@ function toJsonField(a: ContactModel["contact_types"][number]["attributes"][numb
     }
 }
 
-export function generateCreateForm(ct: ContactModel["contact_types"][number]): JsonForm {
+type ContactAttr =
+    | { key: string; label: string; type: "text" | "number" | "date"; hint?: string; required?: boolean; saveTo: string }
+    | { key: string; label: string; type: "select1" | "select"; hint?: string; required?: boolean; saveTo: string; options: { value: string; label: string }[] };
+
+type ContactType = {
+    id: string;
+    label: string;
+    attributes: ContactAttr[];
+};
+
+// ---- xformify JSON (must match your Rust types.rs) ----
+type Localized = { lang: string; value: string };
+type ItemChoice = { value: string; labels: Localized[] };
+type Bind = {
+    required?: "yes" | "no";
+    constraint_msg?: string;
+    calculate?: string;
+    preload?: string;
+    preload_params?: string;
+    type?: string;
+};
+type Node = {
+    uid: string;
+    ref: string;
+    labels: Localized[];
+    hints?: Localized[];
+    items?: ItemChoice[];
+    tag: "input" | "select1" | "select" | "group";
+    bind?: Bind;
+    children: Node[];
+    appearance?: string | null;
+};
+type Form = { title: string; root: string; body: Node[] };
+
+// ---- helpers ----
+const xmlSafeRef = (name: string) => {
+    if (!name) return "_";
+    const first = /^[A-Za-z_]/.test(name) ? name[0] : "_";
+    const rest = name.slice(1).replace(/[^\w.-]/g, "_");
+    return first + rest;
+};
+const labelsEN = (s: string): Localized[] => [{ lang: "en", value: s || "" }];
+const hintsEN = (s?: string): Localized[] => (s ? [{ lang: "en", value: s }] : []);
+const yesNo = (b?: boolean): "yes" | "no" | undefined => (typeof b === "boolean" ? (b ? "yes" : "no") : undefined);
+
+function mapAttrType(t: ContactAttr["type"]): { tag: "input" | "select1" | "select"; bindType: string } {
+    switch (t) {
+        case "select1": return { tag: "select1", bindType: "select1" };
+        case "select": return { tag: "select", bindType: "select" };
+        case "number": return { tag: "input", bindType: "int" }; // use "decimal" if you prefer
+        case "date": return { tag: "input", bindType: "date" };
+        case "text":
+        default: return { tag: "input", bindType: "string" };
+    }
+}
+
+function attrToLeaf(ctId: string, a: ContactAttr): Node {
+    const { tag, bindType } = mapAttrType(a.type);
     return {
-        form_id: `${ct.id}-create`,
-        title: `Create ${ct.label}`,
-        fields: ct.attributes.map(toJsonField),
+        uid: `${ctId}_${a.key}`,
+        ref: xmlSafeRef(a.key), // may be overridden if nested
+        tag,
+        labels: labelsEN(a.label),
+        hints: hintsEN(a.hint),
+        items:
+            tag === "select" || tag === "select1"
+                ? ("options" in a ? a.options.map(o => ({ value: o.value, labels: labelsEN(o.label) })) : [])
+                : [],
+        bind: {
+            required: yesNo(a.required),
+            type: bindType,
+            constraint_msg: "",
+            calculate: "",
+            preload: "",
+            preload_params: "",
+        },
+        children: [],
+        appearance: null,
     };
 }
 
-export function generateEditForm(ct: ContactModel["contact_types"][number]): JsonForm {
+function newGroup(ref: string, uidSeed: string, label?: string): Node {
     return {
-        form_id: `${ct.id}-edit`,
-        title: `Edit ${ct.label}`,
-        fields: ct.attributes.map(toJsonField),
+        uid: `grp_${uidSeed}_${ref}`,
+        ref,
+        tag: "group",
+        labels: labelsEN(label ?? ref),
+        hints: [],
+        children: [],
+        appearance: null,
     };
+}
+
+function findOrCreateGroup(siblings: Node[], ref: string, uidSeed: string): Node {
+    let g = siblings.find(n => n.tag === "group" && n.ref === ref);
+    if (!g) { g = newGroup(ref, uidSeed, ref); siblings.push(g); }
+    return g;
+}
+
+function insertAtPath(rootChildren: Node[], path: string[], leaf: Node, uidSeed: string) {
+    if (path.length <= 1) {
+        leaf.ref = xmlSafeRef(path[0] ?? leaf.ref);
+        rootChildren.push(leaf);
+        return;
+    }
+    let cursor = rootChildren;
+    for (let i = 0; i < path.length - 1; i++) {
+        const seg = xmlSafeRef(path[i]);
+        const grp = findOrCreateGroup(cursor, seg, uidSeed);
+        cursor = grp.children;
+    }
+    leaf.ref = xmlSafeRef(path[path.length - 1]);
+    cursor.push(leaf);
+}
+
+type Mode = "create" | "edit";
+function buildForm(ct: ContactType, mode: Mode, makeEditFieldsOptional = true): Form {
+    const children: Node[] = [];
+    for (const a of ct.attributes) {
+        const path = (a.saveTo?.trim() ? a.saveTo.trim().split(".") : [a.key]).filter(Boolean);
+        const leaf = attrToLeaf(ct.id, a);
+        if (mode === "edit" && makeEditFieldsOptional && leaf.bind) leaf.bind.required = "no";
+        insertAtPath(children, path, leaf, ct.id);
+    }
+    return { title: `${ct.label} (${mode})`, root: "data", body: children };
+}
+
+// ---- PUBLIC: keep your existing names/signatures ----
+export function generateCreateForm(ct: ContactType): Form {
+    return buildForm(ct, "create");
+}
+export function generateEditForm(ct: ContactType): Form {
+    return buildForm(ct, "edit", true); // make required -> "no" on edit
 }
 
 // Registry for logic builder

@@ -9,7 +9,8 @@ import ContactSummaryEditorCard from "./components/ContactSummaryEditorCard";
 import FormCard from "./components/FormCard";
 import LanguageCard from "./components/LanguageCard";
 import { ContactModelEditor, buildContactFieldRegistry, generateCreateForm, generateEditForm, patchBaseSettings } from "@ght/contactmodeleditor";
-import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, mkdir, readTextFile, remove, writeTextFile } from "@tauri-apps/plugin-fs";
+import { toast } from "sonner";
 
 
 
@@ -20,12 +21,27 @@ const Project = () => {
   const contactSaveFn = async (data: any) => {
     console.log("Contact model saved:", data);
     let mutations = [];
+    //Save generated config to be able to open it again
+    mutations.push(writeTextFile(
+      `projects/${projectName}/configuration/contact-model.json`,
+      JSON.stringify(data),
+      { baseDir: BaseDirectory.AppLocalData }
+    ));
 
+    //Delete existing generated forms
+    //This is a simple approach, in the future we might want to be more surgical
+    //and only delete forms that are no longer needed
+    //For now, we assume that all forms are generated and can be safely deleted
+    mutations.push(remove(`projects/${projectName}/forms/contact`, { baseDir: BaseDirectory.AppLocalData, recursive: true }));
+    mutations.push(mkdir(`projects/${projectName}/forms/contact`, { baseDir: BaseDirectory.AppLocalData, recursive: true }));
+
+    //Generate forms for each contact type
     for (const ct of data.contact_types) {
       const generatedCreateForm = generateCreateForm(ct);
       const generatedEditForm = generateEditForm(ct);
       console.log(`Generated create form for ${ct.id}:`, generatedCreateForm);
       console.log(`Generated edit form for ${ct.id}:`, generatedEditForm);
+
 
       mutations.push(writeTextFile(
         `projects/${projectName}/forms/contact/${ct.label}-create.json`,
@@ -54,11 +70,21 @@ const Project = () => {
     }
     await Promise.all(mutations).then((files) => {
       console.log(`${files.length} files written successfully:`, files);
+      toast.success("Contact model and forms saved successfully");
     }).catch((error) => {
       console.error("Error writing files:", error);
+      toast.error("Error saving contact model and/or forms");
     });
   }
 
+  const loadFromFile = () => readTextFile(`projects/${projectName}/configuration/contact-model.json`, { baseDir: BaseDirectory.AppLocalData })
+  const feedbackFn = (message: string, error: string) => {
+    if (error) {
+      toast.error(`Error: ${error}`);
+    } else {
+      toast.success(message);
+    }
+  };
 
   return (
     <>
@@ -86,7 +112,7 @@ const Project = () => {
           </TabsContent>
           <TabsContent value="contact-model">
             <Card className="m-4 p-4">
-              <ContactModelEditor saveFn={contactSaveFn} />
+              <ContactModelEditor saveFn={contactSaveFn} loadFn={loadFromFile} feedbackFn={feedbackFn} />
             </Card>
           </TabsContent>
           <TabsContent value="forms">

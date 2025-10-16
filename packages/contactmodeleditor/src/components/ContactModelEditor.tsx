@@ -3,36 +3,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { ContactModel as ModelZ, ContactTypeModel as CTZ, ContactAttrType } from "./types";
-import { generateCreateForm, generateEditForm, buildContactFieldRegistry, patchBaseSettings } from "./generators";
 
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
-import { Plus, Trash2, Download } from "lucide-react";
+import { Plus, Trash2, Download, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
-
-async function saveJSON(path: string, obj: any) {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = path.split("/").pop() || "file.json"; a.click();
-    URL.revokeObjectURL(url);
-}
 
 type ModelInput = z.input<typeof ModelZ>;
 type ContactType = z.infer<typeof CTZ>;
 
-export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<void> }) {
+export function ContactModelEditor({ saveFn, loadFn, feedbackFn }: { saveFn: (data: any) => Promise<void>, loadFn: () => Promise<string>, feedbackFn: (message: string, error: string) => void }) {
+
+
     const form = useForm<ModelInput>({
-        resolver: zodResolver(ModelZ),
+        resolver: zodResolver(ModelZ.deepPartial()),
         shouldUnregister: false,
         mode: "onChange",
         defaultValues: {
             contact_types: [
                 {
-                    id: "person",
+                    id: "personId",
                     label: "Person",
                     icon: "icon-people-person-general@2x",
                     parents: [],
@@ -47,6 +40,24 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
             ],
         },
     });
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [existingModel, setExistingModel] = useState<ModelInput | null>(null);
+    useEffect(() => {
+        loadFn().then((content) => {
+            const parsed = JSON.parse(content);
+            console.log("Loaded existing contact model config:", parsed);
+            setExistingModel(parsed);
+            form.reset(parsed);
+        }).catch((error) => {
+            console.warn("No existing contact model config found, starting fresh.", error);
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    }, []);
+
+
+    // form.reset()
 
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -65,21 +76,26 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
     // submit
     const exportArtifacts = async (values: ModelInput) => {
         console.log("Exporting", values);
-        const parsed = ModelZ.parse(values);
+        const fixed = applyFixups(values);
+        console.log("After fixups", fixed);
+        const parsed = ModelZ.parse(fixed);
         if (!parsed.contact_types.length) {
-            alert("Define at least one contact type.");
+            feedbackFn("", "Define at least one contact type.");
             return;
         }
         await saveFn(parsed);
-        console.log("Contact model artifacts generated and saved.");
+        console.log("Contact model artifacts generated and saved.", parsed);
 
     };
 
     const onError = (errs: any) => {
+        feedbackFn("", "Please fix validation errors before proceeding.");
         console.error("Model errors:", errs);
     };
 
     const attrPath = `contact_types.${selectedIndex}.attributes` as const;
+
+    if (isLoading) return <div>Loading...</div>;
 
     return (
         <Form {...form}>
@@ -109,7 +125,14 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
                                     </Button>
 
                                     {/* id inline edit */}
-                                    <Input {...form.register(`contact_types.${i}.id` as const, { setValueAs: (v) => v.trim().toLowerCase().replace(/\s+/g, "-") })} placeholder="id (kebab-case)" />
+                                    <Input
+                                        value={form.watch(`contact_types.${i}.id`) || ''}
+                                        onChange={(e) => {
+                                            const value = e.target.value.trim().toLowerCase().replace(/\s+/g, "-");
+                                            form.setValue(`contact_types.${i}.id` as const, value, { shouldValidate: true });
+                                        }}
+                                        placeholder="id (kebab-case)"
+                                    />
 
                                     {/* label button to select row */}
                                     <Button
@@ -118,7 +141,7 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
                                         className="flex-1 text-left"
                                         onClick={() => setSelectedIndex(i)}
                                     >
-                                        {form.getValues(`contact_types.${i}.label`) || "—"}
+                                        Edit <ArrowRight className="w-4 h-4 ml-2" />
                                     </Button>
                                 </div>
                             );
@@ -135,7 +158,7 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
                                     label: "New Type",
                                     icon: "icon-places-clinic@2x",
                                     parents: [],
-                                    attributes: [],
+                                    attributes: [{ key: "name", label: "Name", type: "text", saveTo: "name", required: true, options: [] }],
                                 };
                                 const newIdx = ctFA.fields.length;
                                 ctFA.append(newType);
@@ -223,17 +246,13 @@ export function ContactModelEditor({ saveFn }: { saveFn: (data: any) => Promise<
 
 function AttributesEditor({
     form,
-    path, // e.g. "contact_types.0.attributes"
+    path,
 }: {
     form: ReturnType<typeof useForm<ModelInput>>;
     path: `contact_types.${number}.attributes`;
 }) {
-    const { control, register, watch, setValue } = form;
+    const { control, watch, setValue } = form;
     const fa = useFieldArray({ control, name: path });
-
-    console.log("Rerender AttributesEditor", fa);
-
-
 
     return (
         <Card className="border-dashed">
@@ -241,18 +260,20 @@ function AttributesEditor({
             <CardContent className="space-y-3">
                 {fa.fields.map((row, i) => (
                     <div key={row.id} className="grid md:grid-cols-6 gap-2 items-end">
-                        <Input {...register(`${path}.${i}.key` as const, {
-                            setValueAs: v => (typeof v === "string" ? v.trim() : v),
-                        })} placeholder="key"
+                        <Input
+                            value={watch(`${path}.${i}.key` as const) || ''}
+                            onChange={(e) => setValue(`${path}.${i}.key` as const, e.target.value.trim(), { shouldValidate: true })}
+                            placeholder="key"
                             onBlur={(e) => {
                                 const k = e.currentTarget.value.trim();
                                 const s = watch(`${path}.${i}.saveTo` as const) as string | undefined;
                                 if (!s) setValue(`${path}.${i}.saveTo` as const, k, { shouldValidate: true });
                             }} />
 
-                        <Input {...register(`${path}.${i}.label` as const, {
-                            setValueAs: v => (typeof v === "string" ? v.trim() : v),
-                        })} placeholder="label" />
+                        <Input
+                            value={watch(`${path}.${i}.label` as const) || ''}
+                            onChange={(e) => setValue(`${path}.${i}.label` as const, e.target.value.trim(), { shouldValidate: true })}
+                            placeholder="label" />
 
                         <Select
                             value={watch(`${path}.${i}.type` as const) as any}
@@ -272,13 +293,13 @@ function AttributesEditor({
 
 
                         <Input
-                            {...register(`${path}.${i}.saveTo` as const, {
-                                setValueAs: v => (typeof v === "string" ? v.trim() : v),
-                            })}
+                            value={watch(`${path}.${i}.saveTo` as const) || ''}
+                            onChange={(e) => setValue(`${path}.${i}.saveTo` as const, e.target.value.trim(), { shouldValidate: true })}
                             placeholder='saveTo (e.g. "sex" or "parent._id")'
                         />
                         <Input
-                            {...register(`${path}.${i}.hint` as const)}
+                            value={watch(`${path}.${i}.hint` as const) || ''}
+                            onChange={(e) => setValue(`${path}.${i}.hint` as const, e.target.value, { shouldValidate: true })}
                             placeholder="hint (optional)"
                         />
 
@@ -302,11 +323,13 @@ function AttributesEditor({
                                     {(opts ?? []).map((_, j) => (
                                         <div key={j} className="grid md:grid-cols-4 gap-2 items-end">
                                             <Input
-                                                {...register(`${optionsName}.${j}.label` as const)}
+                                                value={watch(`${optionsName}.${j}.label` as const) || ''}
+                                                onChange={(e) => setValue(`${optionsName}.${j}.label` as const, e.target.value, { shouldValidate: true })}
                                                 placeholder="Label (e.g., Female)"
                                             />
                                             <Input
-                                                {...register(`${optionsName}.${j}.value` as const)}
+                                                value={watch(`${optionsName}.${j}.value` as const) || ''}
+                                                onChange={(e) => setValue(`${optionsName}.${j}.value` as const, e.target.value, { shouldValidate: true })}
                                                 placeholder="Value (e.g., female)"
                                             />
                                             <div className="col-span-2 flex justify-end">
@@ -374,4 +397,40 @@ function AttributesEditor({
             </CardContent>
         </Card>
     );
+}
+
+function slugId(id: string) {
+    return (id ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
+function applyFixups(values: any) {
+    const v = structuredClone(values);
+
+    v.contact_types = (v.contact_types ?? []).map((ct: any) => {
+        const id = slugId(ct.id || ct.label || "contact");
+        const label = ct.label || id;
+
+        const attributes = (ct.attributes ?? []).map((a: any) => {
+            console.info("Fixing up attr", a);
+            const key = (a.key ?? "").trim() || "field";
+            const label = a.label ?? key;
+            // If saveTo empty, default to key
+            const saveTo = (a.saveTo ?? "").trim() || key;
+
+            // Ensure select/select1 has options array
+            let options = a.options ?? [];
+            if ((a.type === "select" || a.type === "select1") && options.length === 0) {
+                options = [{ value: "option", label: "Option" }];
+            }
+            return { ...a, key, label, saveTo, options };
+        });
+
+        return { ...ct, id, label, attributes };
+    });
+
+    return v;
 }

@@ -4,19 +4,39 @@ import { z } from "zod";
 export const ContactAttrType = z.enum(["text", "number", "date", "select1", "select", "boolean", "phone"]);
 export type ContactAttrType = z.infer<typeof ContactAttrType>;
 
-export const ContactAttr = z.object({
+// helper for select options
+const OptionSchema = z.object({
+    value: z.string(),
+    label: z.string().min(1),
+});
+
+// shared fields
+const ContactAttrBase = z.object({
     key: z.string().regex(/^[a-z][a-z0-9_]*$/i, "Use letters, numbers, underscores; start with a letter"),
     label: z.string().min(1),
-    type: ContactAttrType,
-    // for select/select1
-    options: z.array(z.object({ value: z.string(), label: z.string().min(1) })).default([]),
-    // write to which field on the contact doc:
-    saveTo: z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/).default(""), // e.g. "sex" or "parent._id"
+    saveTo: z
+        .string()
+        .regex(/^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/)
+        .or(z.literal(""))
+        .default(""), // e.g. "sex" or "parent._id"
     required: z.boolean().default(false),
-    // optional constraints/hints
     hint: z.string().optional(),
 });
 
+// For non-select types: no options (or an empty array if UI still provides one)
+const NonSelectAttr = ContactAttrBase.extend({
+    type: z.enum(["text", "number", "date", "boolean", "phone"]),
+    options: z.array(OptionSchema).max(0).optional().default([]),
+});
+
+// For select/select1: options are required
+const SelectAttr = ContactAttrBase.extend({
+    type: z.enum(["select", "select1"]),
+    options: z.array(OptionSchema).min(1, "At least one option required"),
+});
+
+// 🔁 Final union
+export const ContactAttr = z.discriminatedUnion("type", [NonSelectAttr, SelectAttr]);
 export type ContactAttr = z.infer<typeof ContactAttr>;
 
 export const ContactTypeModel = z.object({
