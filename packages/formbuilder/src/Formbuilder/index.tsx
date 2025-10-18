@@ -20,9 +20,10 @@ import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
-import { Node, useExistingNodesStore, useFormStore } from "@ght/stores";
+import { Node, useExistingContactFieldStore, useExistingNodesStore, useFormStore } from "@ght/stores";
 import { useParams } from "react-router";
 import { getLanguages } from "@ght/db";
+import { cmAttrsToQBFields } from "./components/Logicbuilder/src/extractContactModelFields";
 
 // Add Tauri type to the global scope
 declare global {
@@ -36,7 +37,7 @@ declare global {
 const initFromForm = (formInput: FullForm) => addUidsToNodes(formInput).body;
 
 
-export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullForm, onSave: (data: FullForm, projectName: string, logicFormNodes: Node[]) => Promise<void>, cancelFn: () => void }) => {
+export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes }: { contactModelAttributes: any, formInput: FullForm, onSave: (data: FullForm, projectName: string, logicFormNodes: Node[]) => Promise<void>, cancelFn: () => void }) => {
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
@@ -46,6 +47,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     const { projectName } = useParams<{ projectName: string }>();
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
+    const setExistingContactFields = useExistingContactFieldStore(state => state.setExistingContactFields);
 
     // const storeLanguages = useLanguageStore(state => state.languages);
     useEffect(() => {
@@ -81,6 +83,11 @@ export const FormEditor = ({ formInput, onSave, cancelFn }: { formInput: FullFor
     useEffect(() => {
         setExistingNodes(filtered);
     }, [filtered, setExistingNodes]);
+
+    useEffect(() => {
+        const qbFields = cmAttrsToQBFields(contactModelAttributes, "default");
+        setExistingContactFields(qbFields);
+    }, [contactModelAttributes, setExistingContactFields]);
 
     const rootRef = 'root'; // Default root reference
 

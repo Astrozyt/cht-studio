@@ -21,7 +21,7 @@ export const FormEditorPage = () => {
         // Check if running in Tauri
         if (await isTauri()) {
             //   const formData = await window.__TAURI__.invoke('load_form', { formName: 'exampleForm' });
-            readTextFile(`projects/${projectName}/forms/${formName}`, { baseDir: BaseDirectory.AppLocalData }).then((content) => {
+            readTextFile(`projects/${projectName}/forms/app/${formName}`, { baseDir: BaseDirectory.AppLocalData }).then((content) => {
                 let parsedData = JSON.parse(content);
                 console.log("Loaded form data:", parsedData);
                 // parsedData.body = parsedData.body.body;
@@ -88,18 +88,29 @@ export const FormEditorPage = () => {
         });
     };
 
+    const [contactModelAttributes, setContactModelAttributes] = useState<any>([]);
+
+    const loadContactModelAttributes = async () => {
+        // Load contact model attributes from the server or local storage
+        const rawAttributes = await readTextFile(`projects/${projectName}/configuration/contact-model.json`, { baseDir: BaseDirectory.AppLocalData });
+        const parsedAttributes = JSON.parse(rawAttributes);
+        const attributes = parsedAttributes.contact_types.flatMap((ct: any) => ct.attributes);
+        setContactModelAttributes(attributes);
+    };
 
     useEffect(() => {
         loadFormData();
+        loadContactModelAttributes();
     }, []);
 
-    console.log("Form data in FormEditorPage:", formData);
+    // console.log("Form data in FormEditorPage:", formData);
+    // console.log("Contact Model Attributessss:", contactModelAttributes);
     return (
         <>
             {formData && formData.body && Array.isArray(formData.body) ? (
                 <div>
                     <h1>Form Builderrr</h1>
-                    <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} />
+                    <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} contactModelAttributes={contactModelAttributes} />
                 </div>
             ) : (
                 <div>Loading your file....</div>

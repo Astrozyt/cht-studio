@@ -6,18 +6,16 @@ import {
   type RuleGroupType,
   type RuleType,
 } from "react-querybuilder";
-import { useExistingNodesStore, useFormStore } from "../../../../../../stores/src/formStore.ts";
+import { useExistingContactFieldStore, useExistingNodesStore, useFormStore } from "../../../../../../stores/src/formStore.ts";
 import "react-querybuilder/dist/query-builder.css";
 import { mapNodesToFields } from "./mapNodesToFields.ts";
 
 const LogicBuilder = ({
-  // formFields,
   saveFn,
   cancelFn = () => console.log("cancel"),
   existingQuery,
   updateFn,
 }: {
-  // formFields?: any[];
   saveFn?: (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query: RuleGroupType<RuleType<string, string, any, string>, string>
@@ -34,7 +32,10 @@ const LogicBuilder = ({
   );
 
   const formFields = useExistingNodesStore(state => state.existingNodes);
+  const contactModelFields = useExistingContactFieldStore(state => state.existingContactFields);
   const defaultLang = useFormStore.getState().languages[0]?.short ?? 'en';
+
+  console.log("xxxzForm fields in LogicBuilder:", formFields);
 
   const fields: Field[] = useMemo(
     () => mapNodesToFields(formFields, defaultLang),
@@ -45,7 +46,7 @@ const LogicBuilder = ({
     <>
       <div data-cy="logicbuilder-field-count" data-count={fields.length} style={{ display: 'none' }} />
       <QueryBuilder
-        fields={fields}
+        fields={[...fields, ...contactModelFields]}
         query={query}
         data-yc="logic-builder-query-builder"
         onQueryChange={(q) => {

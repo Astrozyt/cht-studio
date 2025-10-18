@@ -79,3 +79,12 @@ export const useExistingNodesStore = create<{ existingNodes: Node[]; setExisting
         })
     )
 );
+
+export const useExistingContactFieldStore = create<{ existingContactFields: any[]; setExistingContactFields: (fields: any[]) => void }>()(
+    devtools(
+        (set) => ({
+            existingContactFields: [],
+            setExistingContactFields: (fields) => set({ existingContactFields: fields }),
+        })
+    )
+);

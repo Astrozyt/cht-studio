@@ -52,7 +52,7 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn, isContactForm }: Fil
                 </Button>
                 {!isContactForm && <>
                     <Separator className="h-8" orientation="vertical" />
-                    <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/' : ''}${name}`) }}>
+                    <Button variant="ghost" className="w-1/3 border-t" onClick={() => { navigate(`${isForm ? 'forms/app/' : ''}${name}`) }}>
                         <Edit />
                     </Button>
                     <Separator className="h-8" orientation="vertical" />

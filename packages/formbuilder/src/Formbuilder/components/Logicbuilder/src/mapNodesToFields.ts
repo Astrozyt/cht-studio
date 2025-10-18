@@ -16,7 +16,7 @@ export const BOOLEAN_OPS = [
 ] as const;
 
 export const SELECT_OPS = [
-    '=', '!=', 'in', 'notIn', 'isNull', 'isNotNull',
+    "is", "is not",
 ] as const;
 
 // map your nodes to RQB fields
