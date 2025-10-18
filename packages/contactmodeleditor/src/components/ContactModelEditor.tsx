@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card"
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
 import { Plus, Trash2, Download, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Checkbox } from "./ui/checkbox";
 
 type ModelInput = z.input<typeof ModelZ>;
 type ContactType = z.infer<typeof CTZ>;
@@ -29,6 +30,7 @@ export function ContactModelEditor({ saveFn, loadFn, feedbackFn }: { saveFn: (da
                     label: "Person",
                     icon: "icon-people-person-general@2x",
                     parents: [],
+                    isPrimaryContact: false,
                     attributes: [
                         { key: "name", label: "Name", type: "text", saveTo: "name", required: true },
                         { key: "sex", label: "Sex", type: "select1", options: [{ value: "female", label: "Female" }, { value: "male", label: "Male" }], saveTo: "sex" },
@@ -158,6 +160,8 @@ export function ContactModelEditor({ saveFn, loadFn, feedbackFn }: { saveFn: (da
                                     label: "New Type",
                                     icon: "icon-places-clinic@2x",
                                     parents: [],
+                                    isPrimaryContact: false,
+                                    personOrPlace: "place",
                                     attributes: [{ key: "name", label: "Name", type: "text", saveTo: "name", required: true, options: [] }],
                                 };
                                 const newIdx = ctFA.fields.length;
@@ -220,14 +224,54 @@ export function ContactModelEditor({ saveFn, loadFn, feedbackFn }: { saveFn: (da
                                         </FormItem>
                                     )}
                                 />
+                                {/* //Radiobutton to toggle personsOrPlace */}
+                                <FormField
+                                    name={`contact_types.${selectedIndex}.personOrPlace` as const}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Contact Type: </FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="person">Person</SelectItem>
+                                                        <SelectItem value="place">Place</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    name={`contact_types.${selectedIndex}.isPrimaryContact` as const}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Primary Contact</FormLabel>
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                             <AttributesEditor key={attrPath} form={form} path={attrPath} />
                         </CardContent>
                         <CardFooter className="justify-end">
                             <Button type="submit">
-                                <Download className="w-4 h-4 mr-2" />
-                                Generate & Download
+                                {/* <Download className="w-4 h-4 mr-2" />
+                                Generate & Download */}
+                                Save Contact Model
                             </Button>
                         </CardFooter>
                     </Card>

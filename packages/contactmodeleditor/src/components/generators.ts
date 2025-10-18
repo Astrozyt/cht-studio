@@ -196,16 +196,23 @@ export function buildContactFieldRegistry(model: ContactModel): ContactFieldRegi
 }
 
 // base_settings patch
-type ContactTypeBase = { id: string; name_key: string; icon: string; forms?: { create?: string; edit?: string }; parents?: string[]; };
+// type ContactTypeBase = { id: string; name_key: string; icon: string; forms?: { create?: string; edit?: string }; parents?: string[]; };
+type ContactTypeBase = { id: string; name_key: string; icon: string; create_form: string; edit_form: string; primary_contact: boolean; places: boolean; persons: boolean; parents?: string[]; };
+
 export function patchBaseSettings(base: { contact_types: ContactTypeBase[] }, model: ContactModel) {
     const idx = new Map(base.contact_types.map((t, i) => [t.id, i]));
     for (const ct of model.contact_types) {
-        const forms = { create: `${ct.id}-create`, edit: `${ct.id}-edit` };
+        const create_form = `${ct.id}-create`;
+        const edit_form = `${ct.id}-edit`;
+        // const forms = { create: create_form, edit: edit_form };
+        const persons = (ct as any).personOrPlace === "person";
+        const places = (ct as any).personOrPlace === "place";
+        const primary_contact = (ct as any).isPrimaryContact;
         const i = idx.get(ct.id);
         if (i != null) {
-            base.contact_types[i] = { ...base.contact_types[i], icon: ct.icon, forms, parents: ct.parents, name_key: base.contact_types[i].name_key || `contact.type.${ct.id}` };
+            base.contact_types[i] = { ...base.contact_types[i], icon: ct.icon, create_form, edit_form, places, persons, primary_contact, parents: ct.parents, name_key: base.contact_types[i].name_key || `contact.type.${ct.id}` };
         } else {
-            base.contact_types.push({ id: ct.id, name_key: `contact.type.${ct.id}`, icon: ct.icon, forms, parents: ct.parents });
+            base.contact_types.push({ id: ct.id, name_key: `contact.type.${ct.id}`, icon: ct.icon, create_form, edit_form, places, persons, primary_contact, parents: ct.parents });
         }
     }
     return base;

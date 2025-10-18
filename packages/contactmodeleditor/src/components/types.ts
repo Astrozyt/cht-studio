@@ -43,6 +43,8 @@ export const ContactTypeModel = z.object({
     id: z.string().regex(/^[a-z0-9-]+$/),
     label: z.string().min(1),
     icon: z.string().min(1),
+    personOrPlace: z.enum(["person", "place"]).default("place"),
+    isPrimaryContact: z.boolean().default(false),
     parents: z.array(z.string()).default([]), // other contact_type ids
     attributes: z.array(ContactAttr).default([]),
 });
