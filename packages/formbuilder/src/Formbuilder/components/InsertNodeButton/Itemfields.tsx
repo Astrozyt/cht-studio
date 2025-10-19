@@ -13,7 +13,7 @@ export const ItemFields = ({ items = [], append, remove, mytag, register }: { re
 
     const formLanguages = useFormStore(state => state.languages);
 
-    const allowedLangs = (formLanguages ?? []).map(lang => lang.shortform);
+    const allowedLangs = (formLanguages ?? []).map(lang => lang.short);
 
     return <div className={`space-y-2 ${mytag == 'select' || mytag == 'select1' ? '' : 'hidden'}`}>
         <div className="flex justify-between items-center">
