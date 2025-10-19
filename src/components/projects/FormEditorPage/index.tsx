@@ -63,7 +63,9 @@ export const FormEditorPage = () => {
                     operators: JSON.stringify(node.bind?.operators || []),
                     valueEditorType: node.bind?.valueEditorType || "text",
                     values: JSON.stringify(node.bind?.values || []),
-                    required: node.bind?.required || false
+                    required: node.bind?.required || false,
+                    jsonpath: node.jsonPath.toLowerCase() || "",
+                    xformpath: node.xFormPath.toLowerCase() || ""
                 });
             });
             removeAllProjectFields(db, formName || "default").then(() => {

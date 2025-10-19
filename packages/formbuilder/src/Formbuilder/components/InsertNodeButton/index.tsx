@@ -30,6 +30,7 @@ export const InsertNodeButton = ({
     dispatch,
     parentUid,
     parentRef,
+    parentPaths,
     index,
     level,
     existingNode,
@@ -41,6 +42,7 @@ export const InsertNodeButton = ({
     index: number,
     level: number,
     existingNode?: NodeFormValues,
+    parentPaths: { jsonParent: string; xformParent: string };
     // existingNodes: NodeFormValues[]
 }) => {
 
@@ -62,6 +64,8 @@ export const InsertNodeButton = ({
             items: [],
             hints: emptyLocalized(allowedLangs),
             ref: "",
+            jsonPath: "",
+            xFormPath: "",
             bind: {
                 // nodeset: '',
                 required: 'no',
@@ -93,6 +97,43 @@ export const InsertNodeButton = ({
         name: "tag",
     });
 
+    const refValue = useWatch({ control: form.control, name: 'ref' });
+
+
+    function normalizeRefName(ref: string) {
+        return ref.trim()
+            .replace(/\s+/g, "_")
+            .replace(/[^a-zA-Z0-9_]/g, "")
+            .replace(/^(\d)/, "_$1");
+    }
+
+    function joinJson(parent: string, childSeg: string) {
+        return parent ? `${parent}.${childSeg}` : childSeg;
+    }
+
+    function joinXform(parent: string, childSeg: string) {
+        return `${parent}/${childSeg}`.replace(/\/+/g, "/");
+    }
+
+    useEffect(() => {
+        const refNorm = normalizeRefName(refValue || "");
+        if (!refNorm) {
+            // clear paths if empty ref
+            form.setValue("jsonPath", "", { shouldDirty: true });
+            form.setValue("xFormPath", "", { shouldDirty: true });
+            return;
+        }
+
+        const isRepeat = mytag === "repeat";
+        const jsonSeg = isRepeat ? `${refNorm}[]` : refNorm;
+
+        const jsonPath = joinJson(parentPaths.jsonParent, jsonSeg);
+        const xformPath = joinXform(parentPaths.xformParent, refNorm);
+
+        form.setValue("jsonPath", jsonPath, { shouldDirty: true, shouldValidate: false });
+        form.setValue("xFormPath", xformPath, { shouldDirty: true, shouldValidate: false });
+    }, [refValue, mytag, parentPaths.jsonParent, parentPaths.xformParent]);
+    4
     const items = useWatch({
         control: form.control,
         name: "items",
@@ -105,7 +146,6 @@ export const InsertNodeButton = ({
 
     const [openness, setOpenness] = useState(false);
 
-    console.log("Form errors:", form.formState);
 
     const onSubmit = (data: any) => {
         //TODO: Is validation here needed or built into react-hook-form?
@@ -155,7 +195,7 @@ export const InsertNodeButton = ({
                 <>
                     <FormHeader update={!!existingNode} insert={!existingNode} mytag={mytag} />
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} onInvalid={() => { console.log('error!') }} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} onInvalid={() => { console.error('error!') }} className="space-y-4">
                             <input type="hidden" {...form.register('uid')} />
                             <FormField
                                 control={form.control}
@@ -265,7 +305,7 @@ export const InsertNodeButton = ({
                                                     // formFields={existingNodes}
                                                     saveFn={(query) => {
                                                         // field.onChange(query); // Save logic JSON
-                                                        console.log("Logic saved", query);
+                                                        console.info("Logic saved", query);
 
                                                     }}
                                                     updateFn={(query) => {
@@ -386,7 +426,6 @@ export const InsertNodeButton = ({
                                 control={form.control}
                                 name="bind.type"
                                 render={({ field }) => {
-                                    // console.log("Field value", field);
                                     return <FormItem data-cy="bind-type" className={`${mytag != 'group' && mytag != 'repeat' ? '' : 'hidden'}`}>
                                         <FormLabel>Bind Type</FormLabel>
                                         <FormControl data-cy="bind-type-control"                                                                                                                                                                                                >

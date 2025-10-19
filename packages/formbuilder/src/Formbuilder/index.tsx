@@ -43,7 +43,7 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
         return <div>Error: Invalid form input structure.</div>;
     }
     const [formDataRed, dispatch] = useReducer(formReducer, formInput, initFromForm);
-    console.log("Input: ", formInput, "vs state:", formDataRed);
+    // console.log("Input: ", formInput, "vs state:", formDataRed);
     const { projectName } = useParams<{ projectName: string }>();
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
@@ -95,15 +95,15 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
         cancelFn(); // Call the provided cancel function
     };
 
-    console.log("Filtered nodes for existing fields:", filtered);
-    console.log("Form data in FormEditor:", formDataRed);
+    // console.log("Filtered nodes for existing fields:", filtered);
+    // console.log("Form data in FormEditor:", formDataRed);
     return (
         <div>
             <Card className="flex">
                 <h2>Form Editor ({formInput.title.replace(".json", "")})</h2>
             </Card>
             <ul className=" border-2 rounded p-2">
-                <RenderChildren children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
+                <RenderChildren parentNode={null} children={formDataRed} parentUid={'root'} parentRef={rootRef} level={0} dispatch={dispatch} />
                 <div className="w-full flex justify-items-center">
                     <Button variant="outline" data-cy="save-button" className="bg-green-300 hover:bg-green-400" disabled={formDataRed.length === 0} onClick={() => { onSave({ title: formInput.title, root: formInput.root || 'root', body: formDataRed }, projectName || "default", filtered); }}>
                         Save
@@ -118,13 +118,40 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
     );
 }
 
-const RenderChildren = ({ children, parentUid, level, dispatch, parentRef }: { children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
+const RenderChildren = ({ parentNode, children, parentUid, level, dispatch, parentRef }: { parentNode: NodeFormValues | null, children: NodeFormValues[], parentRef: string, parentUid: string | null, level: number, dispatch: React.Dispatch<Action> }) => {
+    // console.log("Rendering children for parentUid:", parentUid, parentRef, "at level:", level);
+    const parentPaths = parentPathsOf(parentNode, level);
+    const parentRefForUI = parentNode?.ref ?? "root";
     return children.flatMap((child, index) => [
-        <InsertNodeButton key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={index} level={level} />,
+        <InsertNodeButton key={`insert-${parentUid}-${index}`} dispatch={dispatch} parentUid={parentUid} parentPaths={parentPaths} parentRef={parentRefForUI} index={index} level={level} />,
 
         <RenderNode key={`node-${parentUid}-${index}`} node={child} index={index} level={level} dispatch={dispatch} />,
-    ]).concat(<InsertNodeButton key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentRef={parentRef} index={children.length} level={level} />); // final + button
+    ]).concat(<InsertNodeButton key={`insert2-${parentUid}-${children.length}`} dispatch={dispatch} parentUid={parentUid} parentPaths={parentPaths} parentRef={parentRefForUI} index={children.length} level={level} />); // final + button
 };
+
+type ParentPaths = {
+    jsonParent: string;   // "" at root, or e.g. "visit.bp" or "children[]"
+    xformParent: string;  // "/data" at root, or "/data/visit/bp"
+};
+
+function parentPathsOf(parentNode: NodeFormValues | null, level: number): ParentPaths {
+    // Root level (no parent node)
+    if (!parentNode || level === 0) return { jsonParent: "", xformParent: "/data" };
+
+    // For groups/repeats, children live directly under the group/repeat
+    if (parentNode.tag === "group" || parentNode.tag === "repeat") {
+        return {
+            jsonParent: parentNode.jsonPath || "",
+            xformParent: parentNode.xFormPath || "/data",
+        };
+    }
+
+    // Non-container nodes shouldn't have children, but keep a safe default:
+    return {
+        jsonParent: parentNode.jsonPath?.split(".").slice(0, -1).join(".") || "",
+        xformParent: (parentNode.xFormPath || "/data").split("/").slice(0, -1).join("/") || "/data",
+    };
+}
 
 
 
@@ -132,7 +159,7 @@ const RenderNode = ({ node, index, level, dispatch, }: { node: NodeFormValues, i
     if (["input", "select", "select1"].includes(node.tag)) {
         console.log("Field to be listed: ", node.ref, node.tag, node.bind?.type);
     }
-    console.log("Rendering node:", node, "at level:", level, "with index:", index);
+    // console.log("Rendering node:", node, "at level:", level, "with index:", index);
     return (
 
         <Card key={index} data-cy={`formnode-${index}.${node.ref}`} className={`border-2 p-2 m-2 pr-0 mr-0`} style={{ marginLeft: `${level * 0.4}rem` }}>
@@ -178,7 +205,7 @@ const RenderNode = ({ node, index, level, dispatch, }: { node: NodeFormValues, i
 
                 {/* TODO: Add the other types, like trigger, image, ... */}
                 <span className="">
-                    <InsertNodeButton existingNode={node} dispatch={dispatch} parentUid={node.uid || null} parentRef={node.ref} index={0} level={level + 1} />
+                    <InsertNodeButton existingNode={node} dispatch={dispatch} parentUid={node.uid || null} parentPaths={parentPathsOf(node, level + 1)} parentRef={node.ref} index={0} level={level + 1} />
                 </span>
                 <RenderDeleteButton onDelete={() => {
                     console.log('DELETE: ', node.uid);
@@ -191,7 +218,7 @@ const RenderNode = ({ node, index, level, dispatch, }: { node: NodeFormValues, i
                     {(!node.children || node.children.length === 0) && (
                         <li>No children</li>
                     )}
-                    {<RenderChildren children={node.children ?? []} parentRef={node.ref} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
+                    {<RenderChildren children={node.children ?? []} parentRef={node.ref} parentNode={node} parentUid={node.uid!} level={level + 1} dispatch={dispatch} />}
                 </ul>
             )}
         </Card>

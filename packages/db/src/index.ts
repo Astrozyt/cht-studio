@@ -102,19 +102,21 @@ export const initProjectFieldDb = async (db: Database) => {
       operators TEXT,
       valueEditorType TEXT,
       valueList TEXT,
-      required BOOLEAN NOT NULL
+      required BOOLEAN NOT NULL,
+      jsonpath TEXT,
+      xformpath TEXT
     );
   `);
 }
 
 export const getFormFields = async (db: Database) => {
     const result = await db.select("SELECT * FROM project_fields", []);
-    return result as { id: number, name: string; type: string; form: string; label: string; inputType: string; operators: string; valueEditorType: string; values: string; required: boolean }[];
+    return result as { id: number, name: string; type: string; form: string; label: string; xformpath: string; jsonpath: string; inputType: string; operators: string; valueEditorType: string; values: string; required: boolean }[];
 }
 
-export const addFormField = async (project: string, { name, type, form, label, inputType, operators, valueEditorType, values, required }: { name: string, type: string, form: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean }) => {
+export const addFormField = async (project: string, { name, type, form, label, inputType, operators, valueEditorType, values, required, jsonpath, xformpath }: { name: string, type: string, form: string, jsonpath: string, xformpath: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean }) => {
     const db = await getProjectFieldDb(project || "default");
-    await db.execute("INSERT INTO project_fields (name, type, form, label, inputType, operators, valueEditorType, valueList, required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0]).then(() => {
+    await db.execute("INSERT INTO project_fields (name, type, form, label, inputType, operators, valueEditorType, valueList, required, jsonpath, xformpath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0, jsonpath, xformpath]).then(() => {
         console.log(`Form field '${name}' added to DB.`);
     }).catch((err) => {
         console.error("Error adding form field:", err);
@@ -129,6 +131,6 @@ export const removeAllProjectFields = async (db: Database, form: string) => {
     await db.execute("DELETE FROM project_fields WHERE form = ?", [form]);
 }
 
-export const updateFormField = async (db: Database, id: number, name: string, type: string, form: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean) => {
-    await db.execute("UPDATE project_fields SET name = ?, type = ?, form = ?, label = ?, inputType = ?, operators = ?, valueEditorType = ?, values = ?, required = ? WHERE name = ? AND form = ?", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0, id]);
+export const updateFormField = async (db: Database, id: number, name: string, type: string, form: string, jsonpath: string, xformpath: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean) => {
+    await db.execute("UPDATE project_fields SET name = ?, type = ?, form = ?, label = ?, inputType = ?, operators = ?, valueEditorType = ?, values = ?, required = ?, jsonpath = ?, xformpath = ? WHERE id = ?", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0, jsonpath, xformpath, id]);
 }

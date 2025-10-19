@@ -95,6 +95,8 @@ const baseNode = z.object({
     labels: z.array(labelSchema).optional(),
     hints: z.array(hintSchema).optional(),
     items: z.array(itemSchema).optional(),
+    jsonPath: z.string().default(""),
+    xFormPath: z.string().default(""),
 });
 
 export const appearanceOptions = {
