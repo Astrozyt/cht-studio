@@ -39,7 +39,7 @@ const File = ({ isFolder, name, isForm, updateFn, deleteFn, isContactForm }: Fil
                     // const xml = await invoke<string>("xformify", { input: JSON.stringify(name) });
                     console.log("AA:", BaseDirectory.AppLocalData, name);
                     console.log("BB:", `projects/${projectName}/forms/${name}`);
-                    invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${isContactForm ? 'contact/' : 'app'}${name}` }).then((xml) => {
+                    invoke<string>("xformify", { relPath: `projects/${projectName}/forms/${isContactForm ? 'contact/' : 'app/'}${name}` }).then((xml) => {
                         console.log("Generated XML:", xml);
                         openRunner(xml);
                     }).catch((error) => {
