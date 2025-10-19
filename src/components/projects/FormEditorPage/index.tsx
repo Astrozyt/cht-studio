@@ -74,7 +74,7 @@ export const FormEditorPage = () => {
         }
 
         writeTextFile(
-            `projects/${projectName}/forms/${formName}`,
+            `projects/${projectName}/forms/app/${formName}`,
             JSON.stringify(data),
             { baseDir: BaseDirectory.AppLocalData }
         ).then(() => {

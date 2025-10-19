@@ -49,7 +49,6 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
     const setExistingContactFields = useExistingContactFieldStore(state => state.setExistingContactFields);
 
-    // const storeLanguages = useLanguageStore(state => state.languages);
     useEffect(() => {
         getLanguages(projectName || "default").then((langs) => {
             initLanguages(langs);

@@ -3,6 +3,9 @@ import { FullForm } from "../Zod/zodTypes";
 
 export const addUidsToNodes = (nodes: FullForm): FullForm => {
     console.log("Adding UIDs to nodes:", nodes);
+    if (!nodes || !nodes.body) {
+        return nodes;
+    }
     return {
         title: nodes.title,
         body: nodes.body.map((node) => {
