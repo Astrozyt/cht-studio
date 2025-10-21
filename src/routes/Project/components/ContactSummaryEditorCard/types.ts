@@ -1,33 +1,21 @@
-export type RuleType = "last_value" | "count" | "boolean";
+import { z } from "zod";
 
-export interface BaseRule {
-    id: number; // ui id
-    key: string; // exposed in contact-summary context
-    type: RuleType;
-    description?: string;
-}
+export const Rule = z.enum(["last_value", "days_since_last_form"]);
+export const Coerce = z.enum(["number", "string", "boolean"]);
 
-export interface LastValueRule extends BaseRule {
-    type: "last_value";
-    form: string; // form code, e.g., "bp"
-    path: string; // dot path inside report, e.g., "fields.systolic"
-    withinDays?: number; // optional time window
-}
+export const SummaryRowSchema = z.object({
+    id: z.string().min(1),
+    key: z.string().min(1).regex(/^[a-z][a-z0-9_]*$/),
+    rule: Rule,
+    form: z.string().min(1),
+    fieldPath: z.string().optional(), // required only for last_value
+    type: Coerce.default("number"),
+    withinDays: z.coerce.number().int().nonnegative().optional(),
+    fallback: z.union([z.string(), z.number(), z.boolean()]).optional(),
+    description: z.string().optional(),
+}).refine(r => r.rule !== "last_value" || !!r.fieldPath, {
+    path: ["fieldPath"],
+    message: "Field is required for 'last_value'",
+});
 
-export interface CountRule extends BaseRule {
-    type: "count";
-    form: string; // form code
-    where?: string; // JS predicate expression on report, e.g., "r.fields.completed === true"
-    withinDays?: number;
-}
-
-export interface BooleanRule extends BaseRule {
-    type: "boolean";
-    logic: string; // JS expression with (reports, contact, utils)
-}
-
-export type AnyRule = LastValueRule | CountRule | BooleanRule;
-
-export interface SummaryConfig {
-    fields: AnyRule[];
-}
+export type SummaryRow = z.infer<typeof SummaryRowSchema>;

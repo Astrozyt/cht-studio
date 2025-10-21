@@ -134,3 +134,10 @@ export const removeAllProjectFields = async (db: Database, form: string) => {
 export const updateFormField = async (db: Database, id: number, name: string, type: string, form: string, jsonpath: string, xformpath: string, label: string, inputType: string, operators: string, valueEditorType: string, values: string, required: boolean) => {
     await db.execute("UPDATE project_fields SET name = ?, type = ?, form = ?, label = ?, inputType = ?, operators = ?, valueEditorType = ?, values = ?, required = ?, jsonpath = ?, xformpath = ? WHERE id = ?", [name, type, form, label, inputType, operators, valueEditorType, values, required ? 1 : 0, jsonpath, xformpath, id]);
 }
+
+// Return all data in the ProjectFieldDB, sorted by form name
+export const getAllProjectFields = async (projectId: string) => {
+    const db = await getProjectFieldDb(projectId);
+    const result = await db.select("SELECT * FROM project_fields ORDER BY form ASC, name ASC", []);
+    return result as { id: number, name: string; type: string; form: string; label: string; xformpath: string; jsonpath: string; inputType: string; operators: string; valueEditorType: string; values: string; required: boolean }[];
+}

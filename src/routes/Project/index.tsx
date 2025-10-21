@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router";
 import diagram from "../../assets/simple-bpmn-diagram-8354.webp";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import ContactSummaryEditorCard from "./components/ContactSummaryEditorCard";
+import { ContactSummaryEditorCard } from "./components/ContactSummaryEditorCard";
 import FormCard from "./components/FormCard";
 import LanguageCard from "./components/LanguageCard";
 import { ContactModelEditor, buildContactFieldRegistry, generateCreateForm, generateEditForm, patchBaseSettings } from "@ght/contactmodeleditor";
