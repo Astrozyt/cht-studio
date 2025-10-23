@@ -88,3 +88,12 @@ export const useExistingContactFieldStore = create<{ existingContactFields: any[
         })
     )
 );
+
+export const useExistingContactSummaryFieldStore = create<{ existingContactSummaryFields: any[]; setExistingContactSummaryFields: (fields: any[]) => void }>()(
+    devtools(
+        (set) => ({
+            existingContactSummaryFields: [],
+            setExistingContactSummaryFields: (fields) => set({ existingContactSummaryFields: fields }),
+        })
+    )
+);

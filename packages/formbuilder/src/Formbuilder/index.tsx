@@ -20,7 +20,7 @@ import { RenderPreload, RenderPreloadParams } from "./Formfields/RenderPreload";
 import { RenderDeleteButton } from "./Formfields/RenderDeleteButton";
 import { Toaster } from "sonner";
 import { addUidsToNodes } from "./helpers";
-import { Node, useExistingContactFieldStore, useExistingNodesStore, useFormStore } from "@ght/stores";
+import { Node, useExistingContactFieldStore, useExistingContactSummaryFieldStore, useExistingNodesStore, useFormStore } from "@ght/stores";
 import { useParams } from "react-router";
 import { getLanguages } from "@ght/db";
 import { cmAttrsToQBFields } from "./components/Logicbuilder/src/extractContactModelFields";
@@ -37,7 +37,7 @@ declare global {
 const initFromForm = (formInput: FullForm) => addUidsToNodes(formInput).body;
 
 
-export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes }: { contactModelAttributes: any, formInput: FullForm, onSave: (data: FullForm, projectName: string, logicFormNodes: Node[]) => Promise<void>, cancelFn: () => void }) => {
+export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes, contactSummaryFields }: { contactSummaryFields: any, contactModelAttributes: any, formInput: FullForm, onSave: (data: FullForm, projectName: string, logicFormNodes: Node[]) => Promise<void>, cancelFn: () => void }) => {
     if (!formInput || !formInput.body || !Array.isArray(formInput.body)) {
         console.error("Invalid form input structure:", formInput);
         return <div>Error: Invalid form input structure.</div>;
@@ -48,6 +48,8 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
     const initLanguages = useFormStore(state => state.initLanguages);
     const setExistingNodes = useExistingNodesStore(state => state.setExistingNodes);
     const setExistingContactFields = useExistingContactFieldStore(state => state.setExistingContactFields);
+    console.log("xxxReceived Contact summary attributes in FormEditor:", contactSummaryFields);
+    const setExistingContactSummaryFields = useExistingContactSummaryFieldStore(state => state.setExistingContactSummaryFields);
 
     useEffect(() => {
         getLanguages(projectName || "default").then((langs) => {
@@ -87,6 +89,11 @@ export const FormEditor = ({ formInput, onSave, cancelFn, contactModelAttributes
         const qbFields = cmAttrsToQBFields(contactModelAttributes, "default");
         setExistingContactFields(qbFields);
     }, [contactModelAttributes, setExistingContactFields]);
+
+    useEffect(() => {
+        console.log("xxxSetting contact summary fields in store:", contactSummaryFields);
+        setExistingContactSummaryFields(contactSummaryFields);
+    }, [contactSummaryFields, setExistingContactSummaryFields]);
 
     const rootRef = 'root'; // Default root reference
 

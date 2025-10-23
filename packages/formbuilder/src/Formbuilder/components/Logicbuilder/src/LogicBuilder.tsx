@@ -6,7 +6,7 @@ import {
   type RuleGroupType,
   type RuleType,
 } from "react-querybuilder";
-import { useExistingContactFieldStore, useExistingNodesStore, useFormStore } from "../../../../../../stores/src/formStore.ts";
+import { useExistingContactFieldStore, useExistingContactSummaryFieldStore, useExistingNodesStore, useFormStore } from "../../../../../../stores/src/formStore.ts";
 import "react-querybuilder/dist/query-builder.css";
 import { mapNodesToFields } from "./mapNodesToFields.ts";
 
@@ -34,19 +34,31 @@ const LogicBuilder = ({
   const formFields = useExistingNodesStore(state => state.existingNodes);
   const contactModelFields = useExistingContactFieldStore(state => state.existingContactFields);
   const defaultLang = useFormStore.getState().languages[0]?.short ?? 'en';
+  const contactSummaryObjects = useExistingContactSummaryFieldStore(state => state.existingContactSummaryFields);
+  console.log("zzz1:", contactSummaryObjects);
+  const contactSummaryFields = contactSummaryObjects.map((obj): Field => ({
+    name: obj.fieldPath,
+    label: obj.key,
+    type: obj.type || 'text',
+    inputType: obj.type || 'text',
+    valueEditorType: obj.type || 'text',
+    //TODO: refine operators for other types
+    operators: ['=', '!=', '<', '<=', '>', '>='],
+  }));
+  console.log("zzz2:", contactSummaryFields);
 
-  console.log("xxxzForm fields in LogicBuilder:", formFields);
 
   const fields: Field[] = useMemo(
     () => mapNodesToFields(formFields, defaultLang),
     [formFields, defaultLang]
   );
+  console.log("qqqLogicBuilder fields:", fields);
 
   return (
     <>
       <div data-cy="logicbuilder-field-count" data-count={fields.length} style={{ display: 'none' }} />
       <QueryBuilder
-        fields={[...fields, ...contactModelFields]}
+        fields={[...fields, ...contactModelFields, ...contactSummaryFields]}
         query={query}
         data-yc="logic-builder-query-builder"
         onQueryChange={(q) => {

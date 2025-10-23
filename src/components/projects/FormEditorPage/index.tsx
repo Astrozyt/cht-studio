@@ -13,6 +13,22 @@ export const FormEditorPage = () => {
 
     const [formData, setFormData] = useState<FullForm>({ title: "", body: [] });
 
+    const [contactSummaryFields, setContactSummaryFields] = useState<any[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const rawSummaryFields = await readTextFile(`projects/${projectName}/configuration/contact-summary.json`, { baseDir: BaseDirectory.AppLocalData });
+                console.log("xxxRaw contact summary fields:", rawSummaryFields);
+                const parsedSummaryFields = JSON.parse(rawSummaryFields);
+                console.log("xxxParsed contact summary fields:", parsedSummaryFields);
+                setContactSummaryFields(parsedSummaryFields || []);
+            } catch (error) {
+                console.error("Error loading contact summary fields:", error);
+            }
+        })();
+    }, [projectName]);
+
     const navigate = useNavigate();
 
     const cancelFn = () => { navigate(`/projects/${projectName}`); };
@@ -107,12 +123,14 @@ export const FormEditorPage = () => {
 
     // console.log("Form data in FormEditorPage:", formData);
     // console.log("Contact Model Attributessss:", contactModelAttributes);
+
+    console.log("yyyContact Summary Attributessss:", contactSummaryFields);
     return (
         <>
             {formData && formData.body && Array.isArray(formData.body) ? (
                 <div>
                     <h1>Form Builderrr</h1>
-                    <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} contactModelAttributes={contactModelAttributes} />
+                    <FormEditor cancelFn={cancelFn} onSave={saveFormData} formInput={formData} contactSummaryFields={contactSummaryFields} contactModelAttributes={contactModelAttributes} />
                 </div>
             ) : (
                 <div>Loading your file....</div>

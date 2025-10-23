@@ -19,7 +19,6 @@ export const ContactSummaryEditorCard = () => {
     const [fieldsByForm, setFieldsByForm] = useState<Map<string, FlatField[]>>();
     const { projectName } = useParams();
 
-    //TODO: Load initial rows from DB
     useEffect(() => {
         const loadAvailableFields = async () => {
             const rowsFromDb = await getAllProjectFields(projectName || "default");
@@ -257,18 +256,6 @@ export const ContactSummaryEditorCard = () => {
                                 <Button type="submit" onClick={() => { handleSubmit(onAdd)(); }}><Plus /></Button>
                             </TableCell>
 
-                            {/* <Controller
-                                control={control}
-                                name="jsonpath"
-                                render={({ field }) => (
-                                    <Input
-                                        hidden
-                                        value={field.value ?? ""}
-                                        onChange={(e) => field.onChange(e.target.value)}
-                                        onBlur={field.onBlur}
-                                    />
-                                )}
-                            /> */}
                         </TableRow>
                     </TableBody>
                 </Table>
