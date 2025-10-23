@@ -1,11 +1,51 @@
-import { useState } from 'react'
 import './App.css'
 import { Card } from './components/ui/card'
-import TaskForm from './Form'
+// import TaskForm from './components/Form'
+import { type TaskSchema as TaskValues } from "./types";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table';
+import { Badge } from './components/ui/badge';
 
 
-function App() {
-  const [count, setCount] = useState(0)
+
+export const App = ({
+  contactTypes,
+  formIds,
+  onSubmit,
+  existingTasks
+}: {
+  contactTypes: string[];
+  formIds: string[];
+  onSubmit: (v: TaskValues) => void;
+  existingTasks: TaskValues[];
+}) => {
+
+  const mockTasks: TaskValues[] = [{
+    name: "Sample Task",
+    title: "Sample Task Title",
+    icon: "icon-ANC-danger-sign@2x",
+    appliesTo: "contacts",
+    appliesToType: "clinic",
+    appliesIf: "true",
+    contactLabel: "Contacted",
+    events: [
+      {
+        id: "event1",
+        days: 5,
+        start: 0,
+        end: 10
+      }
+    ],
+    actions: [
+      {
+        type: "contact",
+        label: "Call Contact",
+        modifyContent: "Please call the contact."
+      }
+    ],
+    priority: {
+      level: 5
+    }
+  }];
 
   return (
     <Card className="App">
@@ -13,7 +53,40 @@ function App() {
       {/* Data table shadcn */}
 
       {/* Form to add tasks */}
-      <TaskForm contactTypes={["case", "contact"]} formIds={["f1", "f2", "f3"]} onSubmit={(data) => console.log(data)} />
+      {/* <TaskForm contactTypes={["case", "contact"]} formIds={["f1", "f2", "f3"]} onSubmit={(data) => console.log(data)} /> */}
+      <Table>
+        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead >Name</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Icon</TableHead>
+            <TableHead >AppliesTo</TableHead>
+            <TableHead >AppliesToType</TableHead>
+            <TableHead >AppliesIf</TableHead>
+            <TableHead >Contact Label</TableHead>
+            <TableHead >Events</TableHead>
+            <TableHead >Actions</TableHead>
+            <TableHead >Priority</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {mockTasks.map((task) => (
+            <TableRow key={task.name}>
+              <TableCell className="font-medium">{task.name}</TableCell>
+              <TableCell>{task.title}</TableCell>
+              <TableCell>{task.icon}</TableCell>
+              <TableCell>{task.appliesTo}</TableCell>
+              <TableCell>{String(task.appliesToType)}</TableCell>
+              <TableCell>{task.appliesIf}</TableCell>
+              <TableCell>{task.contactLabel}</TableCell>
+              <TableCell><Badge>{task.events.length}</Badge></TableCell>
+              <TableCell><Badge>{task.actions.length}</Badge></TableCell>
+              <TableCell><Badge>{task.priority ? task.priority.level : 'N/A'}</Badge></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </Card>
 
   )

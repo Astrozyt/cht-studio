@@ -1,36 +1,20 @@
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
+import { Trash2, Plus } from "lucide-react";
+import { Form, useFieldArray, useForm, type SubmitHandler } from "react-hook-form";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "./ui/form";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
-
-// TaskForm.tsx
-import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo } from "react";
-import { useFieldArray } from "react-hook-form";
-import { Button } from "./components/ui/button";
-import { Card, CardDescription, CardContent, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form, FormDescription } from "./components/ui/form";
-import { Input } from "./components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
-import { Textarea } from "./components/ui/textarea";
-import { makeTaskSchema, type TaskSchema as TaskValues } from "./types";
 import type zod from "zod";
+import { useMemo } from "react";
+import { makeTaskSchema } from "../types";
 
+export const EditorForm = () => {
 
-export default function TaskForm({
-    contactTypes,
-    formIds,
-    onSubmit,
-}: {
-    contactTypes: string[];
-    formIds: string[];
-    onSubmit: (v: TaskValues) => void;
-}) {
     const schema = useMemo(() => makeTaskSchema({ contactTypes, formIds }), [contactTypes, formIds]);
 
-    // keep ONE schema instance
-
-    // use INPUT type for RHF
-    type TaskInput = zod.input<typeof schema>;
-    type TaskOutput = zod.output<typeof schema>;
 
     const form = useForm<TaskInput>({
         resolver: zodResolver(schema),
@@ -48,6 +32,15 @@ export default function TaskForm({
             priority: { level: 10 },
         },
     });
+
+
+    // keep ONE schema instance
+
+    // use INPUT type for RHF
+    export type TaskInput = zod.input<typeof schema>;
+    export type TaskOutput = zod.output<typeof schema>;
+
+
 
     const onError = (errs: any) => console.error("RHF errors:", errs);
 
@@ -68,7 +61,7 @@ export default function TaskForm({
     const onValid: SubmitHandler<TaskInput> = (values) => onSubmit(schema.parse(values));
 
     return (
-        <Form {...form}>
+        < Form {...form}>
             <form onSubmit={form.handleSubmit(onValid, (e) => console.error(e))} className="space-y-6">
                 {/* BASICS */}
                 <Card>
@@ -412,6 +405,6 @@ export default function TaskForm({
                     <Button type="submit">Save Task</Button>
                 </div>
             </form>
-        </Form>
+        </Form >
     );
-}
+};

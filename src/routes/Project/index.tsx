@@ -11,6 +11,8 @@ import LanguageCard from "./components/LanguageCard";
 import { ContactModelEditor, buildContactFieldRegistry, generateCreateForm, generateEditForm, patchBaseSettings } from "@ght/contactmodeleditor";
 import { BaseDirectory, mkdir, readTextFile, remove, writeTextFile } from "@tauri-apps/plugin-fs";
 import { toast } from "sonner";
+import { App as TaskBuilderApp } from "../../../packages/task-builder/src/App";
+import type { TaskSchema } from "../../../packages/task-builder/src/types";
 
 
 
@@ -122,7 +124,15 @@ const Project = () => {
             <ContactSummaryEditorCard />
           </TabsContent>
           <TabsContent value="tasks">
-            <h1>Tasks</h1>
+            <TaskBuilderApp
+              contactTypes={["person", "household", "clinic"]} // Replace with actual contact types
+              formIds={["visit", "pregnancy", "delivery"]} // Replace with actual form IDs
+              existingTasks={[]} // Add existing tasks array
+              onSubmit={(taskData: TaskSchema) => {
+                console.log("Task created:", taskData);
+                // Handle saving the task
+              }}
+            />
           </TabsContent>
           <TabsContent value="settings">
             <h1>Settings of:  <span className="bold">{projectName}</span></h1>
