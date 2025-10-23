@@ -4,56 +4,61 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import { FlatField, FormInfo, normalizeRow, suggestKey } from "./helpers";
 import { SummaryRow, SummaryRowSchema } from "./types";
+import { getAllProjectFields } from "@ght/db";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+import { BaseDirectory, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 export const ContactSummaryEditorCard = () => {
-    const [rows, setRows] = useState<SummaryRow[]>([
-        {
-            id: "rule1",
-            key: "contact_last_name",
-            rule: "last_value",
-            form: "contact_form",
-            fieldPath: "fields.last_name",
-            type: "string",
-            description: "Last name of the contact",
-        },
-        {
-            id: "rule2",
-            key: "days_since_last_contact",
-            rule: "days_since_last_form",
-            form: "contact_form",
-            type: "number",
-            withinDays: 30,
-            fallback: 9999,
-            description: "Days since last contact form submission",
-        },
-    ]);
-    const [forms, setForms] = useState<FormInfo[]>([{ id: "contact_form", title: "Contact Form" }, { id: "survey_form", title: "Survey Form" }, { id: "feedback_form", title: "Feedback Form" }]);
-    const [fieldsByForm, setFieldsByForm] = useState<Record<string, FlatField[]>>({ contact_form: [{ path: "fields.first_name", label: "First Name", type: "string" }, { path: "fields.last_name", label: "Last Name", type: "string" }, { path: "fields.age", label: "Age", type: "int" }], survey_form: [{ path: "fields.rating", label: "Rating", type: "int" }, { path: "fields.comments", label: "Comments", type: "string" }], feedback_form: [{ path: "fields.feedback_text", label: "Feedback Text", type: "string" }, { path: "fields.satisfaction_level", label: "Satisfaction Level", type: "int" }] });
+    const [rows, setRows] = useState<SummaryRow[]>([]);
+    const [fieldsByForm, setFieldsByForm] = useState<Map<string, FlatField[]>>();
     const { projectName } = useParams();
 
     //TODO: Load initial rows from DB
+    useEffect(() => {
+        const loadAvailableFields = async () => {
+            const rowsFromDb = await getAllProjectFields(projectName || "default");
+            console.log("Loaded project fields:", rowsFromDb);
+            const ProjectFieldMap = new Map<string, FlatField[]>();
+            rowsFromDb.forEach(f => {
+                const form = f.form;
+                if (!ProjectFieldMap.has(form)) ProjectFieldMap.set(form, []);
+                ProjectFieldMap.get(form)?.push({ path: f.jsonpath || f.name, label: f.label, type: f.type });
+            });
+            setFieldsByForm(ProjectFieldMap);
+            console.log("Fields by form:", ProjectFieldMap);
+        };
+        loadAvailableFields();
+    }, [projectName]);
 
-    //TODO: Real implementation
+
+    // Load initial rows from contact-summary.json
+    useEffect(() => {
+        const loadInitialRows = async () => {
+            try {
+                const data = await readTextFile(`projects/${projectName}/configuration/contact-summary.json`, { baseDir: BaseDirectory.AppLocalData });
+                const parsed: SummaryRow[] = JSON.parse(data);
+                setRows(parsed);
+            } catch (error) {
+                console.warn("Could not load contact-summary.json:", error);
+            }
+        };
+        loadInitialRows();
+    }, [projectName]);
 
 
-    // TODO: Save rows to DB/JSON
-    const persistRows = async (rows: SummaryRow[]) => {
-        // For simplicity, we clear all and re-add
-        if (!projectName) return;
-        return;
-    };
+    const defaultFormId = fieldsByForm && Array.from(fieldsByForm.keys())[0];
 
-    const defaultFormId = forms[0]?.id ?? "";
-    const defaultField = defaultFormId ? (fieldsByForm[defaultFormId]?.[0]?.path ?? "") : "";
+    const defaultField = defaultFormId && fieldsByForm ? (fieldsByForm.get(defaultFormId)?.[0]?.path ?? "") : "";
     const form = useForm<SummaryRow>({
         resolver: zodResolver(SummaryRowSchema),
         defaultValues: {
-            id: "<unique_id>",
+            id: crypto.randomUUID(),
             key: defaultFormId ? suggestKey(defaultFormId, defaultField) : "",
             rule: "last_value",
             form: defaultFormId,
@@ -68,37 +73,49 @@ export const ContactSummaryEditorCard = () => {
 
     const { control, register, handleSubmit, setValue, getValues, watch, formState: { errors } } = form;
 
-    const onAdd = handleSubmit(async (data) => {
-        const normalized = normalizeRow(data);
-        const next = [...rows, normalized];
-        setRows(next);
-        await persistRows(next); //TODO
-        const currentForm = data.form;
-        const firstField = fieldsByForm[currentForm]?.[0]?.path ?? "";
+    const onAdd = async (data: any) => {
+        const normalRow = normalizeRow(data)
+        const isUnique = !rows.find(r => r.key === normalRow.key);
+        if (isUnique) {
+            setRows([...rows, normalRow]);
+            try {
+                await writeTextFile(`projects/${projectName}/configuration/contact-summary.json`,
+                    JSON.stringify([...rows, normalRow]),
+                    { baseDir: BaseDirectory.AppLocalData });
+            } catch (error) {
+                toast.error("Could not save contact-summary.json:");
+            }
+        } else {
+            toast.error(`A rule with the key '${normalRow.key}' already exists.`);
+        }
+
         form.reset({
-            id: "<unique_id>",
-            key: suggestKey(currentForm, firstField),
+            id: crypto.randomUUID(),
+            key: "",
             rule: "last_value",
-            form: currentForm,
-            fieldPath: firstField,
+            form: fieldsByForm ? Array.from(fieldsByForm.keys())[0] : "",
+            fieldPath: fieldsByForm ? fieldsByForm.get(Array.from(fieldsByForm.keys())[0])?.[0]?.path || "" : "",
             type: "number",
             withinDays: 365,
             fallback: "",
             description: "",
         });
-    });
+    };
 
     const selectedRule = watch("rule");
     const selectedForm = watch("form");
-    const availableFields = useMemo(
-        () => (selectedForm ? (fieldsByForm[selectedForm] ?? []) : []),
-        [selectedForm, fieldsByForm]
-    );
+    const selectedFieldPath = watch("fieldPath");
 
     const removeRow = async (idx: number) => {
         const next = rows.filter((_, i) => i !== idx);
         setRows(next);
-        await persistRows(next);
+        try {
+            await writeTextFile(`projects/${projectName}/configuration/contact-summary.json`,
+                JSON.stringify(next),
+                { baseDir: BaseDirectory.AppLocalData });
+        } catch (error) {
+            toast.error("Could not save contact-summary.json:");
+        }
     };
 
     return (
@@ -115,8 +132,8 @@ export const ContactSummaryEditorCard = () => {
                             <TableHead>Rule</TableHead>
                             <TableHead>Form</TableHead>
                             <TableHead>Field</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Within</TableHead>
+                            <TableHead className="w-32">Type</TableHead>
+                            <TableHead className="w-20">Within</TableHead>
                             <TableHead>Fallback</TableHead>
                             <TableHead>Description</TableHead>
                             <TableHead></TableHead>
@@ -141,9 +158,20 @@ export const ContactSummaryEditorCard = () => {
                         {rows.length === 0 && (
                             <TableRow><TableCell colSpan={9}><em>No rules yet</em></TableCell></TableRow>
                         )}
+
                         <TableRow>
                             <TableCell>
-                                <Input {...register("key")} />
+                                <Controller
+                                    control={control}
+                                    name="key"
+                                    render={({ field }) => (
+                                        <Input
+                                            value={field.value ?? ""}
+                                            onChange={(e) => field.onChange(e.target.value)}
+                                            onBlur={field.onBlur}
+                                        />
+                                    )}
+                                />
                                 {errors.key && <p className="text-xs text-red-600">{errors.key.message}</p>}
                             </TableCell>
 
@@ -173,13 +201,10 @@ export const ContactSummaryEditorCard = () => {
                                     render={({ field }) => (
                                         <Select value={field.value} onValueChange={(v) => {
                                             field.onChange(v);
-                                            const first = fieldsByForm[v]?.[0]?.path ?? "";
-                                            setValue("fieldPath", first, { shouldDirty: true });
-                                            if (!getValues("key")) setValue("key", suggestKey(v, first), { shouldDirty: true });
                                         }}>
                                             <SelectTrigger><SelectValue placeholder="Form" /></SelectTrigger>
                                             <SelectContent>
-                                                {forms.map(f => <SelectItem key={f.id} value={f.id}>{f.title ?? f.id}</SelectItem>)}
+                                                {fieldsByForm && Array.from(fieldsByForm.keys()).map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                                             </SelectContent>
                                         </Select>
                                     )}
@@ -195,16 +220,11 @@ export const ContactSummaryEditorCard = () => {
                                         render={({ field }) => (
                                             <Select value={field.value ?? ""} onValueChange={(v) => {
                                                 field.onChange(v);
-                                                // optional: guess type
-                                                const ff = availableFields.find(f => f.path === v);
-                                                if (ff?.type && ["int", "integer", "decimal", "number"].includes(ff.type)) {
-                                                    setValue("type", "number", { shouldDirty: true });
-                                                }
                                             }}>
                                                 <SelectTrigger><SelectValue placeholder="Field" /></SelectTrigger>
                                                 <SelectContent>
-                                                    {availableFields.map(ff => (
-                                                        <SelectItem key={ff.path} value={ff.path}>{ff.label} ({ff.path})</SelectItem>
+                                                    {fieldsByForm && selectedForm && fieldsByForm.get(selectedForm)?.map(ff => (
+                                                        <SelectItem key={ff.path} value={ff.path}>{ff.path}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -215,20 +235,7 @@ export const ContactSummaryEditorCard = () => {
                             ) || (<TableCell><em>—</em></TableCell>)}
 
                             <TableCell>
-                                <Controller
-                                    control={control}
-                                    name="type"
-                                    render={({ field }) => (
-                                        <Select value={field.value} onValueChange={field.onChange}>
-                                            <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="number">number</SelectItem>
-                                                <SelectItem value="string">string</SelectItem>
-                                                <SelectItem value="boolean">boolean</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
+                                <Input type="text" disabled value={selectedRule === 'days_since_last_form' ? fieldsByForm?.get(selectedForm)?.find(f => f.path === selectedFieldPath)?.type || '' : 'integer'} />
                             </TableCell>
 
                             {selectedRule === "last_value" && (
@@ -247,8 +254,21 @@ export const ContactSummaryEditorCard = () => {
                             </TableCell>
 
                             <TableCell className="flex justify-end">
-                                <Button onClick={onAdd}>Add</Button>
+                                <Button type="submit" onClick={() => { handleSubmit(onAdd)(); }}><Plus /></Button>
                             </TableCell>
+
+                            {/* <Controller
+                                control={control}
+                                name="jsonpath"
+                                render={({ field }) => (
+                                    <Input
+                                        hidden
+                                        value={field.value ?? ""}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        onBlur={field.onBlur}
+                                    />
+                                )}
+                            /> */}
                         </TableRow>
                     </TableBody>
                 </Table>
