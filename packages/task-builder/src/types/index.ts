@@ -12,23 +12,24 @@ const iconSchema = zod.enum([
 
 const toTuple = (arr: string[]) => arr as [string, ...string[]];
 
-const eventWithDays = zod.object({
-    id: zod.string().min(2).max(50).default(() => crypto.randomUUID()),
-    days: zod.number().min(0).max(365),
-    dueDate: zod.string().min(2).max(200).optional(),
-    start: zod.number().min(0).max(365),
-    end: zod.number().min(0).max(365),
-}).refine(v => v.end >= v.start, { path: ["end"], message: "end must be ≥ start" });
 
-const eventWithDueDate = zod.object({
+const eventSchema = zod.object({
     id: zod.string().min(2).max(50).default(() => crypto.randomUUID()),
-    days: zod.number().min(0).max(365),
-    dueDateExpr: zod.string().min(2).max(200).optional(),
-    start: zod.number().min(0).max(365),
-    end: zod.number().min(0).max(365),
-}).refine(v => v.end >= v.start, { path: ["end"], message: "end must be ≥ start" });
+    start: zod.coerce.number().int().min(0).max(365),
+    end: zod.coerce.number().int().min(0).max(365),
+    // mode: zod.literal('days'),
+    days: zod.coerce.number().int().min(0).max(365),
+}).refine(v => v.end >= v.start, { path: ['end'], message: 'end must be ≥ start' });
 
-const eventSchema = zod.union([eventWithDays, eventWithDueDate]);
+// const EventWithCustom = zod.object({
+//     id: zod.string().min(2).max(50).default(() => crypto.randomUUID()),
+//     start: zod.coerce.number().int().min(0).max(365),
+//     end: zod.coerce.number().int().min(0).max(365),
+//     mode: zod.literal('custom'),
+//     dueDateExpr: zod.string().min(1, 'Required').max(200),
+// }).refine(v => v.end >= v.start, { path: ['end'], message: 'end must be ≥ start' });
+
+// const eventSchema = zod.discriminatedUnion('mode', [EventWithDays, EventWithCustom]);
 
 const actionSchema = zod.object({
     type: zod.enum(["report", "contact"]),
@@ -68,8 +69,8 @@ const prioritySchema = zod.object({
 // }
 
 export function makeTaskSchema(opts: { contactTypes: string[]; formIds: string[] }) {
-    const contactTypeEnum = zod.enum(opts.contactTypes as [string, ...string[]]);
-    const FormId = zod.enum(opts.formIds as [string, ...string[]]);
+    // const contactTypeEnum = zod.enum(opts.contactTypes as [string, ...string[]]);
+    // const FormId = zod.enum(opts.formIds as [string, ...string[]]);
 
     const base = zod.object({
         name: zod.string().min(2).max(50).regex(/^[a-zod0-9-]+$/, "use kebab-case (a–zod, 0–9, -)"),

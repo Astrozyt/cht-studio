@@ -4,6 +4,9 @@ import { Card } from './components/ui/card'
 import { type TaskSchema as TaskValues } from "./types";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table';
 import { Badge } from './components/ui/badge';
+import { useState } from 'react';
+import TaskForm from './components/Form';
+import { Button } from './components/ui/button';
 
 
 
@@ -29,7 +32,7 @@ export const App = ({
     contactLabel: "Contacted",
     events: [
       {
-        id: "event1",
+        id: crypto.randomUUID(),
         days: 5,
         start: 0,
         end: 10
@@ -47,6 +50,15 @@ export const App = ({
     }
   }];
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<TaskValues | null>(null);
+  const [taskList, setTaskList] = useState<TaskValues[]>(existingTasks);
+
+
+  console.log("Existing tasks:", contactTypes,
+    formIds,
+    onSubmit,
+    existingTasks);
   return (
     <Card className="App">
       <h1 className="text-3xl font-bold underline">Tasks</h1>
@@ -55,7 +67,7 @@ export const App = ({
       {/* Form to add tasks */}
       {/* <TaskForm contactTypes={["case", "contact"]} formIds={["f1", "f2", "f3"]} onSubmit={(data) => console.log(data)} /> */}
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>Project tasks</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead >Name</TableHead>
@@ -71,7 +83,7 @@ export const App = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockTasks.map((task) => (
+          {taskList.map((task) => (
             <TableRow key={task.name}>
               <TableCell className="font-medium">{task.name}</TableCell>
               <TableCell>{task.title}</TableCell>
@@ -83,10 +95,30 @@ export const App = ({
               <TableCell><Badge>{task.events.length}</Badge></TableCell>
               <TableCell><Badge>{task.actions.length}</Badge></TableCell>
               <TableCell><Badge>{task.priority ? task.priority.level : 'N/A'}</Badge></TableCell>
+              <TableCell>
+                <Button onClick={() => {
+                  setTaskToEdit(task);
+                  setIsDialogOpen(true);
+                }}>Edit</Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+      <Button onClick={() => {
+        setTaskToEdit(null);
+        setIsDialogOpen(true);
+      }}>
+        Add New Task
+      </Button>
+      <TaskForm
+        contactTypes={contactTypes}
+        formIds={formIds}
+        onSubmit={(data) => setTaskList([...taskList, data])}
+        existingTask={taskToEdit}
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+      />
     </Card>
 
   )

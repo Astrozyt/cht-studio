@@ -13,19 +13,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "./ui/textarea";
 import { makeTaskSchema, type TaskSchema as TaskValues } from "../types";
 import type zod from "zod";
-import { Dialog, DialogContent, DialogFooter, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "./ui/dialog";
+// import { DialogTitle } from "@radix-ui/react-dialog";
 
 
 export default function TaskForm({
     contactTypes,
     formIds,
     onSubmit,
-    existingTasks
+    existingTask,
+    isDialogOpen,
+    setIsDialogOpen
 }: {
     contactTypes: string[];
     formIds: string[];
     onSubmit: (v: TaskValues) => void;
-    existingTasks: TaskValues[];
+    existingTask: TaskValues | null;
+    isDialogOpen: boolean;
+    setIsDialogOpen: (open: boolean) => void;
 }) {
     const schema = useMemo(() => makeTaskSchema({ contactTypes, formIds }), [contactTypes, formIds]);
 
@@ -39,7 +44,7 @@ export default function TaskForm({
         resolver: zodResolver(schema),
         mode: "onChange",
         shouldUnregister: true,
-        defaultValues: {
+        defaultValues: existingTask ? (existingTask as TaskInput) : {
             name: "",
             title: "",
             icon: "icon-calendar",
@@ -69,25 +74,21 @@ export default function TaskForm({
     }, [appliesTo, contactTypes, formIds, setValue]);
 
     const onValid: SubmitHandler<TaskInput> = (values) => onSubmit(schema.parse(values));
+    console.log("eventsFA:", eventsFA.fields);
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="w-full">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Task
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-1/1 max-h-screen m-4 overflow-y-auto">
+                <DialogTitle>{existingTask ? "Edit Task" : "Add New Task"}</DialogTitle>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onValid, (e) => console.error(e))} className="space-y-6">
+                    <form onSubmit={form.handleSubmit(onValid, (e) => console.error(e))} className="space-y-6 grid grid-cols-2">
                         {/* BASICS */}
-                        <Card>
+                        <Card className="w-full grid-cols-2">
                             <CardHeader>
                                 <CardTitle>Basics</CardTitle>
                                 <CardDescription>General task info</CardDescription>
                             </CardHeader>
-                            <CardContent className="grid gap-4 md:grid-cols-2">
+                            <CardContent className="grid gap-4 md:grid-cols-3">
                                 <FormField
                                     name="name"
                                     render={({ field }) => (
@@ -115,17 +116,17 @@ export default function TaskForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Icon</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
+                                            <FormControl>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <SelectTrigger><SelectValue placeholder="Pick icon" /></SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="icon-calendar">icon-calendar</SelectItem>
-                                                    <SelectItem value="icon-follow-up">icon-follow-up</SelectItem>
-                                                    <SelectItem value="icon-death-general">icon-death-general</SelectItem>
-                                                    <SelectItem value="icon-people-person-general@2x">icon-people-person-general@2x</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                                    <SelectContent>
+                                                        <SelectItem value="icon-calendar">icon-calendar</SelectItem>
+                                                        <SelectItem value="icon-follow-up">icon-follow-up</SelectItem>
+                                                        <SelectItem value="icon-death-general">icon-death-general</SelectItem>
+                                                        <SelectItem value="icon-people-person-general@2x">icon-people-person-general@2x</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
                                             <FormDescription>Extend this list with all supported icons.</FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -147,15 +148,15 @@ export default function TaskForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Applies to</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
+                                            <FormControl>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <SelectTrigger><SelectValue /></SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="contacts">contacts</SelectItem>
-                                                    <SelectItem value="reports">reports</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                                    <SelectContent>
+                                                        <SelectItem value="contacts">contacts</SelectItem>
+                                                        <SelectItem value="reports">reports</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -167,19 +168,19 @@ export default function TaskForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>{appliesTo === "contacts" ? "Contact types" : "Form IDs"}</FormLabel>
-                                            <Select
-                                                onValueChange={(v) => field.onChange([v])}
-                                                value={Array.isArray(field.value) ? field.value[0] : ""}
-                                            >
-                                                <FormControl>
+                                            <FormControl>
+                                                <Select
+                                                    onValueChange={(v) => field.onChange([v])}
+                                                    value={Array.isArray(field.value) ? field.value[0] : ""}
+                                                >
                                                     <SelectTrigger><SelectValue placeholder="Select one" /></SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {(appliesTo === "contacts" ? contactTypes : formIds).map(x => (
-                                                        <SelectItem key={x} value={x}>{x}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                                    <SelectContent>
+                                                        {(appliesTo === "contacts" ? contactTypes : formIds).map(x => (
+                                                            <SelectItem key={x} value={x}>{x}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
                                             <FormDescription>First version uses single-select; switch to multiselect later.</FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -216,7 +217,15 @@ export default function TaskForm({
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Priority (0–10)</FormLabel>
-                                            <FormControl><Input type="number" {...field} /></FormControl>
+                                            <FormControl><Input
+                                                type="number"
+                                                value={field.value ?? ""}
+                                                onChange={(e) => {
+                                                    const v = e.target.value;
+                                                    field.onChange(v === "" ? undefined : Number(v));
+                                                }}
+                                                onBlur={field.onBlur}
+                                            /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -231,8 +240,15 @@ export default function TaskForm({
                                 <CardDescription>Due/expiry windows</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {eventsFA.fields.map((row, i) => {
-                                    const hasDays = "days" in (form.getValues(`events.${i}`) as any);
+
+                                {eventsFA?.fields && eventsFA.fields.map((row, i) => {
+                                    console.log("Event row:", row);
+                                    const ev = form.watch(`events.${i}`) ?? {};
+                                    // const hasDays = "days" in (form.getValues(`events.${i}`) as any);
+                                    // const hasDays = true;
+                                    const hasDays =
+                                        ev && typeof ev === 'object' && !Array.isArray(ev) && 'days' in ev;
+
                                     return (
                                         <Card key={row.id} className="border-dashed">
                                             <CardHeader className="pb-2">
@@ -240,12 +256,19 @@ export default function TaskForm({
                                             </CardHeader>
                                             <CardContent className="grid gap-4 md:grid-cols-3">
                                                 <FormField
-
                                                     name={`events.${i}.start` as const}
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>start</FormLabel>
-                                                            <FormControl><Input type="number" {...field} /></FormControl>
+                                                            <FormControl><Input
+                                                                type="number"
+                                                                value={field.value ?? ""}
+                                                                onChange={(e) => {
+                                                                    const v = e.target.value;
+                                                                    field.onChange(v === "" ? undefined : Number(v));
+                                                                }}
+                                                                onBlur={field.onBlur}
+                                                            /></FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -256,50 +279,42 @@ export default function TaskForm({
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>end</FormLabel>
-                                                            <FormControl><Input type="number" {...field} /></FormControl>
+                                                            <FormControl><Input
+                                                                type="number"
+                                                                value={field.value ?? ""}
+                                                                onChange={(e) => {
+                                                                    const v = e.target.value;
+                                                                    field.onChange(v === "" ? undefined : Number(v));
+                                                                }}
+                                                                onBlur={field.onBlur}
+                                                            /></FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
                                                 />
 
-                                                <div className="flex items-end gap-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant={hasDays ? "default" : "outline"}
-                                                        onClick={() => form.setValue(`events.${i}` as any, { start: 0, end: 14, days: 0 } as any, { shouldValidate: true })}
-                                                    >days</Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant={!hasDays ? "default" : "outline"}
-                                                        onClick={() => form.setValue(`events.${i}` as any, { start: 0, end: 14, dueDateExpr: "Date.now()" } as any, { shouldValidate: true })}
-                                                    >custom dueDate</Button>
-                                                </div>
 
-                                                {hasDays ? (
-                                                    <FormField
 
-                                                        name={`events.${i}.days` as const}
-                                                        render={({ field }) => (
-                                                            <FormItem className="md:col-span-3">
-                                                                <FormLabel>days</FormLabel>
-                                                                <FormControl><Input type="number" {...field} /></FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                ) : (
-                                                    <FormField
 
-                                                        name={`events.${i}.dueDateExpr` as const}
-                                                        render={({ field }) => (
-                                                            <FormItem className="md:col-span-3">
-                                                                <FormLabel>dueDateExpr</FormLabel>
-                                                                <FormControl><Input placeholder="(event, contact, report) => ... as string" {...field} /></FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                )}
+                                                <FormField
+                                                    name={`events.${i}.days` as const}
+                                                    render={({ field }) => (
+                                                        <FormItem className="md:col-span-3">
+                                                            <FormLabel>days</FormLabel>
+                                                            <FormControl><Input
+                                                                type="number"
+                                                                value={field.value ?? ""}
+                                                                onChange={(e) => {
+                                                                    const v = e.target.value;
+                                                                    field.onChange(v === "" ? undefined : Number(v));
+                                                                }}
+                                                                onBlur={field.onBlur}
+                                                            /></FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+
                                             </CardContent>
                                             <CardFooter className="justify-end">
                                                 <Button variant="ghost" type="button" onClick={() => eventsFA.remove(i)}>
@@ -321,7 +336,7 @@ export default function TaskForm({
                         </Card>
 
                         {/* ACTIONS */}
-                        <Card>
+                        <Card className="col-span-1">
                             <CardHeader>
                                 <CardTitle>Actions</CardTitle>
                                 <CardDescription>What happens when the task is opened</CardDescription>
@@ -341,15 +356,15 @@ export default function TaskForm({
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Type</FormLabel>
-                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                <FormControl>
+                                                            <FormControl>
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                     <SelectTrigger><SelectValue /></SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                    <SelectItem value="report">report</SelectItem>
-                                                                    <SelectItem value="contact">contact</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="report">report</SelectItem>
+                                                                        <SelectItem value="contact">contact</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -362,14 +377,14 @@ export default function TaskForm({
                                                         render={({ field }) => (
                                                             <FormItem>
                                                                 <FormLabel>Form</FormLabel>
-                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                    <FormControl>
+                                                                <FormControl>
+                                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                         <SelectTrigger><SelectValue /></SelectTrigger>
-                                                                    </FormControl>
-                                                                    <SelectContent>
-                                                                        {formIds.map(fid => <SelectItem key={fid} value={fid}>{fid}</SelectItem>)}
-                                                                    </SelectContent>
-                                                                </Select>
+                                                                        <SelectContent>
+                                                                            {formIds.map(fid => <SelectItem key={fid} value={fid}>{fid}</SelectItem>)}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>
                                                         )}
@@ -414,16 +429,15 @@ export default function TaskForm({
                                 </Button>
                             </CardContent>
                         </Card>
+
                         {form.formState.errors.actions && (
                             <p className="text-sm text-red-500">
                                 {(form.formState.errors.actions as any).message ?? "Add at least one action"}
                             </p>
                         )}
-                        <div className="flex justify-end">
-                            <Button type="submit">Save Task</Button>
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={onClose}>
+
+                        <DialogFooter className="col-span-2">
+                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 Cancel
                             </Button>
                             <Button type="submit">Save Task</Button>
@@ -436,6 +450,7 @@ export default function TaskForm({
     );
 }
 
-const onClose = () => {
-    // Implement dialog close logic here
-};
+// const onClose = () => {
+//     // Implement dialog close logic here
+//     setIsDialogOpen(false);
+// };
