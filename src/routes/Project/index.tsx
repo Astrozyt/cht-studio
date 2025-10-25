@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { App as TaskBuilderApp } from "../../../packages/task-builder/src/App";
 import type { TaskSchema } from "../../../packages/task-builder/src/types";
 import { useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 
 
@@ -140,6 +141,7 @@ const Project = () => {
           <Button className="w-fit" disabled>Play project</Button>
           <Button className="w-fit" disabled>Sync</Button>
           <Button className="w-fit" disabled>New Branch</Button>
+          <Button className="w-fit" onClick={() => invoke("xformify2", { relPath: `projects/${projectName}` })}>Export</Button>
         </Menubar>
 
         <Tabs defaultValue="general" className="w-full mt-4">
