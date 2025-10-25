@@ -8,8 +8,6 @@ import { useState } from 'react';
 import TaskForm from './components/Form';
 import { Button } from './components/ui/button';
 
-
-
 export const App = ({
   contactTypes,
   formIds,
@@ -18,47 +16,14 @@ export const App = ({
 }: {
   contactTypes: string[];
   formIds: string[];
-  onSubmit: (v: TaskValues) => void;
+  onSubmit: (v: TaskValues[]) => void;
   existingTasks: TaskValues[];
 }) => {
-
-  const mockTasks: TaskValues[] = [{
-    name: "Sample Task",
-    title: "Sample Task Title",
-    icon: "icon-ANC-danger-sign@2x",
-    appliesTo: "contacts",
-    appliesToType: "clinic",
-    appliesIf: "true",
-    contactLabel: "Contacted",
-    events: [
-      {
-        id: crypto.randomUUID(),
-        days: 5,
-        start: 0,
-        end: 10
-      }
-    ],
-    actions: [
-      {
-        type: "contact",
-        label: "Call Contact",
-        modifyContent: "Please call the contact."
-      }
-    ],
-    priority: {
-      level: 5
-    }
-  }];
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<TaskValues | null>(null);
   const [taskList, setTaskList] = useState<TaskValues[]>(existingTasks);
 
-
-  console.log("Existing tasks:", contactTypes,
-    formIds,
-    onSubmit,
-    existingTasks);
   return (
     <Card className="App">
       <h1 className="text-3xl font-bold underline">Tasks</h1>
@@ -114,7 +79,7 @@ export const App = ({
       <TaskForm
         contactTypes={contactTypes}
         formIds={formIds}
-        onSubmit={(data) => setTaskList([...taskList, data])}
+        onSubmit={(data) => { setTaskList([...taskList, data]); onSubmit([...taskList, data]); setIsDialogOpen(false); }}
         existingTask={taskToEdit}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}

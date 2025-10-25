@@ -74,7 +74,6 @@ export default function TaskForm({
     }, [appliesTo, contactTypes, formIds, setValue]);
 
     const onValid: SubmitHandler<TaskInput> = (values) => onSubmit(schema.parse(values));
-    console.log("eventsFA:", eventsFA.fields);
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

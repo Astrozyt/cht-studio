@@ -9,17 +9,17 @@ import { ContactSummaryEditorCard } from "./components/ContactSummaryEditorCard"
 import FormCard from "./components/FormCard";
 import LanguageCard from "./components/LanguageCard";
 import { ContactModelEditor, buildContactFieldRegistry, generateCreateForm, generateEditForm, patchBaseSettings } from "@ght/contactmodeleditor";
-import { BaseDirectory, mkdir, readTextFile, remove, writeTextFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, mkdir, readDir, readTextFile, remove, writeTextFile } from "@tauri-apps/plugin-fs";
 import { toast } from "sonner";
 import { App as TaskBuilderApp } from "../../../packages/task-builder/src/App";
 import type { TaskSchema } from "../../../packages/task-builder/src/types";
+import { useEffect, useState } from "react";
 
 
 
 const Project = () => {
   let { projectName } = useParams();
 
-  // const formFieldDB = projectName && getProjectFieldDb(projectName);
   const contactSaveFn = async (data: any) => {
     console.log("Contact model saved:", data);
     let mutations = [];
@@ -88,6 +88,48 @@ const Project = () => {
     }
   };
 
+  const [existingTasks, setExistingTasks] = useState<TaskSchema[]>([]);
+  const [contactTypes, setContactTypes] = useState<string[]>([]);
+  const [formIds, setFormIds] = useState<string[]>([]);
+
+  const loadTasks = async () => {
+    try {
+      const data = await readTextFile(`projects/${projectName}/configuration/tasks.json`, { baseDir: BaseDirectory.AppLocalData });
+      const tasks: TaskSchema[] = JSON.parse(data);
+      setExistingTasks(tasks);
+    } catch (error) {
+      console.error("Error loading existing tasks:", error);
+    }
+  };
+
+  const loadContactTypes = async () => {
+    try {
+      const data = await readTextFile(`projects/${projectName}/configuration/contact-model.json`, { baseDir: BaseDirectory.AppLocalData });
+      const contactModel = JSON.parse(data);
+      const types = contactModel.contact_types.map((ct: any) => ct.label);
+      setContactTypes(types);
+    } catch (error) {
+      console.error("Error loading contact types:", error);
+    }
+  };
+
+  const loadFormIds = async () => {
+    try {
+      const rawFormIds = await readDir(`projects/${projectName}/forms/app`, { baseDir: BaseDirectory.AppLocalData });
+      const jsonIds = rawFormIds.filter((file) => file.name.endsWith('.json'));
+      const ids = jsonIds.map((file) => file.name.replace('.json', ''));
+      setFormIds(ids);
+    } catch (error) {
+      console.error("Error loading form IDs:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadContactTypes();
+    loadFormIds();
+    loadTasks();
+  }, [projectName]);
+
   return (
     <>
 
@@ -125,12 +167,20 @@ const Project = () => {
           </TabsContent>
           <TabsContent value="tasks">
             <TaskBuilderApp
-              contactTypes={["person", "household", "clinic"]} // Replace with actual contact types
-              formIds={["visit", "pregnancy", "delivery"]} // Replace with actual form IDs
-              existingTasks={[]} // Add existing tasks array
-              onSubmit={(taskData: TaskSchema) => {
+              contactTypes={contactTypes}
+              formIds={formIds || ['mockFormId']}
+              existingTasks={existingTasks}
+              onSubmit={(taskData: TaskSchema[]) => {
                 console.log("Task created:", taskData);
-                // Handle saving the task
+                writeTextFile(
+                  `projects/${projectName}/configuration/tasks.json`,
+                  JSON.stringify(taskData),
+                  { baseDir: BaseDirectory.AppLocalData }
+                ).then(() => {
+                  toast.success("Task saved successfully");
+                }).catch((error) => {
+                  toast.error("Error saving task");
+                });
               }}
             />
           </TabsContent>
