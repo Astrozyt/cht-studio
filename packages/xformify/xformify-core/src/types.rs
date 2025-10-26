@@ -1,19 +1,48 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Form {
     pub title: String,
     pub root: String,
     pub body: Vec<Node>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
+
+pub struct Event {
+    pub id: String,
+    pub start: u64,
+    pub end: u64,
+    pub days: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Action {
+    pub r#type: String,
+    pub form: String,
+    pub label: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TaskJsonInput {
+    pub name: String,
+    pub title: String,
+    pub icon: String,
+    pub applies_to: String,
+    pub applies_to_type: Vec<String>,
+    pub applies_if: String,
+    pub events: Vec<Event>,
+    pub actions: Vec<Action>,
+    pub priority: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Localized {
     pub lang: String,
     pub value: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Rule {
     pub id: Option<String>,
     pub field: String,
@@ -23,7 +52,7 @@ pub struct Rule {
     pub value: serde_json::Value,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Logic {
     pub combinator: String, // "and" | "or"
     #[serde(default)]
@@ -31,7 +60,7 @@ pub struct Logic {
     pub id: Option<String>,
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Bind {
     #[serde(default)]
     pub required: Option<String>, // "yes" | "no"
@@ -51,13 +80,13 @@ pub struct Bind {
     pub r#type: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ItemChoice {
     pub value: String,
     pub labels: Vec<Localized>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Node {
     pub uid: String,
     pub r#ref: String,

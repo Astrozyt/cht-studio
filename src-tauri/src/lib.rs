@@ -1,5 +1,6 @@
 use tauri::Manager;
 use xformify_core::json_to_xform;
+use xformify_core::x_all_forms;
 use xformify_core::Form;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -105,74 +106,37 @@ fn xformify2(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
     // Resolve BaseDirectory::AppLocalData and join with the provided relative path
     let base_dir = app.path().app_local_data_dir().map_err(|e| e.to_string())?;
     let app_forms_dir = base_dir.join(rel_path).join("forms/app");
+    let contact_forms_dir = base_dir.join(rel_path).join("forms/contact");
+
     print!("   ||  app_forms_dir: {}", app_forms_dir.display());
-    let export_dir = base_dir.join(rel_path).join("export/forms/app");
+    print!("   ||  contact_forms_dir: {}", contact_forms_dir.display());
 
-    std::fs::create_dir_all(&export_dir).map_err(|e| {
-        format!(
-            "Failed to create export dir {}: {}",
-            export_dir.display(),
-            e
-        )
-    })?;
+    let app_export_dir = base_dir.join(rel_path).join("export/forms/app");
+    let contact_export_dir = base_dir.join(rel_path).join("export/forms/contact");
 
-    let entries = std::fs::read_dir(&app_forms_dir)
-        .map_err(|e| format!("Failed to read {}: {}", app_forms_dir.display(), e))?;
-
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
+    // Create app forms for export
+    let _appformresult = match x_all_forms(app_forms_dir, app_export_dir) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("Error processing app forms: {}", e);
+            return Err(e);
         }
-        if !path.extension().map_or(false, |ext| ext == "json") {
-            continue;
+    };
+    // Create contact forms for export
+    let _contactformresult = match x_all_forms(contact_forms_dir, contact_export_dir) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("Error processing contact forms: {}", e);
+            return Err(e);
         }
+    };
+    // Generate task.js
+    // Generate contact-summary.templated.js
+    // Generate app_settings.json
+    // Copy assets
+    // export
+    // outside: run/upload with CLI
 
-        let json = match std::fs::read_to_string(&path) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("Failed to read {}: {}", path.display(), e);
-                continue;
-            }
-        };
-
-        let form: Form = match serde_json::from_str(&json) {
-            Ok(f) => f,
-            Err(e) => {
-                eprintln!("Failed to parse {}: {}", path.display(), e);
-                continue;
-            }
-        };
-
-        let props = serde_json::json!({
-            "title": { "en": form.title.to_lowercase() },
-            "icon": "icon-calendar",
-            "context": {"person": true},  // e.g. { "person": true }
-        });
-
-        let xml_id = form.title.replace(' ', "_").to_lowercase();
-        let xform_xml = match json_to_xform(&xml_id, &form) {
-            Ok(x) => x,
-            Err(e) => {
-                eprintln!("json_to_xform failed for {}: {}", path.display(), e);
-                continue;
-            }
-        };
-        std::fs::write(&export_dir.join(&xml_id).with_extension("xml"), &xform_xml)
-            .map_err(|e| format!("Failed to write XForm file {}: {}", export_dir.display(), e))?;
-
-        std::fs::write(
-            &export_dir.join(xml_id).with_extension("properties.json"),
-            &props.to_string(),
-        )
-        .map_err(|e| {
-            format!(
-                "Failed to write properties file {}: {}",
-                export_dir.display(),
-                e
-            )
-        })?;
-    }
     Ok("XFormify2 conversion successful".to_string())
 }
 

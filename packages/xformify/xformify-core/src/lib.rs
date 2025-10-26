@@ -9,6 +9,12 @@ mod builder {
     pub mod itext;
 }
 
+mod xpropertify;
+pub use xpropertify::x_all_forms;
+mod xtaskify;
+pub use xtaskify::xtaskify;
+mod jsonlogic_to_js;
+
 use anyhow::Result;
 use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::Writer;
