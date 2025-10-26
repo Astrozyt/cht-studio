@@ -15,7 +15,19 @@ import { makeTaskSchema, type TaskSchema as TaskValues } from "../types";
 import type zod from "zod";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "./ui/dialog";
 // import { DialogTitle } from "@radix-ui/react-dialog";
+import {
+    defaultControlElements,
+    QueryBuilder,
+    type Field,
+    type RuleGroupType,
+    type RuleType,
+} from "react-querybuilder";
+import "react-querybuilder/dist/query-builder.css";
 
+const deepClone = <T,>(v: T): T =>
+    typeof structuredClone === 'function'
+        ? structuredClone(v)
+        : JSON.parse(JSON.stringify(v));
 
 export default function TaskForm({
     contactTypes,
@@ -61,6 +73,8 @@ export default function TaskForm({
 
     const { control, handleSubmit, watch, setValue } = form;
     const appliesTo = watch("appliesTo");
+    const appliesIf = watch("appliesIf");
+
 
     const eventsFA = useFieldArray({ control, name: "events" });
     const actionsFA = useFieldArray({ control, name: "actions" });
@@ -74,6 +88,8 @@ export default function TaskForm({
     }, [appliesTo, contactTypes, formIds, setValue]);
 
     const onValid: SubmitHandler<TaskInput> = (values) => onSubmit(schema.parse(values));
+
+    console.log("Applies if: ", appliesIf)
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -187,15 +203,28 @@ export default function TaskForm({
                                 />
 
                                 <FormField
-
                                     name="appliesIf"
-                                    render={({ field }) => (
-                                        <FormItem className="md:col-span-2">
+                                    render={({ field }) => {
+                                        const qbValue =
+                                            field.value && typeof field.value === 'object'
+                                                ? deepClone(field.value) // make sure it's mutable for RQB
+                                                : { combinator: 'and', rules: [] };
+                                        return (<FormItem className="md:col-span-2">
                                             <FormLabel>appliesIf (optional)</FormLabel>
-                                            <FormControl><Textarea rows={3} placeholder="ctx.contactSummary.last_bp_systolic > 140" {...field} /></FormControl>
+                                            <FormControl>
+                                                <QueryBuilder
+                                                    fields={[
+                                                        { name: 'contactSummary.last_bp_systolic', label: 'Last BP Systolic' },
+                                                        { name: 'contactSummary.last_bp_diastolic', label: 'Last BP Diastolic' },
+                                                    ]}
+                                                    query={qbValue}
+                                                    onQueryChange={field.onChange}
+                                                />
+
+                                            </FormControl>
                                             <FormMessage />
-                                        </FormItem>
-                                    )}
+                                        </FormItem>)
+                                    }}
                                 />
 
                                 <FormField

@@ -444,6 +444,9 @@ importers:
       react-hook-form:
         specifier: 7.56.1
         version: 7.56.1(react@19.1.1)
+      react-querybuilder:
+        specifier: ^8.8.1
+        version: 8.8.1(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1)
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.3.1
@@ -5884,6 +5887,18 @@ snapshots:
       react: 19.1.1
       react-redux: 9.2.0(@types/react@19.1.9)(react@19.1.1)(redux@5.0.1)
 
+  '@reduxjs/toolkit@2.8.2(react-redux@9.2.0(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1))(react@19.1.1)':
+    dependencies:
+      '@standard-schema/spec': 1.0.0
+      '@standard-schema/utils': 0.3.0
+      immer: 10.1.1
+      redux: 5.0.1
+      redux-thunk: 3.1.0(redux@5.0.1)
+      reselect: 5.1.1
+    optionalDependencies:
+      react: 19.1.1
+      react-redux: 9.2.0(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1)
+
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
   '@rolldown/pluginutils@1.0.0-beta.38': {}
@@ -7841,6 +7856,17 @@ snapshots:
       - '@types/react'
       - redux
 
+  react-querybuilder@8.8.1(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1):
+    dependencies:
+      '@reduxjs/toolkit': 2.8.2(react-redux@9.2.0(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1))(react@19.1.1)
+      immer: 10.1.1
+      numeric-quantity: 2.1.0
+      react: 19.1.1
+      react-redux: 9.2.0(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - redux
+
   react-redux@9.2.0(@types/react@19.1.9)(react@19.1.1)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
@@ -7848,6 +7874,15 @@ snapshots:
       use-sync-external-store: 1.5.0(react@19.1.1)
     optionalDependencies:
       '@types/react': 19.1.9
+      redux: 5.0.1
+
+  react-redux@9.2.0(@types/react@19.2.0)(react@19.1.1)(redux@5.0.1):
+    dependencies:
+      '@types/use-sync-external-store': 0.0.6
+      react: 19.1.1
+      use-sync-external-store: 1.5.0(react@19.1.1)
+    optionalDependencies:
+      '@types/react': 19.2.0
       redux: 5.0.1
 
   react-refresh@0.17.0: {}

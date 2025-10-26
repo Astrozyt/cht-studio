@@ -27,6 +27,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.56.1",
+    "react-querybuilder": "^8.8.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
     "zod": "^3.25.76"

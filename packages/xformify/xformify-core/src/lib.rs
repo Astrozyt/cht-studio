@@ -13,6 +13,8 @@ mod xpropertify;
 pub use xpropertify::x_all_forms;
 mod xtaskify;
 pub use xtaskify::xtaskify;
+mod jsonlogic_taskexporter;
+use jsonlogic_taskexporter::rqb_group_to_jsonlogic;
 mod jsonlogic_to_js;
 
 use anyhow::Result;

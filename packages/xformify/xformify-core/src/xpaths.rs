@@ -1,4 +1,5 @@
 use regex::Regex;
+use serde_json::Value;
 
 pub fn sanitize_name(s: &str) -> String {
     let s = s.trim().to_lowercase().replace(' ', "_");
@@ -6,6 +7,23 @@ pub fn sanitize_name(s: &str) -> String {
         .unwrap()
         .replace_all(&s, "")
         .into_owned()
+}
+
+fn value_to_xpath_literal(v: &Value) -> String {
+    match v {
+        Value::String(s) => format!("'{}'", s.replace('\'', "''")),
+        Value::Number(n) => n.to_string(),
+        Value::Bool(b) => if *b { "true()" } else { "false()" }.to_string(),
+        Value::Null => "null".to_string(),
+        Value::Array(a) => format!(
+            "[{}]",
+            a.iter()
+                .map(value_to_xpath_literal)
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        Value::Object(_) => "null".to_string(), // or error out if you don't expect objects
+    }
 }
 
 pub fn compile_logic_to_xpath(
@@ -23,17 +41,9 @@ pub fn compile_logic_to_xpath(
     let mut parts = Vec::new();
     for r in &logic.rules {
         let left = path_for(&r.field);
-        let right = match &r.value {
-            serde_json::Value::String(s) => format!("'{}'", s.replace('\'', "''")),
-            serde_json::Value::Number(n) => n.to_string(),
-            serde_json::Value::Bool(b) => {
-                if *b {
-                    "true()".into()
-                } else {
-                    "false()".into()
-                }
-            }
-            _ => "''".into(),
+        let right: String = match r.value.as_ref() {
+            Some(v) => value_to_xpath_literal(v),
+            None => "null".to_string(),
         };
         let op_map = match r.operator.as_str() {
             "=" => "=",

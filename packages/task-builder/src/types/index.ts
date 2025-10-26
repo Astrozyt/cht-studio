@@ -1,4 +1,5 @@
 import * as zod from 'zod'
+import { QbQuery } from './queryBuilderSchema';
 
 const iconSchema = zod.enum([
     'icon-ANC-danger-sign@2x', 'icon-disease-HIV-AIDS@2x', 'icon-healthcare-diagnosis.svg', 'icon-oppia-mobile@2x', 'icon-people-nurse@2x', 'icon-places-hospital@2x', 'medic-person.svg',
@@ -84,7 +85,9 @@ export function makeTaskSchema(opts: { contactTypes: string[]; formIds: string[]
          * In runtime this is a FUNCTION. Here you can store a string expression or DSL;
          * on export compile to: (contact, reports, ctx) => { return <expr>; }
          */
-        appliesIf: zod.string().min(0).max(20_000).optional(),
+        // appliesIf: zod.string().min(0).max(20_000).optional(),
+        appliesIf: QbQuery,
+
 
         /** Optional: label template shown under a task; UI-only in Studio */
         contactLabel: zod.string().min(2).max(120).optional(),

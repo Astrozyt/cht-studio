@@ -1,6 +1,7 @@
 use tauri::Manager;
 use xformify_core::json_to_xform;
 use xformify_core::x_all_forms;
+use xformify_core::xtaskify;
 use xformify_core::Form;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -131,6 +132,16 @@ fn xformify2(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
         }
     };
     // Generate task.js
+    let _ = match xtaskify(
+        base_dir.join(rel_path).join("configuration/tasks.json"),
+        base_dir.join(rel_path).join("export"),
+    ) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("Error processing tasks: {}", e);
+            return Err(e);
+        }
+    };
     // Generate contact-summary.templated.js
     // Generate app_settings.json
     // Copy assets

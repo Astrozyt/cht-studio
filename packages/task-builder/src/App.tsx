@@ -7,6 +7,7 @@ import { Badge } from './components/ui/badge';
 import { useState } from 'react';
 import TaskForm from './components/Form';
 import { Button } from './components/ui/button';
+import { MinusCircleIcon } from 'lucide-react';
 
 export const App = ({
   contactTypes,
@@ -48,14 +49,15 @@ export const App = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {taskList.map((task) => (
-            <TableRow key={task.name}>
+          {taskList.map((task) => {
+            console.log("jjj appliesIf: ", task.appliesIf);
+            return <TableRow key={task.name}>
               <TableCell className="font-medium">{task.name}</TableCell>
               <TableCell>{task.title}</TableCell>
               <TableCell>{task.icon}</TableCell>
               <TableCell>{task.appliesTo}</TableCell>
               <TableCell>{String(task.appliesToType)}</TableCell>
-              <TableCell>{task.appliesIf}</TableCell>
+              <TableCell><Badge>{task.appliesIf?.rules?.length || "-"}</Badge></TableCell>
               <TableCell>{task.contactLabel}</TableCell>
               <TableCell><Badge>{task.events.length}</Badge></TableCell>
               <TableCell><Badge>{task.actions.length}</Badge></TableCell>
@@ -67,10 +69,10 @@ export const App = ({
                 }}>Edit</Button>
               </TableCell>
             </TableRow>
-          ))}
+          })}
         </TableBody>
       </Table>
-      <Button onClick={() => {
+      <Button className='size-fit ml-auto mr-auto' onClick={() => {
         setTaskToEdit(null);
         setIsDialogOpen(true);
       }}>
