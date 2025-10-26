@@ -49,9 +49,32 @@ pub fn write_binds<W: Write>(
     Ok(())
 }
 
+fn sanitize_name_path(p: &str) -> String {
+    p.split('.')
+        .map(|seg| sanitize_name(seg))
+        .collect::<Vec<_>>()
+        .join("/")
+}
+
 fn write_bind<W: Write>(w: &mut Writer<W>, idx: &PathIndex, n: &Node) -> anyhow::Result<()> {
     let nodeset = idx.path_for(&n.r#ref);
     let mut attrs: Vec<(&str, String)> = vec![("nodeset", nodeset)];
+
+    let resolve_field = |field: &str| -> String {
+        if let Some(rest) = field.strip_prefix("contact.") {
+            // contact model: contact.haircolor → instance('contact')/haircolor
+            format!("instance('contact')/contact/{}", sanitize_name_path(rest))
+        } else if let Some(rest) = field.strip_prefix("contactSummary.") {
+            // contact-summary: contactSummary.last_bp → instance('contact-summary')/context/last_bp
+            format!(
+                "instance('contact-summary')/context/{}",
+                sanitize_name_path(rest)
+            )
+        } else {
+            // default: treat as a local form field ref
+            idx.path_for(field)
+        }
+    };
 
     if let Some(t) = n.bind.r#type.as_deref() {
         attrs.push(("type", map_type(t).to_string()));
@@ -60,12 +83,12 @@ fn write_bind<W: Write>(w: &mut Writer<W>, idx: &PathIndex, n: &Node) -> anyhow:
         attrs.push(("required", "true()".into()));
     }
     if let Some(rel) = &n.bind.relevant {
-        if let Some(xp) = compile_logic_to_xpath(&|f| idx.path_for(f), rel) {
+        if let Some(xp) = compile_logic_to_xpath(&resolve_field, rel) {
             attrs.push(("relevant", xp));
         }
     }
     if let Some(c) = &n.bind.constraint {
-        if let Some(xp) = compile_logic_to_xpath(&|f| idx.path_for(f), c) {
+        if let Some(xp) = compile_logic_to_xpath(&resolve_field, c) {
             attrs.push(("constraint", xp));
         }
     }
@@ -92,8 +115,7 @@ fn map_type(t: &str) -> &str {
         "string" => "string",
         "int" => "int",
         "date" => "date",
-        "select1" => "select1",
-        "select" => "select",
+        "select1" | "select" => "string",
         _ => "string",
     }
 }

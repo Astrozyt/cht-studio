@@ -26,6 +26,8 @@ use builder::body::write_body;
 use builder::instance::write_instance;
 use builder::itext::Itext;
 
+use crate::builder::instance::write_external_instances;
+
 pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String, anyhow::Error> {
     // Collect itext
     let mut it = Itext::new();
@@ -72,8 +74,10 @@ pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String, anyhow::Error>
 
     // <model>
     start(&mut w, "model", &[])?;
+
     write_itext(&mut w, &it)?;
     write_instance(&mut w, xml_id, &form.body)?;
+    write_external_instances(&mut w);
     write_binds(&mut w, &idx, &form.body)?;
     end(&mut w, "model")?;
     end(&mut w, "h:head")?;

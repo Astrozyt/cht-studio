@@ -47,3 +47,19 @@ fn end_elem<W: Write>(w: &mut Writer<W>, name: &str) -> anyhow::Result<()> {
     w.write_event(Event::End(BytesStart::new(name).to_end()))?;
     Ok(())
 }
+
+pub fn write_external_instances<W: std::io::Write>(w: &mut Writer<W>) -> anyhow::Result<()> {
+    // <instance id="contact" src="jr://instance/contact"/>
+    let mut inst_contact = BytesStart::new("instance");
+    inst_contact.push_attribute(("id", "contact"));
+    inst_contact.push_attribute(("src", "jr://instance/contact"));
+    w.write_event(Event::Empty(inst_contact))?;
+
+    // <instance id="contact-summary" src="jr://instance/contact-summary"/>
+    let mut inst_cs = BytesStart::new("instance");
+    inst_cs.push_attribute(("id", "contact-summary"));
+    inst_cs.push_attribute(("src", "jr://instance/contact-summary"));
+    w.write_event(Event::Empty(inst_cs))?;
+
+    Ok(())
+}
