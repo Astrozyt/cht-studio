@@ -1,8 +1,8 @@
 use tauri::Manager;
+use xformify_core::generate_contact_summary_from_json;
 use xformify_core::json_to_xform;
 use xformify_core::x_all_forms;
 use xformify_core::xtaskify;
-use xformify_core::Form;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -143,6 +143,17 @@ fn xformify2(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
         }
     };
     // Generate contact-summary.templated.js
+    let rules_json = base_dir
+        .join(rel_path)
+        .join("configuration")
+        .join("contact-summary.json");
+    match generate_contact_summary_from_json(
+        rules_json.clone(),
+        base_dir.join(rel_path).join("export"),
+    ) {
+        Ok(path) => println!("Wrote {}", path),
+        Err(e) => eprintln!("contact-summary generation skipped: {}", e),
+    }
     // Generate app_settings.json
     // Copy assets
     // export

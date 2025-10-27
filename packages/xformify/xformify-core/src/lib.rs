@@ -15,9 +15,11 @@ mod xtaskify;
 pub use xtaskify::xtaskify;
 mod jsonlogic_taskexporter;
 use jsonlogic_taskexporter::rqb_group_to_jsonlogic;
+mod contact_summary;
 mod jsonlogic_to_js;
 
 use anyhow::Result;
+pub use contact_summary::generate_contact_summary_from_json;
 use quick_xml::events::{BytesStart, BytesText, Event};
 use quick_xml::Writer;
 use std::collections::BTreeSet;
