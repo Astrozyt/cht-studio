@@ -2,8 +2,109 @@ use serde_json::{self as sj, Value};
 use std::path::PathBuf;
 
 use crate::{jsonlogic_taskexporter::rqb_group_to_jsonlogic, AppliesIf, Task};
+use regex::{Captures, Regex};
 
 type TaskJsonInput = Vec<Task>;
+
+/// Render the array of tasks as a JS module where `appliesIf` is a function.
+/// Expects tasks where `applies_if` has already been normalized to:
+///   - None  => omit field
+///   - Some(AppliesIf::EmptyString(expr)) => JS expression string
+///   - Some(AppliesIf::Group(_)) => should have been converted earlier
+fn write_tasks_js(tasks: &[Task]) -> Result<String, String> {
+    let mut out = String::new();
+    out.push_str("module.exports = [\n");
+
+    for (i, t) in tasks.iter().enumerate() {
+        // Serialize to Value so we can drop/override `appliesIf`
+        let mut v = sj::to_value(t).map_err(|e| e.to_string())?;
+
+        // Pull out appliesIf (if present) and remove it from the value map
+        let applies_if_expr: Option<String> = match t.applies_if.as_ref() {
+            Some(AppliesIf::EmptyString(expr)) if !expr.trim().is_empty() => {
+                Some(expr.trim().to_string())
+            }
+            // Group should have been converted earlier; if any slipped through, drop it
+            _ => None,
+        };
+
+        if let Value::Object(map) = &mut v {
+            map.remove("appliesIf"); // we’ll print it manually as a function
+        }
+
+        // Pretty-print the rest of the object (without appliesIf)
+        let mut body = sj::to_string_pretty(&v).map_err(|e| e.to_string())?;
+
+        // Drop the surrounding braces so we can inject the function cleanly
+        // body is like "{\n  ...\n}"
+        if let Some(stripped) = body.strip_prefix("{").and_then(|s| s.strip_suffix("}")) {
+            body = stripped.trim_matches('\n').to_string();
+        }
+
+        // Write object
+        out.push_str("  {\n");
+
+        // If we have appliesIf, print it first (nice to have at the top),
+        // then a trailing comma if there are other fields.
+        if let Some(expr) = applies_if_expr {
+            out.push_str("    appliesIf: function (contact, reports, ctx) {\n");
+            out.push_str("      return ");
+            out.push_str(&expr);
+            out.push_str(";\n");
+            out.push_str("    }");
+            if !body.trim().is_empty() {
+                out.push_str(",\n");
+            } else {
+                out.push('\n');
+            }
+        }
+
+        // Print the remaining JSON fields with proper indentation
+        if !body.trim().is_empty() {
+            // re-indent body by 2 spaces
+            for line in body.lines() {
+                out.push_str("    ");
+                out.push_str(line);
+                out.push('\n');
+            }
+        }
+
+        out.push_str("  }");
+        if i + 1 < tasks.len() {
+            out.push_str(",\n");
+        } else {
+            out.push('\n');
+        }
+    }
+
+    out.push_str("];\n");
+    Ok(out)
+}
+
+fn convert_get_to_ctx(js_expr: &str) -> String {
+    // Matches: get(data,"<path>")
+    // Example capture: ctx.contactSummary.last_bp_diastolic
+    static GET_RE: once_cell::sync::Lazy<Regex> =
+        once_cell::sync::Lazy::new(|| Regex::new(r#"get\(data,\s*"([^"]+)"\)"#).unwrap());
+
+    // Replace all occurrences
+    let replaced = GET_RE.replace_all(js_expr, |caps: &Captures| {
+        let mut path = caps[1].to_string(); // e.g. "ctx.a.b"
+        if let Some(rest) = path.strip_prefix("ctx.") {
+            // drop leading "ctx."
+            path = rest.to_string();
+        } else if path == "ctx" {
+            path.clear();
+        }
+        if path.is_empty() {
+            "ctx".to_string()
+        } else {
+            format!("ctx?.{}", path.replace('.', "?."))
+        }
+    });
+
+    replaced.into_owned()
+}
 
 pub fn xtaskify(configuration_path: PathBuf, export_path: PathBuf) -> Result<String, String> {
     // 1) Read
@@ -31,21 +132,13 @@ pub fn xtaskify(configuration_path: PathBuf, export_path: PathBuf) -> Result<Str
                 if trimmed.is_empty() {
                     None
                 } else if looks_like_json(trimmed) {
-                    // Treat as JSONLogic
-                    match serde_json::from_str::<Value>(trimmed) {
-                        Ok(jsonlogic) => {
-                            let js = crate::jsonlogic_to_js::jsonlogic_to_js(&jsonlogic);
-                            Some(AppliesIf::EmptyString(js))
-                        }
-                        Err(e) => {
-                            eprintln!(
-                                "Warning: appliesIf looks like JSON but failed to parse: {e}"
-                            );
-                            Some(AppliesIf::EmptyString(trimmed.to_string()))
-                        }
-                    }
+                    // JSONLogic in a string -> to JS expr
+                    let val: Value = serde_json::from_str(trimmed).map_err(|e| e.to_string())?;
+                    let js = crate::jsonlogic_to_js::jsonlogic_to_js(&val);
+                    let js = convert_get_to_ctx(&js);
+                    Some(AppliesIf::EmptyString(js))
                 } else {
-                    // Already a JS expression string
+                    // Assume already a JS expr
                     Some(AppliesIf::EmptyString(trimmed.to_string()))
                 }
             }
@@ -53,6 +146,7 @@ pub fn xtaskify(configuration_path: PathBuf, export_path: PathBuf) -> Result<Str
                 // Convert RQB → JSONLogic → JS string
                 let jl = rqb_group_to_jsonlogic(&group);
                 let js = crate::jsonlogic_to_js::jsonlogic_to_js(&jl);
+                let js = convert_get_to_ctx(&js); // <<< post-process here
                 Some(AppliesIf::EmptyString(js))
             }
         };
@@ -66,9 +160,10 @@ pub fn xtaskify(configuration_path: PathBuf, export_path: PathBuf) -> Result<Str
     drop_nulls_and_empty(&mut val);
 
     // 5) Produce JS module
-    let json = sj::to_string_pretty(&val).map_err(|e| e.to_string())?;
-    let js = format!("module.exports = {};\n", json);
+    // 4) Build JS module source with appliesIf as a real function
+    let js = write_tasks_js(&tasks)?;
 
+    // 5) Write to file
     let out = export_path.join("tasks.js");
     std::fs::write(&out, js).map_err(|e| format!("Failed to write {}: {}", out.display(), e))?;
     Ok(out.display().to_string())
