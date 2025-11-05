@@ -16,6 +16,8 @@ pub use xtaskify::xtaskify;
 mod jsonlogic_taskexporter;
 use jsonlogic_taskexporter::rqb_group_to_jsonlogic;
 mod contact_summary;
+mod json_to_base_settings;
+pub use json_to_base_settings::json_to_base_settings;
 mod jsonlogic_to_js;
 
 use anyhow::Result;
@@ -32,7 +34,11 @@ use builder::itext::Itext;
 
 use crate::builder::instance::write_external_instances;
 
-pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String, anyhow::Error> {
+pub fn json_to_xform(
+    xml_id: &str,
+    form: &Form,
+    is_contact_forms: bool,
+) -> Result<String, anyhow::Error> {
     // Collect itext
     let mut it = Itext::new();
     fn walk(it: &mut Itext, prefix: &str, n: &Node) {
@@ -80,9 +86,21 @@ pub fn json_to_xform(xml_id: &str, form: &Form) -> Result<String, anyhow::Error>
     start(&mut w, "model", &[])?;
 
     write_itext(&mut w, &it)?;
-    write_instance(&mut w, xml_id, &form.body)?;
+    write_instance(&mut w, xml_id, &form.body, is_contact_forms)?;
     write_external_instances(&mut w);
     write_binds(&mut w, &idx, &form.body)?;
+    //Write selfclosing tag: <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+    start(
+        &mut w,
+        "bind",
+        &[
+            ("nodeset", "/data/meta/instanceID"),
+            ("type", "string"),
+            ("readonly", "true()"),
+            ("calculate", "concat('uuid:', uuid())"),
+        ],
+    )?;
+    end(&mut w, "bind")?;
     end(&mut w, "model")?;
     end(&mut w, "h:head")?;
 

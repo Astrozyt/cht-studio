@@ -109,7 +109,7 @@ pub fn generate_contact_summary_from_json(
 //
 function pick(obj, path) {{
   if (!obj || !path) return undefined;
-  return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+  return path.split('.').reduce((o, k) => (o === null ? undefined : o[k]), obj);
 }}
 
 function newestReport(reports, form, withinDays) {{
@@ -154,7 +154,7 @@ module.exports = {{
     }}
   ],
 
-  context: (contact, reports, ctx) => {{
+  context: (_, reports) => {{
     {ctx_lines}
     return {{
       contactSummary: {{
@@ -178,6 +178,7 @@ module.exports = {{
             .join(",\n        ")
     );
 
+    let js = js.replace("\"", "'");
     // 4) write
     let out = export_path.join("contact-summary.templated.js");
     std::fs::write(&out, js).map_err(|e| format!("Failed to write {}: {}", out.display(), e))?;
@@ -202,6 +203,6 @@ fn cast_expr(var: &str, typ: &str) -> String {
     match typ {
         "number" => format!("(Number.isFinite(Number({var})) ? Number({var}) : null)"),
         "boolean" => format!("(({var}) ? true : ({var}===0 ? false : Boolean({var})))"),
-        _ => format!("({var}==null ? null : String({var}))"),
+        _ => format!("({var}===null ? null : String({var}))"),
     }
 }

@@ -32,6 +32,8 @@ fn write_tasks_js(tasks: &[Task]) -> Result<String, String> {
             map.remove("appliesIf"); // we’ll print it manually as a function
         }
 
+        prune_keys(&mut v, &["priority"]);
+
         // Pretty-print the rest of the object (without appliesIf)
         let mut body = sj::to_string_pretty(&v).map_err(|e| e.to_string())?;
 
@@ -79,6 +81,26 @@ fn write_tasks_js(tasks: &[Task]) -> Result<String, String> {
 
     out.push_str("];\n");
     Ok(out)
+}
+
+fn prune_keys(v: &mut serde_json::Value, keys: &[&str]) {
+    use serde_json::Value;
+    match v {
+        Value::Object(map) => {
+            for val in map.values_mut() {
+                prune_keys(val, keys);
+            }
+            for k in keys {
+                map.remove(*k);
+            }
+        }
+        Value::Array(arr) => {
+            for x in arr {
+                prune_keys(x, keys);
+            }
+        }
+        _ => {}
+    }
 }
 
 fn convert_get_to_ctx(js_expr: &str) -> String {
@@ -158,13 +180,21 @@ pub fn xtaskify(configuration_path: PathBuf, export_path: PathBuf) -> Result<Str
     // 4) Convert to Value, drop nulls/empties
     let mut val = sj::to_value(&tasks).map_err(|e| format!("Serialize to Value failed: {e}"))?;
     drop_nulls_and_empty(&mut val);
+    prune_keys(&mut val, &["priority"]);
+
+    // Rehydrate into strongly-typed tasks so `write_tasks_js` can work unchanged
+    let tasks_clean: TaskJsonInput = serde_json::from_value(val)
+        .map_err(|e| format!("Failed to rehydrate cleaned tasks: {e}"))?;
 
     // 5) Produce JS module
     // 4) Build JS module source with appliesIf as a real function
-    let js = write_tasks_js(&tasks)?;
-
+    let js = write_tasks_js(&tasks_clean)?;
+    //replace all " by ' in js
+    let js = js.replace("\"", "'");
+    let js = js.replace("'modifyContent': null,", "");
     // 5) Write to file
     let out = export_path.join("tasks.js");
+
     std::fs::write(&out, js).map_err(|e| format!("Failed to write {}: {}", out.display(), e))?;
     Ok(out.display().to_string())
 }

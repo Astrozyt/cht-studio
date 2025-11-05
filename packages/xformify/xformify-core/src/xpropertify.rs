@@ -14,11 +14,15 @@ use std::path::PathBuf;
 
 // use anyhow::Ok;
 
-use crate::{json_to_xform, Form};
+use crate::{ContactFormEntry, ContactForms, Form, json_to_xform};
 
 // use std::result::Result::Ok;
 
-pub fn x_all_forms(source_dir: PathBuf, export_dir: PathBuf) -> Result<String, String> {
+pub fn x_all_forms(
+    source_dir: PathBuf,
+    export_dir: PathBuf,
+    is_contact_forms: bool,
+) -> Result<String, String> {
     std::fs::create_dir_all(&export_dir).map_err(|e| {
         format!(
             "Failed to create export dir {}: {}",
@@ -26,6 +30,10 @@ pub fn x_all_forms(source_dir: PathBuf, export_dir: PathBuf) -> Result<String, S
             e
         )
     })?;
+
+    let mut contact_forms: ContactForms = ContactForms {
+        contact_forms: vec![],
+    };
 
     let entries = std::fs::read_dir(&source_dir)
         .map_err(|e| format!("Failed to read {}: {}", source_dir.display(), e))?;
@@ -62,13 +70,20 @@ pub fn x_all_forms(source_dir: PathBuf, export_dir: PathBuf) -> Result<String, S
         });
 
         let xml_id = form.title.replace(' ', "_").to_lowercase();
-        let xform_xml = match json_to_xform(&xml_id, &form) {
+        let xform_xml = match json_to_xform(&xml_id, &form, is_contact_forms) {
             Ok(x) => x,
             Err(e) => {
                 eprintln!("json_to_xform failed for {}: {}", path.display(), e);
                 continue;
             }
         };
+
+        if is_contact_forms {
+        contact_forms.contact_forms.push(ContactFormEntry {
+            create: "form:contact:".to_string() + &xml_id.clone(),
+            edit: "form:contact:".to_string() + &xml_id.clone(),
+        });
+        }
         std::fs::write(&export_dir.join(&xml_id).with_extension("xml"), &xform_xml)
             .map_err(|e| format!("Failed to write XForm file {}: {}", export_dir.display(), e))?;
 
@@ -84,7 +99,25 @@ pub fn x_all_forms(source_dir: PathBuf, export_dir: PathBuf) -> Result<String, S
             )
         })?;
     }
-    Ok("".to_string())
+    let formlist = serde_json::to_string_pretty(&contact_forms)
+        .map_err(|e| format!("Failed to serialize contact forms: {}", e))?;
+    //     )
+    // if is_contact_forms {
+    //     let contact_forms_path = export_dir.join("contact_forms.json");
+    //     std::fs::write(
+    //         &contact_forms_path,
+    //         serde_json::to_string_pretty(&contact_forms)
+    //             .map_err(|e| format!("Failed to serialize contact forms: {}", e))?,
+    //     )
+    //     .map_err(|e| {
+    //         format!(
+    //             "Failed to write contact forms file {}: {}",
+    //             contact_forms_path.display(),
+    //             e
+    //         )
+    //     })?;
+    // }
+    Ok(formlist)
 }
 
 // pub fn xpropertify(

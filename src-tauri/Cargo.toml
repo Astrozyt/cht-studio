@@ -29,6 +29,7 @@ serde_json = "1"
 xform_to_xml = {path="../packages/xform_to_xml" }
 xformify-core = {path="../packages/xformify/xformify-core"}
 tauri-plugin-sql = {version = "2", features = ["sqlite"] }
+# rusqlite = { version = "0.31", features = ["bundled"] }
 
 
 

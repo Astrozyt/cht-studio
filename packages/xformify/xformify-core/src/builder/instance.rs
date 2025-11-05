@@ -9,12 +9,24 @@ pub fn write_instance<W: Write>(
     w: &mut Writer<W>,
     root_id: &str,
     nodes: &[Node],
+    is_contact_forms: bool,
 ) -> anyhow::Result<()> {
+    let sanitized_root_id = if (is_contact_forms) {
+        format!("contact:{}", root_id)
+    } else {
+        root_id.to_string()
+    };
     start_elem(w, "instance", &[])?;
-    start_elem(w, "data", &[("id", root_id), ("version", "1")])?;
+    start_elem(w, "data", &[("id", &sanitized_root_id), ("version", "1")])?;
     for n in nodes {
         write_node(w, n)?;
     }
+
+    //Write <meta><instanceID/></meta><dataID/></meta>
+    start_elem(w, "meta", &[])?;
+    let e = BytesStart::new("instanceID");
+    w.write_event(Event::Empty(e))?;
+    end_elem(w, "meta")?;
     end_elem(w, "data")?;
     end_elem(w, "instance")?;
     Ok(())

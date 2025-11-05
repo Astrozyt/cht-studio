@@ -1,5 +1,6 @@
 use tauri::Manager;
 use xformify_core::generate_contact_summary_from_json;
+use xformify_core::json_to_base_settings;
 use xformify_core::json_to_xform;
 use xformify_core::x_all_forms;
 use xformify_core::xtaskify;
@@ -93,8 +94,8 @@ fn xformify(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
     let form: xformify_core::Form =
         serde_json::from_str(&data).map_err(|e| format!("Failed to parse JSON: {}", e))?;
     let xml_id = form.title.replace(' ', "_").to_lowercase();
-    let xform =
-        json_to_xform(&xml_id, &form).map_err(|e| format!("Failed to convert to XForm: {}", e))?;
+    let xform = json_to_xform(&xml_id, &form, false)
+        .map_err(|e| format!("Failed to convert to XForm: {}", e))?;
     // Save the generated XForm XML to a file
     let xform_path = path.with_extension("xml");
     std::fs::write(&xform_path, &xform)
@@ -115,22 +116,35 @@ fn xformify2(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
     let app_export_dir = base_dir.join(rel_path).join("export/forms/app");
     let contact_export_dir = base_dir.join(rel_path).join("export/forms/contact");
 
+    std::fs::write(base_dir.join(rel_path).join("export/.eslintrc"), "")
+        .map_err(|e| format!("Failed to write .eslintrc: {}", e))?;
+    std::fs::write(
+        base_dir.join(rel_path).join("export/targets.js"),
+        "module.exports = [];",
+    )
+    .map_err(|e| format!("Failed to write targets.js: {}", e))?;
+
     // Create app forms for export
-    let _appformresult = match x_all_forms(app_forms_dir, app_export_dir) {
+    let _appformresult = match x_all_forms(app_forms_dir, app_export_dir, false) {
         Ok(result) => result,
         Err(e) => {
             eprintln!("Error processing app forms: {}", e);
             return Err(e);
         }
     };
+
     // Create contact forms for export
-    let _contactformresult = match x_all_forms(contact_forms_dir, contact_export_dir) {
+    let contactformresult = match x_all_forms(contact_forms_dir, contact_export_dir, true) {
         Ok(result) => result,
         Err(e) => {
             eprintln!("Error processing contact forms: {}", e);
             return Err(e);
         }
     };
+    println!("CONTACTF: {}", contactformresult);
+
+    let cfres = std::fs::write(base_dir.join(rel_path).join("export/forms").with_extension("json"), serde_json::to_string_pretty(&contactformresult).map_err(|e| format!("Failed to serialize contact forms: {}", e))?);
+    println!("{:?}", cfres);
     // Generate task.js
     let _ = match xtaskify(
         base_dir.join(rel_path).join("configuration/tasks.json"),
@@ -155,6 +169,16 @@ fn xformify2(app: tauri::AppHandle, rel_path: &str) -> Result<String, String> {
         Err(e) => eprintln!("contact-summary generation skipped: {}", e),
     }
     // Generate app_settings.json
+    let _ = match json_to_base_settings(
+        base_dir.join(rel_path),
+        base_dir.join(rel_path).join("export/app_settings"),
+    ) {
+        Ok(result) => result,
+        Err(e) => {
+            eprintln!("Error generating app_settings.json: {}", e);
+            return Err(e);
+        }
+    };
     // Copy assets
     // export
     // outside: run/upload with CLI
